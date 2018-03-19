@@ -1,0 +1,59 @@
+TITLE:: MidiPacker
+summary:: contains a class that packs an unpacks packed midi data (used to interpret sysex dumps)
+categories:: Midi Utils
+related:: Classes/ScProphetRev2
+
+DESCRIPTION::
+MidiPacker provides methods to pack and/or convert a 7-bit packed midi bytestream into/from an 8-bit
+midi bytestream as is typically needed to interpret sysex bytestreams.
+
+
+CLASSMETHODS::
+
+METHOD:: new
+creates a new instance of a MidiPacker
+
+returns:: MidiPacker
+
+
+INSTANCEMETHODS::
+
+METHOD:: midi_pack
+
+midi_pack takes a list of 8-bit numbers and turns them into a "packed" list of 7-bit numbers.
+This is useful because in MIDI the MSB is used to indicate the start of a command, so all data
+needs to be converted to a representation that uses at most 7 bits.
+
+ARGUMENT:: list_of_num
+a supercollider List of 8-bit numbers
+
+returns:: a (longer) supercollider List of 7-bit numbers
+
+METHOD:: midi_unpack
+midi_unpack takes a list of 7-bit numbers and turns them back into an "unpacked" list of 8-bit numbers.
+
+ARGUMENT:: bytes
+a list of 7-bit numbers
+
+returns:: a (shorter) list of 8-bit numbers
+
+
+EXAMPLES::
+
+code::
+(
+m = MidiPacker.new;
+m.midi_pack([255, 167, 230]);
+)
+::
+
+gives [112, 127, 39, 102]
+
+code::
+(
+m = MidiPacker.new;
+m.midi_unpack([112, 127, 39, 102]);
+)
+::
+
+gives [255, 167, 230]

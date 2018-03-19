@@ -1,0 +1,51 @@
+TITLE:: PatchRandomizer
+summary:: randomize a list of parameters in a given patch
+categories:: Utils
+related:: Classes/PatchMorpher, Classes/ScProphetRev2
+
+DESCRIPTION::
+takes a begin patch and randomizes a subset of its parameters (chosen by user)
+
+
+CLASSMETHODS::
+
+METHOD:: new
+returns a new PatchRandomizer
+
+ARGUMENT:: startpatch
+an ScProphetRev2.rev2 that is initialized by calling ScProphetRev2.get_patch_from_synth
+
+ARGUMENT:: nlist
+list of NRPN numbers to randomize
+
+ARGUMENT:: hwsynth
+a ScProphetRev2 instance
+
+returns:: a new PatchRandomizer
+
+
+INSTANCEMETHODS::
+
+METHOD:: randomize
+randomize the list of NRPN numbers passed to new
+
+returns:: hw synth is initialized with randomized values
+
+EXAMPLES::
+
+code::
+// every 5 seconds, randomize all NRPNs from 0 to 169 (warning: this range contains a few seemingly unused NRPNs)
+(
+~synth = ScProphetRev2.new;
+~synth.connect;
+fork {
+	inf.do({
+		~synth.get_patch_from_synth(4, 4, {
+			var ran = PatchRandomizer.new(~synth.rev2, (0..169), ~synth);
+			ran.randomize();
+		});
+		5.wait;
+	});
+};
+)
+::

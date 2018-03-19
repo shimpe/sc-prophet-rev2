@@ -1,0 +1,93 @@
+TITLE:: PatchMorpher
+summary:: finds intermediate patches in between two patches
+categories:: Utils
+related:: Classes/ScProphetRev2, Classes/PatchRandomizer
+
+DESCRIPTION::
+PatchMorpher takes two initialized ScProphetRev2.rev2 instances and tries to blend them into a new patch.
+
+CLASSMETHODS::
+
+METHOD:: new
+returns a new PatchMorpher
+
+ARGUMENT:: patchlist
+A list of 2 ScProphetRev2.rev2 that were initialize from different patches.
+
+ARGUMENT:: nrpnlist
+A list of NRPNs we want to change
+
+ARGUMENT:: hwsynth
+an instance of the ScProphetRev2.rev2 internal datastructure
+
+returns:: a new PatchMorpher
+
+
+INSTANCEMETHODS::
+
+
+METHOD:: morph
+This function calculates the blended version of the two given patches.
+
+ARGUMENT:: fromfactor
+Setting fromfactor to 0 yields a 100% sound of the first patch in the patch list
+Setting fromfactor to 1 yields a 100% sound of the second patch in the patch list
+
+ARGUMENT:: tofactor
+Setting tofactor to 0 yields a 100% sound of the first patch in the patch list
+Setting tofactor to 1 yields a 100% sound of the second patch in the patch list
+
+ARGUMENT:: dur_seconds
+Says how long the morphing process should run.
+
+ARGUMENT:: steps_per_second
+Says the resolution with which the parameters are updated.
+
+ARGUMENT:: channel
+Midi channel
+
+returns:: this
+
+METHOD:: init
+(describe method here)
+
+ARGUMENT:: plist
+list of initialized ScProphetRev2.rev2
+
+ARGUMENT:: nlist
+list of NPRN numbers that need to be morphed
+
+ARGUMENT:: hwsynth
+a connected Sc2ProphetRev2 instance
+
+returns:: (describe returnvalue here)
+
+
+EXAMPLES::
+
+code::
+(
+// morph from F1, P5 to F1, P6 over the course of 20 seconds
+var parser = TheoryNoteParser.new;
+
+~synth = ScProphetRev2.new;
+~synth.connect;
+
+fork {
+	var duration = 20;
+	~synth.get_patch_from_synth(4, 4,
+		{ ~patch1 = ~synth.rev2.copy();
+			~synth.get_patch_from_synth(4, 5, {
+				~patch2 = ~synth.rev2.copy();
+			});
+	});
+	10.wait;
+	~patch1.postln;
+	~patch2.postln;
+	~morpher = PatchMorpher.new([~patch1, ~patch2], (0..169), ~synth);
+	~morpher.morph(0, 1, duration, 1);
+	duration.wait;
+}
+
+)
+::

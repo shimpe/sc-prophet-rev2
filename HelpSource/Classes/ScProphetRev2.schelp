@@ -1,0 +1,157 @@
+TITLE:: ScProphetRev2
+summary:: class to talk to DSI Prophet Rev2 hardware synthesizer
+categories:: Utils
+related:: Classes/PatchMorpher, Classes/PatchRandomizer
+
+DESCRIPTION::
+ScProphetRev2 provides a way to talk to a Dave Smith Instruments Prophet Rev2 hardware synthesizer. Presets can be downloaded from the synth into supercollider and displayed in a text report. Notes and control signals (via NRPN messages) can be sent to the synth to generate sound and modify the
+parameters from supercollider.
+
+
+CLASSMETHODS::
+
+METHOD:: new
+creates a new instance of ScProphetRev, a class to communicate with a DSI rev2 synth.
+
+returns:: ScProphetRev2
+
+
+INSTANCEMETHODS::
+
+METHOD:: midi_out
+midi_out is an instance variable that contains the midi out device.
+It can be used in conjunction with supercollider patterns. midi_out is
+not initialized until you call "connect".
+
+returns:: a MIDIOut
+
+METHOD:: connect
+Before we can talk to the HW synth, first contact needs to be established.
+Connect will do that.
+
+ARGUMENT:: name
+
+returns:: a connected ScProphetRev2
+
+METHOD:: rev2
+rev2 is an instance variable that contains the current state of the synth.
+After calling get_patch_from_synth, rev2 contains the current value for all known parameters.
+This is done by parsing the sysex response from the synth.
+
+returns:: a Dictionary from NPRN -> some properties of the parameter (things like name, layer, ...)
+
+METHOD:: sendNRPN
+This method allows one to send NRPNs to the synth. NRPNs are non-registered midi parameter numbers. They
+allow for controlling the synth parameters.
+
+ARGUMENT:: number
+Number of NRPN control to address.
+
+ARGUMENT:: value
+Value to be sent to the NRPN control
+
+ARGUMENT:: channel
+midi channel
+
+ARGUMENT:: verbose
+if true, print some extra documentation will be printed
+
+returns:: (describe returnvalue here)
+
+
+METHOD:: get_patch_from_synth
+Method to upload a patch from the synth to supercollider.
+
+ARGUMENT:: bank
+A number from 0-7. (0=U1, 1=U2, 2=U2, 3=U3, 4=F1, 5=F2, 6=F3, 7=F4)
+
+ARGUMENT:: program
+A number from 0-127 (patch number)
+
+ARGUMENT:: completionHandler
+Do something when upload is complete
+
+returns:: ScProphetRev2
+
+
+METHOD:: patch_explainer
+Display last downloaded patch in a text report.
+
+returns:: list of strings
+
+
+METHOD:: makeNRPNResponder
+creates a CCResponder that can react to all incoming rev2 NRPN messages.
+
+ARGUMENT:: parmnum
+If not set to nil, parmnum will only react to a given NRPN message.
+If set to nil, parmnum will cause the system to all possible received NRPN messages.
+
+ARGUMENT:: action
+function to be executed when the CCResponder is triggered.
+
+EXAMPLES::
+
+code::
+// reverse engineer patch from bank F2, program P2
+// banks are numbered 0=U1, 1=U2, 2=U3, 3=U4, 4=F1, 5=F2, 6=F3, 7=F4
+// patches are numbered 0=P1 to 127=P128
+(
+~synth = ScProphetRev2.new;
+~synth.connect;
+~synth.get_patch_from_synth(5, 1, { ~synth.patch_explainer.join("\n").postln; });
+)
+::
+
+code::
+// play notes and automate cutoff and slop from supercollider patterns
+(
+var arpeggio, cutoff, slop, jointpattern;
+var player;
+var parser = TheoryNoteParser.new; // this class is defined in the TheoryQuark
+~synth = ScProphetRev2.new;
+~synth.connect;
+
+arpeggio = Pbind(
+	\type, \midi,
+	\midicmd, \noteOn,
+	\midiout, ~synth.midi_out,
+	\chan, 1,
+	\midinote, Pseq([
+		Pseq(parser.asMidi("c2 e2 g2 b2 c3 b2 g2 e2")+24, 4),
+		Pseq(parser.asMidi("d2 e2 g2 b2 d3 b2 g2 d2")+24, 4),
+	], inf),
+	\dur, Pseq([0.1],inf),
+	\amp, Pbrown(0.3, 0.6, 0.05, inf),
+);
+
+cutoff = Pbind(
+	\instrument, \default,
+	\amp, 0,
+    \number, 15,
+	\value, Pseq([Pseries(20, 1, length:107),
+	              Pseries(127, 1.neg, length:107)], inf).trace,
+	\dur, 0.05,
+	\channel, 1,
+	\receiver, Pfunc({ | event | ~synth.sendNRPN(event[\number], event[\value], event[\channel])}),
+);
+
+slop = Pbind(
+	\instrument, \default,
+	\amp, 0,
+	\number, 12,
+	\value, Pseq([Pseries(0, 1, length:50),
+	              Pseries(50, 1.neg, length:50)], inf).trace,
+	\dur, 0.1,
+	\channel, 1,
+	\receiver, Pfunc({ | event | ~synth.sendNRPN(event[\number], event[\value], event[\channel])}),
+);
+
+
+jointpattern = Ppar([arpeggio, cutoff, slop], inf);
+~player = jointpattern.play;
+)
+
+~player.stop;
+
+::
