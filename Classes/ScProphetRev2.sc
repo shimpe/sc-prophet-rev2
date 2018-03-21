@@ -4303,6 +4303,52 @@ ScProphetRev2 {
 		^"!!";
 	}
 
+	select_bank {
+		| bank, channel = 1 |
+		bank = bank.asInteger;
+		if (bank < 0) {
+			bank = 0;
+		} /*else*/ {
+			if (bank > 7) {
+				bank = 7;
+			};
+		};
+		this.midi_out.control(channel, 16r20, bank);
+	}
+
+	select_patch_on_current_bank {
+		| patch, channel=1 |
+		patch = patch.asInteger;
+		if (patch < 0) {
+			patch = 0;
+		} /* else */ {
+			if (patch > 127) {
+				patch = 127;
+			};
+		};
+		this.midi_out.program(channel, patch);
+	}
+
+	select_bank_patch {
+		| bank, patch, channel = 1|
+		this.select_bank(bank);
+		this.select_patch_on_current_bank(patch);
+	}
+
+	select_patch_by_id {
+		| bank = "F2", name="P2", channel = 1|
+		var offset = 0;
+		var split = bank.splitNumbers;
+		var bankname = split[0];
+		var banknumber = split[1].asInteger - 1;
+		var patchnumber = name.splitNumbers[1].asInteger - 1;
+		if (bankname.compare("F", ignoreCase:true)==0) {
+			offset = 4;
+		};
+		this.select_bank_patch(banknumber+offset, patchnumber, channel);
+
+	}
+
 	get_patch_from_synth {
 		| bank = 0, program = 0, completionHandler = nil |
 		var sysex_data = nil;
