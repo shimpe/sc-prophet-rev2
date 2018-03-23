@@ -4349,6 +4349,11 @@ ScProphetRev2 {
 
 	}
 
+	all_notes_off {
+		| channel = 1 |
+		this.midi_out.control(channel, 16r7B, 0);
+	}
+
 	get_patch_from_synth {
 		| bank = 0, program = 0, completionHandler = nil |
 		var sysex_data = nil;
