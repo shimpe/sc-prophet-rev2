@@ -979,6 +979,7 @@ NrpnTable {
 			'SEQ1_POLY_NOTE6_VEL62' : 1041,
 			'SEQ1_POLY_NOTE6_VEL63' : 1042,
 			'SEQ1_POLY_NOTE6_VEL64' : 1043,
+			'SEQ_PLAY_STOP' : 1088,
 
 			'MASTERTUNE_COURSE' : 4097,
 			'MASTERTUNE_FINE' : 4096,
@@ -1003,6 +1004,8 @@ NrpnTable {
 			'SCREENSAVER' : 4120,
 			'SUSTAIN_ARP' : 4121,
 			'LAYER A/B SWITCH' : 4190,
+
+			'SEQ_REC_ONOFF' : 16383,
 		]);
 
 		num2string = IdentityDictionary.new;
@@ -1019,7 +1022,7 @@ NrpnTable {
 
 		var offset = 0;
 		if (this.string2num[name].isNil) {
-			"ouch".postln;
+			("ouch: name "++name++" is not known").postln;
 			^nil;
 		};
 
