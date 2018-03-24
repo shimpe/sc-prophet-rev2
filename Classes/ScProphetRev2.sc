@@ -2059,6 +2059,11 @@ ScProphetRev2 {
 			3090 : (\layer:"B", \min:128, \max:255, \name:"Seq Step 1-64 Velocity 6 (step 63)", \sysexpos:2046),
 			1043 : (\layer:"A", \min:128, \max:255, \name:"Seq Step 1-64 Velocity 6 (step 64)", \sysexpos:1023),
 			3091 : (\layer:"B", \min:128, \max:255, \name:"Seq Step 1-64 Velocity 6 (step 64)", \sysexpos:2047),
+
+			1088 : (\layer:"A", \min:0, \max:1, \name:"Seq Play/Stop"),
+			//3136 : (\layer:"B", \min:0, \max:1, \name:"Seq Play/Stop"), //???
+			16383: (\layer:"A", \min:0, \max:1, \name:"Seq Rec On/Off"),
+
 			// the following NRPNs are fake, just to give the characters a place to live in the data structure
 			// you cannot send/receive them by NRPN, only by sysex
 			20000 : (\layer:"A", \min:0, \max:87, \name:"Layer A char 1", \sysexpos:235),
@@ -4354,6 +4359,51 @@ ScProphetRev2 {
 		this.midi_out.control(channel, 16r7B, 0);
 	}
 
+	get_software_version {
+		| completionHandler=nil |
+		var sysex_data = nil;
+		var cSTART_SYSEX = 16rF0;
+		var cNRT_MSG = 16r7E;
+		var cREQ_CHANNEL = 16r7F;
+		var cREQ_INQUIRY_MSG = 16r06;
+		var cREQ_INQUIRY_REQ = 16r01;
+		var cEOX = 16rF7;
+
+		MIDIIn.sysex = {
+			| uid, data |
+			var cSYSEX_HEADER = 1; // length in bytes
+			var cNRT_MSG = 1;
+			var cCHANNEL = 1;
+			var cINQUIRY_MSG = 1;
+			var cINQUIRY_REPLY = 1;
+			var cDSI_ID = 1;
+			var cREV2_ID = 1;
+			var cFAMILY_MS = 1;
+			var cFAMILY_MEMBER_LS = 1;
+			var cFAMILY_MEMBER_MS = 1;
+			var cEOX = 1;
+			var actual_data;
+			var sysex_raw_data;
+			var minorversion, majorversion;
+			data.postln;
+			sysex_raw_data = data.drop(cSYSEX_HEADER + cNRT_MSG + cCHANNEL + cINQUIRY_MSG + cINQUIRY_REPLY +
+				cDSI_ID + cREV2_ID + cFAMILY_MS + cFAMILY_MEMBER_LS + cFAMILY_MEMBER_MS).drop(cEOX.neg);
+			MIDIIn.sysex = {};
+
+			if (completionHandler.notNil) {
+				completionHandler.(sysex_raw_data);
+			} /* else */ {
+				sysex_raw_data.postln;
+			};
+		};
+		if (this.midi_out.notNil) {
+			this.midi_out.sysex(Int8Array.newFrom([cSTART_SYSEX, cNRT_MSG, cREQ_CHANNEL, cREQ_INQUIRY_MSG, cREQ_INQUIRY_REQ, cEOX]));
+		} {
+			"WARNING: cannot send commands to synth because not connected yet.".postln;
+			"WARNING: Call connect first.".postln;
+		};
+	}
+
 	get_patch_from_synth {
 		| bank = 0, program = 0, completionHandler = nil |
 		var sysex_data = nil;
@@ -4361,7 +4411,7 @@ ScProphetRev2 {
 		var cDSI_ID = 16r01;
 		var cREV2_ID = 16r2F;
 		var cREQ_PRG_TRANSMIT = 16r05;
-		var cEOX = 16rFE;
+		var cEOX = 16rF7;
 
 		MIDIIn.sysex = {
 			| uid, data |
@@ -4406,6 +4456,57 @@ ScProphetRev2 {
 
 		if (midi_out.notNil) {
 			midi_out.sysex(Int8Array.newFrom([cSTART_SYSEX, cDSI_ID, cREV2_ID, cREQ_PRG_TRANSMIT, bank, program, cEOX]));
+		} {
+			"WARNING: cannot send commands to synth because not connected yet.".postln;
+			"WARNING: Call connect first.".postln;
+		};
+	}
+
+	get_current_patch_state {
+		| completionHandler=nil |
+		var sysex_data = nil;
+		var cSTART_SYSEX = 16rF0;
+		var cDSI_ID = 16r01;
+		var cREV2_ID = 16r2F;
+		var cREQ_STATE_TRANSMIT = 16r06;
+		var cEOX = 16rF7;
+
+		MIDIIn.sysex = {
+			| uid, data |
+			var cSYSEX_HEADER = 1; // length in bytes
+			var cDSI_ID = 1;
+			var cREV2_ID = 1;
+			var cSTATE_DATA = 1;
+			var cEOX = 1;
+			var actual_data;
+			var sysex_raw_data;
+			var sysex_unpacked;
+			sysex_raw_data = data.drop(cSYSEX_HEADER + cDSI_ID + cREV2_ID + cSTATE_DATA).drop(cEOX.neg);
+			sysex_unpacked = this.util.midi_unpack(sysex_raw_data);
+			sysex_unpacked.do({
+				| el, idx |
+				if ((this.sysex_bytepos[idx][\key].isNil) || (this.sysex_bytepos[idx][\key] != 1.neg)) {
+					if (sysex_bytepos[idx][\nrpn].isNil) {
+					} /* else */ {
+						var ev = (this.rev2[(this.sysex_bytepos[idx][\nrpn])]).copy();
+						ev[\curval] = el.copy();
+						this.rev2[(this.sysex_bytepos[idx][\nrpn])] = ev;
+
+					};
+				} /* else */ {
+					//("byte "++el++" at idx "++idx++" has no known meaning.").postln;
+				};
+			});
+
+			MIDIIn.sysex = {};
+
+			if (completionHandler.notNil) {
+				completionHandler.();
+			};
+		};
+
+		if (midi_out.notNil) {
+			midi_out.sysex(Int8Array.newFrom([cSTART_SYSEX, cDSI_ID, cREV2_ID, cREQ_STATE_TRANSMIT, cEOX]));
 		} {
 			"WARNING: cannot send commands to synth because not connected yet.".postln;
 			"WARNING: Call connect first.".postln;
