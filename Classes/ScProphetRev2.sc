@@ -32,6 +32,7 @@ ScProphetRev2 {
 	var <>sequencer_mode;
 	var <>sequencer_type;
 	var <>pan_mode;
+	var <>foot_assign;
 	var <>layer_mode;
 	var <>tunings;
 	var <>pressure_curve;
@@ -40,6 +41,7 @@ ScProphetRev2 {
 	var <>rev2_nrpn;
 	var <>rev2_nrpn_globals;
 	var <>sysex_bytepos;
+	var <>global_sysex_bytepos;
 	var <>util;
 
 	*new {
@@ -114,6 +116,7 @@ ScProphetRev2 {
 		this.sequencer_mode = ["Normal", "NoReset", "NoGate", "NoGateReset", "KeyStep"];
 		this.sequencer_type = ["Gated", "Poly"];
 		this.pan_mode = ["Alternate", "Fixed"];
+		this.foot_assign = ["Breath CC2", "Foot CC4", "Exp CC11", "Volume", "LPF Full", "LPF Half"];
 		this.layer_mode = ["Layer A", "Split A/B", "Stack A/B"];
 		this.tunings = ["12-tone ET", "Harmonic series", "Carlos Harmonic 12 tone", "Meantone", "Quarter tone ET",
 			"19 tone ET", "31 tone ET", "Pythagorean C", "Just Intonation in A with 7-limit tritone at D#",
@@ -2110,28 +2113,29 @@ ScProphetRev2 {
 			22067 : (\layer:"B", \min:0, \max:87, \name:"Layer B char 20", \sysexpos:1278),
 		]);
 		this.rev2_nrpn_globals = Dictionary.newFrom([
-			4097 : (\layer: "GLOBAL", \min:0, \max:24, \name:"Master Coarse Tune", \sysexpos:2.neg),
-			4096 : (\layer: "GLOBAL", \min:0, \max:50, \name:"Master Fine Tune", \sysexpos:0),
-			4098 : (\layer: "GLOBAL", \min:0, \max:16, \name:"MIDI Channel", \hint:this.midi_channel, \sysexpos:1),
-			4099 : (\layer: "GLOBAL", \min:0, \max:4, \name:"MIDI Clock Mode", \hint:this.midi_clock_mode, \sysexpos:2),
-			4100 : (\layer: "GLOBAL", \min:0, \max:1, \name:"MIDI Clock Cable", \hint:this.midi_clock_cable, \sysexpos:3),
-			4101 : (\layer: "GLOBAL", \min:0, \max:2, \name:"MIDI Param Send", \hint:this.midi_param_sendrecv, \sysexpos:4),
-			4102 : (\layer: "GLOBAL", \min:0, \max:2, \name:"MIDI Param Receive", \hint:this.midi_param_sendrecv, \sysexpos:5),
-			4103 : (\layer: "GLOBAL", \min:0, \max:1, \name:"MIDI Control Enable", \hint:this.off_on, \sysexpos:6),
-			4104 : (\layer: "GLOBAL", \min:0, \max:1, \name:"MIDI SysEx Cable", \hint:this.midi_usb, \sysexpos:13.neg),
-			4105 : (\layer: "GLOBAL", \min:0, \max:2, \name:"MIDI Out Select", \hint:this.midi_out_select, \sysexpos:7),
-			4107 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Local Control", \hint:this.off_on, \sysexpos:10),
-			4109 : (\layer: "GLOBAL", \min:0, \max:2, \name:"Pot Mode", \hint:this.pot_mode, \sysexpos:12),
-			4111 : (\layer: "GLOBAL", \min:0, \max:3, \name:"Seq Pedal Mode", \hint:this.seq_pedal_mode, \sysexpos:11),
-			4112 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Sustain Polarity", \hint:this.sustain_polarity,\sysexpos:13),
-			4113 : (\layer: "GLOBAL", \min:0, \max:7, \name:"Velocity Curve", \hint:this.velocity_curve,\sysexpos:14),
-			4114 : (\layer: "GLOBAL", \min:0, \max:7, \name:"Pressure Curve", \hint:this.pressure_curve,\sysexpos:15),
-			4115 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Mono/Stereo", \hint:this.stereo_mono,\sysexpos:16),
-			4116 : (\layer: "GLOBAL", \min:0, \max:16, \name:"Alt. Tunings", \hint:this.tunings,\sysexpos:16.neg),
-			4118 : (\layer: "GLOBAL", \min:0, \max:1, \name:"MIDI Prog Enable", \hint:this.off_on,\sysexpos:19),
-			4119 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Multi Mode", \hint:this.off_on,\sysexpos:18),
-			4120 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Screen Saver", \hint:this.off_on,\sysexpos:17),
-			4121 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Sustain/Arp",\hint:this.arp_sustain, \sysexpos:20),
+			4097 : (\layer: "GLOBAL", \min:0, \max:24, \name:"Master Coarse Tune", \sysexpos:0),
+			4096 : (\layer: "GLOBAL", \min:0, \max:50, \name:"Master Fine Tune", \sysexpos:1),
+			4098 : (\layer: "GLOBAL", \min:0, \max:16, \name:"MIDI Channel", \hint:this.midi_channel, \sysexpos:2),
+			4099 : (\layer: "GLOBAL", \min:0, \max:4, \name:"MIDI Clock Mode", \hint:this.midi_clock_mode, \sysexpos:3),
+			4100 : (\layer: "GLOBAL", \min:0, \max:1, \name:"MIDI Clock Cable", \hint:this.midi_clock_cable, \sysexpos:4),
+			4101 : (\layer: "GLOBAL", \min:0, \max:2, \name:"MIDI Param Send", \hint:this.midi_param_sendrecv, \sysexpos:5),
+			4102 : (\layer: "GLOBAL", \min:0, \max:2, \name:"MIDI Param Receive", \hint:this.midi_param_sendrecv, \sysexpos:6),
+			4103 : (\layer: "GLOBAL", \min:0, \max:1, \name:"MIDI Control Enable", \hint:this.off_on, \sysexpos:7),
+			4104 : (\layer: "GLOBAL", \min:0, \max:1, \name:"MIDI SysEx Cable", \hint:this.midi_usb, \sysexpos:8),
+			4105 : (\layer: "GLOBAL", \min:0, \max:2, \name:"MIDI Out Select", \hint:this.midi_out_select, \sysexpos:9),
+			4107 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Local Control", \hint:this.off_on, \sysexpos:12),
+			4109 : (\layer: "GLOBAL", \min:0, \max:2, \name:"Pot Mode", \hint:this.pot_mode, \sysexpos:14),
+			4111 : (\layer: "GLOBAL", \min:0, \max:3, \name:"Seq Pedal Mode", \hint:this.seq_pedal_mode, \sysexpos:13),
+			4112 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Sustain Polarity", \hint:this.sustain_polarity,\sysexpos:15),
+			4113 : (\layer: "GLOBAL", \min:0, \max:7, \name:"Velocity Curve", \hint:this.velocity_curve,\sysexpos:17),
+			4114 : (\layer: "GLOBAL", \min:0, \max:7, \name:"Pressure Curve", \hint:this.pressure_curve,\sysexpos:18),
+			4115 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Mono/Stereo", \hint:this.stereo_mono,\sysexpos:19),
+			4116 : (\layer: "GLOBAL", \min:0, \max:16, \name:"Alt. Tunings", \hint:this.tunings,\sysexpos:16),
+			4118 : (\layer: "GLOBAL", \min:0, \max:1, \name:"MIDI Prog Enable", \hint:this.off_on,\sysexpos:22),
+			4119 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Multi Mode", \hint:this.off_on,\sysexpos:21),
+			4120 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Screen Saver", \hint:this.off_on,\sysexpos:20),
+			4121 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Sustain/Arp",\hint:this.arp_sustain, \sysexpos:23),
+			4122 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Foot Assign", \hint:this.foot_assign, \sysexpos:24),
 			4190 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Layer A/B Switch", \hint:this.layer_mode)]);
 		this.sysex_bytepos = Dictionary.newFrom([
 			0 : (\name:"Osc 1 Freq", \nrpn:0),
@@ -4183,6 +4187,38 @@ ScProphetRev2 {
 			1023 : (\name:"Seq Step 1-64 Velocity 6 (step 64)", \nrpn:1043),
 			2047 : (\name:"Seq Step 1-64 Velocity 6 (step 64)", \nrpn:3091),
 		]);
+		this.global_sysex_bytepos = Dictionary.newFrom([
+			0 : (\name:"Master Coarse Tune", \nrpn:4097),
+			1 : (\name:"Master Fine Tune", \nrpn:4096),
+			2 : (\name:"MIDI Channel", \nrpn:4098),
+			3 : (\name:"MIDI Clock Mode", \nrpn:4099),
+			4 : (\name:"MIDI Clock Cable", \nrpn:4100),
+			5 : (\name:"MIDI Param Send", \nrpn:4101),
+			6 : (\name:"MIDI Param Receive", \nrpn:4102),
+			7 : (\name:"MIDI Control Enable", \nrpn:4103),
+			8 : (\name:"MIDI SysEx Cable", \nrpn:4104),
+			9 : (\name:"MIDI Out Select", \nrpn:4105),
+			10: (\key:1.neg, \name:"UNKNOWN"),
+			11: (\key:1.neg, \name:"UNKNOWN"),
+			12: (\name:"Local Control", \nrpn:4107),
+			13: (\name:"Seq Pedal Mode", \nrpn:4111),
+			14: (\name:"Pot Mode", \nrpn:4109),
+			15: (\name:"Sustain Polarity", \nrpn:4112),
+			16: (\name:"Alt. Tunings", \nrpn:4116),
+			17: (\name:"Velocity Curve", \nrpn:4113),
+			18: (\name:"Pressure Curve", \nrpn:4114),
+			19: (\name:"Mono/Stereo", \nrpn:4115),
+			20: (\name:"Screen Saver", \nrpn:4120),
+			21: (\name:"Multi Mode", \nrpn:4119),
+			22: (\name:"MIDI Prog Enable", \nrpn:4118),
+			23: (\name:"Sustain/Arp", \nrpn:4121),
+			24: (\name:"Foot Assign", \nrpn:4122),
+			25: (\key:1.neg, \name:"UNKNOWN"),
+			26: (\key:1.neg, \name:"UNKNOWN"),
+			27: (\key:1.neg, \name:"UNKNOWN"),
+			28: (\key:1.neg, \name:"UNKNOWN"),
+		]);
+
 		this.rev2 = merge(this.rev2_nrpn , this.rev2_nrpn_globals, { | a, b | a } );
 	}
 
@@ -4271,13 +4307,13 @@ ScProphetRev2 {
 	}
 
 	lut {
-		| constant, offset, mask = 16rFFFFFFFF, norange = false |
+		| constant, offset=0, mask = 16rFFFFFFFF, norange = false |
 		/*
 		if (mask != -1) {
-			("constant "++constant).postln;
-			("offset "++offset).postln;
-			("mask "++mask).postln;
-			("norange "++norange).postln;
+		("constant "++constant).postln;
+		("offset "++offset).postln;
+		("mask "++mask).postln;
+		("norange "++norange).postln;
 		};
 		*/
 		if (this.rev2[constant+offset].isNil) {
@@ -4534,16 +4570,29 @@ ScProphetRev2 {
 			var sysex_raw_data;
 			var sysex_unpacked;
 			sysex_raw_data = data.drop(cSYSEX_HEADER + cDSI_ID + cREV2_ID + cSTATE_DATA).drop(cEOX.neg);
-			sysex_unpacked = this.util.midi_unpack(sysex_raw_data);
+			sysex_unpacked = sysex_raw_data; // do not unpack!
 
 			MIDIIn.sysex = {};
+
+			sysex_unpacked.do({
+				| el, idx |
+				if ((this.global_sysex_bytepos[idx][\key].isNil) || (this.global_sysex_bytepos[idx][\key] != 1.neg)) {
+					if (this.global_sysex_bytepos[idx][\nrpn].isNil) {
+						//("global_sysex_bytepos[idx] = "++this.global_sysex_bytepos[idx]++" at idx= "++idx++" has no nrpn assigned");
+					} /* else */ {
+						var ev = (this.rev2[(this.global_sysex_bytepos[idx][\nrpn])]).copy();
+						ev[\curval] = el.copy();
+						this.rev2[(this.global_sysex_bytepos[idx][\nrpn])] = ev;
+					};
+				} /* else */ {
+					//("byte "++el++" at idx "++idx++" has no known meaning.").postln;
+				};
+			});
+
 			if (completionHandler.notNil) {
 				completionHandler.();
-			} {
-				("size: " ++ (sysex_unpacked.size)).postln;
-				sysex_unpacked.postln;
-				(sysex_unpacked.collect({|e| e >> 4; })).postln;
-			};
+			}
+
 		};
 
 		if (midi_out.notNil) {
@@ -4677,6 +4726,17 @@ ScProphetRev2 {
 		var cSEQ1_POLY_NOTE1_VEL1 = 340;
 
 		var cLAYERA_CHAR1 = 20000;
+
+		var analyze_globals = {
+			var explanation = [];
+			explanation = explanation.add("GLOBALS");
+			explanation = explanation.add("*******");
+			this.rev2_nrpn_globals.keys.do({
+				|key|
+				explanation = explanation.add((this.rev2[key][\name]++" = "++this.lut(key, 0, norange:true)));
+			});
+			explanation;
+		};
 
 		var analyze_header = {
 			| offset |
@@ -4954,6 +5014,7 @@ ScProphetRev2 {
 			2048: "* Layer B analysis *"
 		]);
 
+		explanation = explanation.addAll(analyze_globals.());
 		[0, 2048].do({
 			| offset |
 			explanation = explanation.add("");
