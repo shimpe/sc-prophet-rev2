@@ -10,6 +10,7 @@ ScProphetRev2 {
 	var <>midi_channel;
 	var <>midi_param_sendrecv;
 	var <>off_on;
+	var <>arp_sustain;
 	var <>midi_usb;
 	var <>midi_out_select;
 	var <>pot_mode;
@@ -85,6 +86,7 @@ ScProphetRev2 {
 		this.midi_channel = [ "All",	"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"];
 		this.midi_param_sendrecv = ["NRPN", "CC", "Off"];
 		this.off_on = ["Off", "On"];
+		this.arp_sustain = ["Arp Hold", "Sustain"];
 		this.midi_usb = ["MIDI", "USB"];
 		this.midi_out_select = ["Off", "MIDI", "USB", "MIDI+USB"];
 		this.pot_mode = ["Relative", "PassThru", "Jump"];
@@ -2108,28 +2110,28 @@ ScProphetRev2 {
 			22067 : (\layer:"B", \min:0, \max:87, \name:"Layer B char 20", \sysexpos:1278),
 		]);
 		this.rev2_nrpn_globals = Dictionary.newFrom([
-			4097 : (\layer: "GLOBAL", \min:0, \max:24, \name:"Master Coarse Tune"),
-			4096 : (\layer: "GLOBAL", \min:0, \max:50, \name:"Master Fine Tune"),
-			4098 : (\layer: "GLOBAL", \min:0, \max:16, \name:"MIDI Channel", \hint:this.midi_channel),
-			4099 : (\layer: "GLOBAL", \min:0, \max:4, \name:"MIDI Clock Mode", \hint:this.midi_clock_mode),
-			4100 : (\layer: "GLOBAL", \min:0, \max:1, \name:"MIDI Clock Cable", \hint:this.midi_clock_cable),
-			4101 : (\layer: "GLOBAL", \min:0, \max:2, \name:"MIDI Param Send", \hint:this.midi_param_sendrecv),
-			4102 : (\layer: "GLOBAL", \min:0, \max:2, \name:"MIDI Param Receive", \hint:this.midi_param_sendrecv),
-			4103 : (\layer: "GLOBAL", \min:0, \max:1, \name:"MIDI Control Enable", \hint:this.off_on),
-			4104 : (\layer: "GLOBAL", \min:0, \max:1, \name:"MIDI SysEx Cable", \hint:this.midi_usb),
-			4105 : (\layer: "GLOBAL", \min:0, \max:2, \name:"MIDI Out Select", \hint:this.midi_out_select),
-			4107 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Local Control", \hint:this.off_on),
-			4109 : (\layer: "GLOBAL", \min:0, \max:2, \name:"Pot Mode", \hint:this.pot_mode),
-			4111 : (\layer: "GLOBAL", \min:0, \max:3, \name:"Seq Pedal Mode", \hint:this.seq_pedal_mode),
-			4112 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Sustain Polarity", \hint:this.sustain_polarity),
-			4113 : (\layer: "GLOBAL", \min:0, \max:7, \name:"Velocity Curve", \hint:this.velocity_curve),
-			4114 : (\layer: "GLOBAL", \min:0, \max:7, \name:"Pressure Curve", \hint:this.pressure_curve),
-			4115 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Mono/Stereo", \hint:this.stereo_mono),
-			4116 : (\layer: "GLOBAL", \min:0, \max:16, \name:"Alt. Tunings", \hint:this.tunings),
-			4118 : (\layer: "GLOBAL", \min:0, \max:1, \name:"MIDI Prog Enable", \hint:this.off_on),
-			4119 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Multi Mode", \hint:this.off_on),
-			4120 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Screen Saver", \hint:this.off_on),
-			4121 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Sustain/Arp"),
+			4097 : (\layer: "GLOBAL", \min:0, \max:24, \name:"Master Coarse Tune", \sysexpos:2.neg),
+			4096 : (\layer: "GLOBAL", \min:0, \max:50, \name:"Master Fine Tune", \sysexpos:0),
+			4098 : (\layer: "GLOBAL", \min:0, \max:16, \name:"MIDI Channel", \hint:this.midi_channel, \sysexpos:1),
+			4099 : (\layer: "GLOBAL", \min:0, \max:4, \name:"MIDI Clock Mode", \hint:this.midi_clock_mode, \sysexpos:2),
+			4100 : (\layer: "GLOBAL", \min:0, \max:1, \name:"MIDI Clock Cable", \hint:this.midi_clock_cable, \sysexpos:3),
+			4101 : (\layer: "GLOBAL", \min:0, \max:2, \name:"MIDI Param Send", \hint:this.midi_param_sendrecv, \sysexpos:4),
+			4102 : (\layer: "GLOBAL", \min:0, \max:2, \name:"MIDI Param Receive", \hint:this.midi_param_sendrecv, \sysexpos:5),
+			4103 : (\layer: "GLOBAL", \min:0, \max:1, \name:"MIDI Control Enable", \hint:this.off_on, \sysexpos:6),
+			4104 : (\layer: "GLOBAL", \min:0, \max:1, \name:"MIDI SysEx Cable", \hint:this.midi_usb, \sysexpos:13.neg),
+			4105 : (\layer: "GLOBAL", \min:0, \max:2, \name:"MIDI Out Select", \hint:this.midi_out_select, \sysexpos:7),
+			4107 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Local Control", \hint:this.off_on, \sysexpos:10),
+			4109 : (\layer: "GLOBAL", \min:0, \max:2, \name:"Pot Mode", \hint:this.pot_mode, \sysexpos:12),
+			4111 : (\layer: "GLOBAL", \min:0, \max:3, \name:"Seq Pedal Mode", \hint:this.seq_pedal_mode, \sysexpos:11),
+			4112 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Sustain Polarity", \hint:this.sustain_polarity,\sysexpos:13),
+			4113 : (\layer: "GLOBAL", \min:0, \max:7, \name:"Velocity Curve", \hint:this.velocity_curve,\sysexpos:14),
+			4114 : (\layer: "GLOBAL", \min:0, \max:7, \name:"Pressure Curve", \hint:this.pressure_curve,\sysexpos:15),
+			4115 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Mono/Stereo", \hint:this.stereo_mono,\sysexpos:16),
+			4116 : (\layer: "GLOBAL", \min:0, \max:16, \name:"Alt. Tunings", \hint:this.tunings,\sysexpos:16.neg),
+			4118 : (\layer: "GLOBAL", \min:0, \max:1, \name:"MIDI Prog Enable", \hint:this.off_on,\sysexpos:19),
+			4119 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Multi Mode", \hint:this.off_on,\sysexpos:18),
+			4120 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Screen Saver", \hint:this.off_on,\sysexpos:17),
+			4121 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Sustain/Arp",\hint:this.arp_sustain, \sysexpos:20),
 			4190 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Layer A/B Switch", \hint:this.layer_mode)]);
 		this.sysex_bytepos = Dictionary.newFrom([
 			0 : (\name:"Osc 1 Freq", \nrpn:0),
@@ -4511,6 +4513,46 @@ ScProphetRev2 {
 			"WARNING: cannot send commands to synth because not connected yet.".postln;
 			"WARNING: Call connect first.".postln;
 		};
+	}
+
+	get_global_parameters_from_synth {
+		| completionHandler=nil |
+		var cSTART_SYSEX = 16rF0;
+		var cDSI_ID = 16r01;
+		var cREV2_ID = 16r2F;
+		var cREQ_GLOBAL_PAR = 16r0E;
+		var cEOX = 16rF7;
+
+		MIDIIn.sysex = {
+			| uid, data |
+			var cSYSEX_HEADER = 1; // length in bytes
+			var cDSI_ID = 1;
+			var cREV2_ID = 1;
+			var cSTATE_DATA = 1;
+			var cEOX = 1;
+			var actual_data;
+			var sysex_raw_data;
+			var sysex_unpacked;
+			sysex_raw_data = data.drop(cSYSEX_HEADER + cDSI_ID + cREV2_ID + cSTATE_DATA).drop(cEOX.neg);
+			sysex_unpacked = this.util.midi_unpack(sysex_raw_data);
+
+			MIDIIn.sysex = {};
+			if (completionHandler.notNil) {
+				completionHandler.();
+			} {
+				("size: " ++ (sysex_unpacked.size)).postln;
+				sysex_unpacked.postln;
+				(sysex_unpacked.collect({|e| e >> 4; })).postln;
+			};
+		};
+
+		if (midi_out.notNil) {
+			midi_out.sysex(Int8Array.newFrom([cSTART_SYSEX, cDSI_ID, cREV2_ID, cREQ_GLOBAL_PAR, cEOX]));
+		} {
+			"WARNING: cannot send commands to synth because not connected yet.".postln;
+			"WARNING: Call connect first.".postln;
+		};
+
 	}
 
 	charlut {
