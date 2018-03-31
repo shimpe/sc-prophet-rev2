@@ -147,7 +147,7 @@ NrpnTable {
 			'BPM_TEMPO' : 179,
 
 			'GATED_SEQMODE' : 182,
-			'GATED_SEQPOLY' : 183,
+			'SEQ_GATEDPOLY' : 183,
 			'SEQ1_DST' : 184,
 			'SEQ2_DST' : 185,
 			'SEQ3_DST' : 186,
