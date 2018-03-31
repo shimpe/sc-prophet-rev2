@@ -12,7 +12,7 @@ PatchDumper {
 	}
 
 	lut {
-		| constant, offset=0, mask = 16rFFFFFFFF, norange = false |
+		| constant, offset=0, mask = 16rFFFFFFFF, norange = false, midivalue = false |
 		/*
 		if (mask != -1) {
 		("constant "++constant).postln;
@@ -32,22 +32,47 @@ PatchDumper {
 				^("UNKNOWN curval at idx "++(constant+offset));
 			} {
 				if (this.rev2[constant+offset][\hint].notNil) {
-					if (this.rev2[constant+offset][\hint][(this.rev2[constant+offset][\curval] & mask)].isNil) {
+					var value = this.rev2[constant+offset][\curval] & mask;
+					if (value > this.rev2[constant+offset][\max]) {
+						var closestpoweroftwo = this.rev2[constant+offset][\curval].asInt.log2.floor;
+						var mask = 2.pow(closestpoweroftwo)-1;
+						if (mask > 0) {
+							value = (this.rev2[constant+offset][\curval].asInt) & mask.asInt;
+						};
+					};
+					if (this.rev2[constant+offset][\hint][value].isNil) {
 						^("Warning: lut couldn't translate value "++(this.rev2[constant+offset][\curval] & mask)++
 							" for nrpn constant "++(constant+offset)++". Perhaps you need to specify a mask in call to lut.");
 					} {
-						^(this.rev2[constant+offset][\hint][(this.rev2[constant+offset][\curval] & mask)]);
+						^(this.rev2[constant+offset][\hint][value]);
 					}
 				} {
 					var unit = "";
+					var value = this.rev2[constant+offset][\curval].asInt;
 					if (this.rev2[constant+offset][\unit].notNil) {
 						unit = this.rev2[constant+offset][\unit];
 					};
+					if (value > this.rev2[constant+offset][\max]) {
+						var closestpoweroftwo = this.rev2[constant+offset][\curval].asInt.log2.floor;
+						var mask = 2.pow(closestpoweroftwo)-1;
+						if (mask > 0) {
+							value = (this.rev2[constant+offset][\curval].asInt) & mask.asInt;
+						};
+					};
+					if (midivalue.not) {
+						if (this.rev2[constant+offset][\signed].notNil) {
+							if (this.rev2[constant+offset][\signed]) {
+								//("BEFORE SIGN: "++value).postln;
+								value = value - (this.rev2[constant+offset][\max]/2).ceil.asInt;
+								//("AFTER SIGN: "++value++" (max is "++ this.rev2[constant+offset][\max] ++")").postln;
+							};
+						};
+					};
 					if (norange) {
-						^(this.rev2[constant+offset][\curval].asString ++ unit);
+						^(value.asString ++ unit);
 					} {
-						var percentage = this.rev2[constant+offset][\curval].linlin(this.rev2[constant+offset][\min], this.rev2[constant+offset][\max], 0, 100);
-						^(this.rev2[constant+offset][\curval].asString ++ unit ++ " ("++percentage.round(1)++"% of range)");
+						var percentage = value.linlin(this.rev2[constant+offset][\min], this.rev2[constant+offset][\max], 0, 100);
+						^(value.asString ++ unit ++ " ("++percentage.round(1)++"% of range)");
 					};
 				};
 			};
@@ -55,6 +80,23 @@ PatchDumper {
 		^"!!";
 	}
 
+	lutb {
+		// internal usage only...
+		| constant, offset=0, mask=16rFFFFFFFF, norange=false |
+		^this.lut(constant, offset+2048, mask, norange);
+	}
+
+	lutt {
+		// internal usage only...
+		| value, constant, offset=0, mask=16rFFFFFFFF, norange=false |
+		^(if (this.lut(constant, offset, mask, norange).compare(value) == 0) {"1"} {"0"});
+	}
+
+	lutbt {
+		// internal usage only...
+		| value, constant, offset=0, mask=16rFFFFFFFF, norange=false |
+		^(if (this.lutb(constant, offset, mask, norange).compare(value) == 0) {"1"} {"0"});
+	}
 
 	charlut {
 		| constant, offset |
@@ -62,7 +104,9 @@ PatchDumper {
 		if (this.rev2[constant+offset][\curval].isNil) {
 			^("UNKNOWN character at idx "++(constant+offset));
 		} {
-			^((this.rev2[constant+offset][\curval]).asAscii);
+			var code = this.rev2[constant+offset][\curval];
+			if (code < 32) { code = 32; };
+			^((code & 127).asAscii);
 		};
 	}
 
