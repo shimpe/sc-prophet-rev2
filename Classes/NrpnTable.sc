@@ -1,6 +1,7 @@
 NrpnTable {
 	var <>string2num;
 	var <>num2string;
+
 	*new {
 		^super.new.init();
 	}
@@ -103,6 +104,10 @@ NrpnTable {
 			'OSC2_SHAPEMOD' : 103,
 			'OSC2_NOTERESET' : 104,
 			'LFO1_KEYSYNC' : 105,
+			'LFO2_KEYSYNC' : 106,
+			'LFO3_KEYSYNC' : 107,
+			'LFO4_KEYSYNC' : 108,
+
 			'OSC1_SUBOSC' : 110,
 			'GLIDE' : 111,
 			'PITCHBENDRANGE' : 113,
@@ -129,7 +134,8 @@ NrpnTable {
 			'ABMODE' : 163,
 
 			'UNISON_DETUNE' : 167,
-			'UNISON_MODE' : 168,
+			'UNISON_OFFON' : 168,
+			'UNISON_MODE' : 169,
 			'KEYMODE' : 170,
 			'SPLITPOINT' : 171,
 			'ARP_OFFON' : 172,
@@ -1006,6 +1012,8 @@ NrpnTable {
 			'LAYER A/B SWITCH' : 4190,
 
 			'SEQ_REC_ONOFF' : 16383,
+
+			'cLAYERA_CHAR1' : 20000,
 		]);
 
 		num2string = IdentityDictionary.new;
