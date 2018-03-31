@@ -1,0 +1,749 @@
+\documentclass[8pt,a4paper]{extarticle}
+\usepackage[a4paper, margin=0.5in]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{mdframed}
+\usepackage{tikz}
+\usepackage{amssymb}
+\usepackage{etoolbox}
+\hypersetup{
+  colorlinks   = true, %Colours links instead of ugly boxes
+  urlcolor     = blue, %Colour for external hyperlinks
+  linkcolor    = blue, %Colour of internal links
+  citecolor   = red %Colour of citations
+}
+
+%%% begin variables
+\newcommand*{\aname}{}%
+\newcommand*{\abank}{}%
+\newcommand*{\aprogram}{}%
+\newcommand*{\aunison}{0}%
+\newcommand*{\avoices}{}%
+\newcommand*{\adetune}{}%
+\newcommand*{\afreqone}{}%
+\newcommand*{\afinetuneone}{}%
+\newcommand*{\afreqonesawone}{0}%
+\newcommand*{\afreqonetrione}{0}%
+\newcommand*{\afreqoneswtrone}{0}%
+\newcommand*{\afreqonepulseone}{0}%
+\newcommand*{\afreqoneoffone}{0}%
+\newcommand*{\ashapemodone}{}%
+\newcommand*{\asuboct}{}%
+\newcommand*{\anoise}{}%
+\newcommand*{\akeybdoneone}{0}%
+\newcommand*{\afreqtwo}{}%
+\newcommand*{\afinetunetwo}{}%
+\newcommand*{\afreqonesawtwo}{0}%
+\newcommand*{\afreqonetritwo}{0}%
+\newcommand*{\afreqoneswtrtwo}{0}%
+\newcommand*{\afreqonepulsetwo}{0}%
+\newcommand*{\afreqoneofftwo}{0}%
+\newcommand*{\ashapemodtwo}{}%
+\newcommand*{\aoscmix}{}%
+\newcommand*{\aslop}{}%
+\newcommand*{\async}{0}%
+\newcommand*{\akeybdonetwo}{0}%
+\newcommand*{\alpfcutoff}{}%
+\newcommand*{\alpfreson}{}%
+\newcommand*{\alpfenvamt}{}%
+\newcommand*{\alpfvel}{}%
+\newcommand*{\alpfkeyamt}{}%
+\newcommand*{\alpfaudiomod}{}%
+\newcommand*{\afourpole}{0}%
+\newcommand*{\alpfdelay}{}%
+\newcommand*{\alpfattack}{}%
+\newcommand*{\alpfdecay}{}%
+\newcommand*{\alpfsustain}{}%
+\newcommand*{\alpfrelease}{}%
+\newcommand*{\aamppanspread}{}%
+\newcommand*{\aampenvamt}{}%
+\newcommand*{\aampvel}{}%
+\newcommand*{\aampdelay}{}%
+\newcommand*{\aampattack}{}%
+\newcommand*{\aampdecay}{}%
+\newcommand*{\aampsustain}{}%
+\newcommand*{\aamprelease}{}%
+\newcommand*{\alfoonetri}{0}%
+\newcommand*{\alfoonesaw}{0}%
+\newcommand*{\alfoonerevsw}{0}%
+\newcommand*{\alfoonesqr}{0}%
+\newcommand*{\alfoonernd}{0}%
+\newcommand*{\alfoonefreq}{}%
+\newcommand*{\alfooneamt}{}%
+\newcommand*{\alfoonedest}{}%
+\newcommand*{\alfooneclksync}{0}%
+\newcommand*{\alfoonekeysync}{0}%
+\newcommand*{\alfotwotri}{0}%
+\newcommand*{\alfotwosaw}{0}%
+\newcommand*{\alfotworevsw}{0}%
+\newcommand*{\alfotwosqr}{0}%
+\newcommand*{\alfotwornd}{0}%
+\newcommand*{\alfotwofreq}{}%
+\newcommand*{\alfotwoamt}{}%
+\newcommand*{\alfotwodest}{}%
+\newcommand*{\alfotwoclksync}{0}%
+\newcommand*{\alfotwokeysync}{0}%
+\newcommand*{\alfothreetri}{0}%
+\newcommand*{\alfothreesaw}{0}%
+\newcommand*{\alfothreerevsw}{0}%
+\newcommand*{\alfothreesqr}{0}%
+\newcommand*{\alfothreernd}{0}%
+\newcommand*{\alfothreefreq}{}%
+\newcommand*{\alfothreeamt}{}%
+\newcommand*{\alfothreedest}{}%
+\newcommand*{\alfothreeclksync}{0}%
+\newcommand*{\alfothreekeysync}{0}%
+\newcommand*{\alfofourtri}{0}%
+\newcommand*{\alfofoursaw}{0}%
+\newcommand*{\alfofourrevsw}{0}%
+\newcommand*{\alfofoursqr}{0}%
+\newcommand*{\alfofourrnd}{0}%
+\newcommand*{\alfofourfreq}{}%
+\newcommand*{\alfofouramt}{}%
+\newcommand*{\alfofourdest}{}%
+\newcommand*{\alfofourclksync}{0}%
+\newcommand*{\alfofourkeysync}{0}%
+\newcommand*{\afxon}{0}%
+\newcommand*{\afx}{}%
+\newcommand*{\afxmix}{}%
+\newcommand*{\afxclksync}{0}%
+\newcommand*{\afxparamone}{}%
+\newcommand*{\afxparamtwo}{}%
+\newcommand*{\aarpbpm}{}%
+\newcommand*{\aarpdivide}{}%
+\newcommand*{\aarpon}{0}%
+\newcommand*{\aarpmode}{}%
+\newcommand*{\agatedtype}{0}%
+\newcommand*{\apolytype}{0}%
+\newcommand*{\aauxdest}{}%
+\newcommand*{\aauxenvamt}{}%
+\newcommand*{\aauxvel}{}%
+\newcommand*{\aauxdelay}{}%
+\newcommand*{\aauxrepeat}{0}%
+\newcommand*{\aauxattack}{}%
+\newcommand*{\aauxdecay}{}%
+\newcommand*{\aauxsustain}{}%
+\newcommand*{\aauxrelease}{}%
+\newcommand*{\amodonesrc}{}%
+\newcommand*{\amodonedst}{}%
+\newcommand*{\amodoneamt}{}%
+\newcommand*{\amodtwosrc}{}%
+\newcommand*{\amodtwodst}{}%
+\newcommand*{\amodtwoamt}{}%
+\newcommand*{\amodthreesrc}{}%
+\newcommand*{\amodthreedst}{}%
+\newcommand*{\amodthreeamt}{}%
+\newcommand*{\amodfoursrc}{}%
+\newcommand*{\amodfourdst}{}%
+\newcommand*{\amodfouramt}{}%
+\newcommand*{\amodfivesrc}{}%
+\newcommand*{\amodfivedst}{}%
+\newcommand*{\amodfiveamt}{}%
+\newcommand*{\amodsixsrc}{}%
+\newcommand*{\amodsixdst}{}%
+\newcommand*{\amodsixamt}{}%
+\newcommand*{\amodsevensrc}{}%
+\newcommand*{\amodsevendst}{}%
+\newcommand*{\amodsevenamt}{}%
+\newcommand*{\amodeightsrc}{}%
+\newcommand*{\amodeightdst}{}%
+\newcommand*{\amodeightamt}{}%
+\newcommand*{\amodwheeldst}{}%
+\newcommand*{\amodwheelamt}{}%
+\newcommand*{\abreathdst}{}%
+\newcommand*{\abreathamt}{}%
+\newcommand*{\aveldst}{}%
+\newcommand*{\avelamt}{}%
+\newcommand*{\afootdst}{}%
+\newcommand*{\afootamt}{}%
+\newcommand*{\atrkonedest}{}%
+\newcommand*{\atrkoneone}{}%
+\newcommand*{\atrkonetwo}{}%
+\newcommand*{\atrkonethree}{}%
+\newcommand*{\atrkonefour}{}%
+\newcommand*{\atrkonefive}{}%
+\newcommand*{\atrkonesix}{}%
+\newcommand*{\atrkoneseven}{}%
+\newcommand*{\atrkoneeight}{}%
+\newcommand*{\atrkonenine}{}%
+\newcommand*{\atrkoneten}{}%
+\newcommand*{\atrkoneeleven}{}%
+\newcommand*{\atrkonetwelve}{}%
+\newcommand*{\atrkonethirteen}{}%
+\newcommand*{\atrkonefourteen}{}%
+\newcommand*{\atrkonefifteen}{}%
+\newcommand*{\atrkonesixteen}{}%
+\newcommand*{\atrktwodest}{}%
+\newcommand*{\atrktwoone}{}%
+\newcommand*{\atrktwotwo}{}%
+\newcommand*{\atrktwothree}{}%
+\newcommand*{\atrktwofour}{}%
+\newcommand*{\atrktwofive}{}%
+\newcommand*{\atrktwosix}{}%
+\newcommand*{\atrktwoseven}{}%
+\newcommand*{\atrktwoeight}{}%
+\newcommand*{\atrktwonine}{}%
+\newcommand*{\atrktwoten}{}%
+\newcommand*{\atrktwoeleven}{}%
+\newcommand*{\atrktwotwelve}{}%
+\newcommand*{\atrktwothirteen}{}%
+\newcommand*{\atrktwofourteen}{}%
+\newcommand*{\atrktwofifteen}{}%
+\newcommand*{\atrktwosixteen}{}%
+\newcommand*{\atrkthreedest}{}%
+\newcommand*{\atrkthreeone}{}%
+\newcommand*{\atrkthreetwo}{}%
+\newcommand*{\atrkthreethree}{}%
+\newcommand*{\atrkthreefour}{}%
+\newcommand*{\atrkthreefive}{}%
+\newcommand*{\atrkthreesix}{}%
+\newcommand*{\atrkthreeseven}{}%
+\newcommand*{\atrkthreeeight}{}%
+\newcommand*{\atrkthreenine}{}%
+\newcommand*{\atrkthreeten}{}%
+\newcommand*{\atrkthreeeleven}{}%
+\newcommand*{\atrkthreetwelve}{}%
+\newcommand*{\atrkthreethirteen}{}%
+\newcommand*{\atrkthreefourteen}{}%
+\newcommand*{\atrkthreefifteen}{}%
+\newcommand*{\atrkthreesixteen}{}%
+\newcommand*{\atrkfourdest}{}%
+\newcommand*{\atrkfourone}{}%
+\newcommand*{\atrkfourtwo}{}%
+\newcommand*{\atrkfourthree}{}%
+\newcommand*{\atrkfourfour}{}%
+\newcommand*{\atrkfourfive}{}%
+\newcommand*{\atrkfoursix}{}%
+\newcommand*{\atrkfourseven}{}%
+\newcommand*{\atrkfoureight}{}%
+\newcommand*{\atrkfournine}{}%
+\newcommand*{\atrkfourten}{}%
+\newcommand*{\atrkfoureleven}{}%
+\newcommand*{\atrkfourtwelve}{}%
+\newcommand*{\atrkfourthirteen}{}%
+\newcommand*{\atrkfourfourteen}{}%
+\newcommand*{\atrkfourfifteen}{}%
+\newcommand*{\atrkfoursixteen}{}%
+\newcommand*{\bname}{}%
+\newcommand*{\bbank}{}%
+\newcommand*{\bprogram}{}%
+\newcommand*{\bunison}{0}%
+\newcommand*{\bvoices}{}%
+\newcommand*{\bdetune}{}%
+\newcommand*{\bfreqone}{}%
+\newcommand*{\bfinetuneone}{}%
+\newcommand*{\bfreqonesawone}{0}%
+\newcommand*{\bfreqonetrione}{0}%
+\newcommand*{\bfreqoneswtrone}{0}%
+\newcommand*{\bfreqonepulseone}{0}%
+\newcommand*{\bfreqoneoffone}{0}%
+\newcommand*{\bshapemodone}{}%
+\newcommand*{\bsuboct}{}%
+\newcommand*{\bnoise}{}%
+\newcommand*{\bkeybdoneone}{0}%
+\newcommand*{\bfreqtwo}{}%
+\newcommand*{\bfinetunetwo}{}%
+\newcommand*{\bfreqonesawtwo}{0}%
+\newcommand*{\bfreqonetritwo}{0}%
+\newcommand*{\bfreqoneswtrtwo}{0}%
+\newcommand*{\bfreqonepulsetwo}{0}%
+\newcommand*{\bfreqoneofftwo}{0}%
+\newcommand*{\bshapemodtwo}{}%
+\newcommand*{\boscmix}{}%
+\newcommand*{\bslop}{}%
+\newcommand*{\bkeybdtwo}{0}%
+\newcommand*{\bsync}{0}%
+\newcommand*{\bkeybdonetwo}{0}%
+\newcommand*{\blpfcutoff}{}%
+\newcommand*{\blpfreson}{}%
+\newcommand*{\blpfenvamt}{}%
+\newcommand*{\blpfvel}{}%
+\newcommand*{\blpfkeyamt}{}%
+\newcommand*{\blpfaudiomod}{}%
+\newcommand*{\bfourpole}{0}%
+\newcommand*{\blpfdelay}{}%
+\newcommand*{\blpfattack}{}%
+\newcommand*{\blpfdecay}{}%
+\newcommand*{\blpfsustain}{}%
+\newcommand*{\blpfrelease}{}%
+\newcommand*{\bamppanspread}{}%
+\newcommand*{\bampenvamt}{}%
+\newcommand*{\bampvel}{}%
+\newcommand*{\bampdelay}{}%
+\newcommand*{\bampattack}{}%
+\newcommand*{\bampdecay}{}%
+\newcommand*{\bampsustain}{}%
+\newcommand*{\bamprelease}{}%
+\newcommand*{\blfoonetri}{0}%
+\newcommand*{\blfoonesaw}{0}%
+\newcommand*{\blfoonerevsw}{0}%
+\newcommand*{\blfoonesqr}{0}%
+\newcommand*{\blfoonernd}{0}%
+\newcommand*{\blfoonefreq}{}%
+\newcommand*{\blfooneamt}{}%
+\newcommand*{\blfoonedest}{}%
+\newcommand*{\blfooneclksync}{0}%
+\newcommand*{\blfoonekeysync}{0}%
+\newcommand*{\blfotwotri}{0}%
+\newcommand*{\blfotwosaw}{0}%
+\newcommand*{\blfotworevsw}{0}%
+\newcommand*{\blfotwosqr}{0}%
+\newcommand*{\blfotwornd}{0}%
+\newcommand*{\blfotwofreq}{}%
+\newcommand*{\blfotwoamt}{}%
+\newcommand*{\blfotwodest}{}%
+\newcommand*{\blfotwoclksync}{0}%
+\newcommand*{\blfotwokeysync}{0}%
+\newcommand*{\blfothreetri}{0}%
+\newcommand*{\blfothreesaw}{0}%
+\newcommand*{\blfothreerevsw}{0}%
+\newcommand*{\blfothreesqr}{0}%
+\newcommand*{\blfothreernd}{0}%
+\newcommand*{\blfothreefreq}{}%
+\newcommand*{\blfothreeamt}{}%
+\newcommand*{\blfothreedest}{}%
+\newcommand*{\blfothreeclksync}{0}%
+\newcommand*{\blfothreekeysync}{0}%
+\newcommand*{\blfofourtri}{0}%
+\newcommand*{\blfofoursaw}{0}%
+\newcommand*{\blfofourrevsw}{0}%
+\newcommand*{\blfofoursqr}{0}%
+\newcommand*{\blfofourrnd}{0}%
+\newcommand*{\blfofourfreq}{}%
+\newcommand*{\blfofouramt}{}%
+\newcommand*{\blfofourdest}{}%
+\newcommand*{\blfofourclksync}{0}%
+\newcommand*{\blfofourkeysync}{0}%
+\newcommand*{\bfxon}{0}%
+\newcommand*{\bfx}{}%
+\newcommand*{\bfxmix}{}%
+\newcommand*{\bfxclksync}{0}%
+\newcommand*{\bfxparamone}{}%
+\newcommand*{\bfxparamtwo}{}%
+\newcommand*{\barpbpm}{}%
+\newcommand*{\barpdivide}{}%
+\newcommand*{\barpon}{0}%
+\newcommand*{\barpmode}{}%
+\newcommand*{\bgatedtype}{0}%
+\newcommand*{\bpolytype}{0}%
+\newcommand*{\bauxdest}{}%
+\newcommand*{\bauxenvamt}{}%
+\newcommand*{\bauxvel}{}%
+\newcommand*{\bauxdelay}{}%
+\newcommand*{\bauxrepeat}{0}%
+\newcommand*{\bauxattack}{}%
+\newcommand*{\bauxdecay}{}%
+\newcommand*{\bauxsustain}{}%
+\newcommand*{\bauxrelease}{}%
+\newcommand*{\bmodonesrc}{}%
+\newcommand*{\bmodonedst}{}%
+\newcommand*{\bmodoneamt}{}%
+\newcommand*{\bmodtwosrc}{}%
+\newcommand*{\bmodtwodst}{}%
+\newcommand*{\bmodtwoamt}{}%
+\newcommand*{\bmodthreesrc}{}%
+\newcommand*{\bmodthreedst}{}%
+\newcommand*{\bmodthreeamt}{}%
+\newcommand*{\bmodfoursrc}{}%
+\newcommand*{\bmodfourdst}{}%
+\newcommand*{\bmodfouramt}{}%
+\newcommand*{\bmodfivesrc}{}%
+\newcommand*{\bmodfivedst}{}%
+\newcommand*{\bmodfiveamt}{}%
+\newcommand*{\bmodsixsrc}{}%
+\newcommand*{\bmodsixdst}{}%
+\newcommand*{\bmodsixamt}{}%
+\newcommand*{\bmodsevensrc}{}%
+\newcommand*{\bmodsevendst}{}%
+\newcommand*{\bmodsevenamt}{}%
+\newcommand*{\bmodeightsrc}{}%
+\newcommand*{\bmodeightdst}{}%
+\newcommand*{\bmodeightamt}{}%
+\newcommand*{\bmodwheeldst}{}%
+\newcommand*{\bmodwheelamt}{}%
+\newcommand*{\bbreathdst}{}%
+\newcommand*{\bbreathamt}{}%
+\newcommand*{\bveldst}{}%
+\newcommand*{\bvelamt}{}%
+\newcommand*{\bfootdst}{}%
+\newcommand*{\bfootamt}{}%
+\newcommand*{\btrkonedest}{}%
+\newcommand*{\btrkoneone}{}%
+\newcommand*{\btrkonetwo}{}%
+\newcommand*{\btrkonethree}{}%
+\newcommand*{\btrkonefour}{}%
+\newcommand*{\btrkonefive}{}%
+\newcommand*{\btrkonesix}{}%
+\newcommand*{\btrkoneseven}{}%
+\newcommand*{\btrkoneeight}{}%
+\newcommand*{\btrkonenine}{}%
+\newcommand*{\btrkoneten}{}%
+\newcommand*{\btrkoneeleven}{}%
+\newcommand*{\btrkonetwelve}{}%
+\newcommand*{\btrkonethirteen}{}%
+\newcommand*{\btrkonefourteen}{}%
+\newcommand*{\btrkonefifteen}{}%
+\newcommand*{\btrkonesixteen}{}%
+\newcommand*{\btrktwodest}{}%
+\newcommand*{\btrktwoone}{}%
+\newcommand*{\btrktwotwo}{}%
+\newcommand*{\btrktwothree}{}%
+\newcommand*{\btrktwofour}{}%
+\newcommand*{\btrktwofive}{}%
+\newcommand*{\btrktwosix}{}%
+\newcommand*{\btrktwoseven}{}%
+\newcommand*{\btrktwoeight}{}%
+\newcommand*{\btrktwonine}{}%
+\newcommand*{\btrktwoten}{}%
+\newcommand*{\btrktwoeleven}{}%
+\newcommand*{\btrktwotwelve}{}%
+\newcommand*{\btrktwothirteen}{}%
+\newcommand*{\btrktwofourteen}{}%
+\newcommand*{\btrktwofifteen}{}%
+\newcommand*{\btrktwosixteen}{}%
+\newcommand*{\btrkthreedest}{}%
+\newcommand*{\btrkthreeone}{}%
+\newcommand*{\btrkthreetwo}{}%
+\newcommand*{\btrkthreethree}{}%
+\newcommand*{\btrkthreefour}{}%
+\newcommand*{\btrkthreefive}{}%
+\newcommand*{\btrkthreesix}{}%
+\newcommand*{\btrkthreeseven}{}%
+\newcommand*{\btrkthreeeight}{}%
+\newcommand*{\btrkthreenine}{}%
+\newcommand*{\btrkthreeten}{}%
+\newcommand*{\btrkthreeeleven}{}%
+\newcommand*{\btrkthreetwelve}{}%
+\newcommand*{\btrkthreethirteen}{}%
+\newcommand*{\btrkthreefourteen}{}%
+\newcommand*{\btrkthreefifteen}{}%
+\newcommand*{\btrkthreesixteen}{}%
+\newcommand*{\btrkfourdest}{}%
+\newcommand*{\btrkfourone}{}%
+\newcommand*{\btrkfourtwo}{}%
+\newcommand*{\btrkfourthree}{}%
+\newcommand*{\btrkfourfour}{}%
+\newcommand*{\btrkfourfive}{}%
+\newcommand*{\btrkfoursix}{}%
+\newcommand*{\btrkfourseven}{}%
+\newcommand*{\btrkfoureight}{}%
+\newcommand*{\btrkfournine}{}%
+\newcommand*{\btrkfourten}{}%
+\newcommand*{\btrkfoureleven}{}%
+\newcommand*{\btrkfourtwelve}{}%
+\newcommand*{\btrkfourthirteen}{}%
+\newcommand*{\btrkfourfourteen}{}%
+\newcommand*{\btrkfourfifteen}{}%
+\newcommand*{\btrkfoursixteen}{}%
+%%% end variables
+
+% LN = line
+\newcommand{\LN}[1][2em]{\tikz {\draw (0,0) -- (#1,0)} } %line%
+% LLN = labeled line
+\newcommand{\LLN}[2][2em]{%
+    \ifboolexpr{ test {\expandafter\ifstrempty\expandafter{#2}}}
+    {\LN[#1]}
+    {\tikz {\draw (0,-0.4em) node[above=0.4em, right, fill=yellow, opacity=.8] {\textbf{\textit{#2}}} -- (#1,-0.4em)}}
+}%labeled line%
+% checkbox
+\newcommand{\CB}[1][0.8em]{\tikz{\draw rectangle(#1,#1)}}
+% CCB = conditional checkbox
+\newcommand{\CCB}[2][0.8em]{%
+    \ifboolexpr{ test {\ifnumcomp{#2}{=}{1}}}
+        {\tikz{\draw rectangle(#1,#1) node[midway,fill=yellow, opacity=.8, yshift=0.3em] {\Large$\checkmark$}}}
+        {\CB[#1]}}
+% LCB = Labeled Checkbox
+\newcommand{\LCB}[2][0.8em]{\tikz{\draw rectangle(#1, #1) node[above] {#2}}}
+% CLCB = conditional labeled checkbox
+\newcommand{\CLCB}[3][0.8em]{%
+    \ifboolexpr{ test {\ifnumcomp{#3}{=}{1}} }
+        {\tikz{\draw rectangle(#1,#1) node[midway,fill=yellow, opacity=.8, yshift=0.4em] {$\scalebox{1.5}\checkmark$} node[above] {#2}}}
+        {\tikz{\draw rectangle(#1,#1) node[above] {#2}}}}
+
+\begin{document}
+\noindent%
+Layer\,A\footnote{generated with supercollider and \LaTeX using \url{https://github.com/shimpe/sc-prophet-rev2} and \url{https://gezz.eu/tutorials/index.html}}
+ Name\,\LLN[15em]{\aname} Bank\,\LLN[3em]{\abank} Prg\,\LLN[3em]{\aprogram} Unison\,\CCB{\aunison} Voices\,\LLN[5em]{\avoices} Detune\,\LLN[5em]{\adetune} \linebreak
+%%\vspace*{-0.7em}
+\textbf{Oscillator\,1}\linebreak
+Freq\,\LLN{\afreqone} Fine\,tune\,\LLN{\afinetuneone} Shape\,\CLCB{Saw}{\afreqonesawone} \CLCB{Tri}{\afreqonetrione} \CLCB{SwTr}{\afreqoneswtrone} \CLCB{Pls}{\afreqonepulseone} \CLCB{Off}{\afreqoneoffone} Shape\,mod\,\LLN{\ashapemodone} Sub\,oct\,\LLN{\asuboct} Noise\,\LLN{\anoise} Keybd\,\CCB{\akeybdoneone}\linebreak
+%%\vspace*{-0.7em}
+%\begin{mdframemd}[backgroundcolor=blue!20]
+\textbf{Oscillator\,2}\linebreak
+Freq\,\LLN{\afreqtwo} Fine\,tune\,\LLN{\afinetunetwo} Shape\,\CLCB{Saw}{\afreqonesawtwo} \CLCB{Tri}{\afreqonetritwo} \CLCB{SwTr}{\afreqoneswtrtwo} \CLCB{Pls}{\afreqonepulsetwo} \LCB{Off} Shape\,mod\,\LLN{\ashapemodtwo} Osc\,mix\,\LLN{\aoscmix} Slop\,\tikz{\draw (0,0)--(2em,0) node[above=0.4em, right=-2em, fill=yellow, opacity=.8] {\textbf{\textit{\aslop}}}  node[above=0.7em] {Sync\,\CCB{\async}}} Keybd\,\CCB{\akeybdonetwo}\linebreak
+\textbf{Low\,pass\,filter}\linebreak
+Cutoff\,\LLN{\alpfcutoff} Resonance\,\LLN{\alpfreson} Env\,amount\,\LLN{\alpfenvamt} Velocity\,\LLN{\alpfvel} Key\,amount\,\LLN{\alpfkeyamt} Audio\,mod\,\LLN{\alpfaudiomod}\linebreak
+4\,pole\,\CCB{\afourpole} Delay\,\LLN{\alpfdelay} Attack\,\LLN{\alpfattack} Decay\,\LLN{\alpfdecay} Sustain\,\LLN{\alpfsustain} Release\,\LLN{\alpfrelease}\linebreak
+\textbf{Amplifier}\linebreak
+Pan\,spread\,\LLN{\aamppanspread} Env\,amount\,\LLN{\aampenvamt} Velocity\,\LLN{\aampvel} Delay\,\LLN{\aampdelay}\linebreak
+Attack\,\LLN{\aampattack} Decay\,\LLN{\aampdecay} Sustain\,\LLN{\aampsustain} Release\,\LLN{\aamprelease}\linebreak
+%\end{mdframemd}
+%%\vspace*{-0.7em}
+\textbf{LFOs}\linebreak
+1 Shape\,\CLCB{Tri}{\alfoonetri} \CLCB{Saw}{\alfoonesaw} \CLCB{RevSw}{\alfoonerevsw} \CLCB{Sqr}{\alfoonesqr} \CLCB{Rnd}{\alfoonernd} Frequency\,\LLN{\alfoonefreq} Amount\,\LLN{\alfooneamt} Destination\,\LLN[7em]{\alfoonedest} Clk\,sync\,\CCB{\alfooneclksync} Key\,sync\,\CCB{\alfoonekeysync}\linebreak
+%%\vspace*{-0.7em}
+2 Shape\,\CLCB{Tri}{\alfotwotri} \CLCB{Saw}{\alfotwosaw} \CLCB{RevSw}{\alfotworevsw} \CLCB{Sqr}{\alfotwosqr} \CLCB{Rnd}{\alfotwornd} Frequency\,\LLN{\alfotwofreq} Amount\,\LLN{\alfotwoamt} Destination\,\LLN[7em]{\alfotwodest} Clk\,sync\,\CCB{\alfotwoclksync} Key\,sync\,\CCB{\alfotwokeysync}\linebreak
+%%\vspace*{-0.7em}
+3 Shape\,\CLCB{Tri}{\alfothreetri} \CLCB{Saw}{\alfothreesaw} \CLCB{RevSw}{\alfothreerevsw} \CLCB{Sqr}{\alfothreesqr} \CLCB{Rnd}{\alfothreernd} Frequency\,\LLN{\alfothreefreq} Amount\,\LLN{\alfothreeamt} Destination\,\LLN[7em]{\alfothreedest} Clk\,sync\,\CCB{\alfothreeclksync} Key\,sync\,\CCB{\alfothreekeysync}\linebreak
+%%\vspace*{-0.7em}
+4 Shape\,\CLCB{Tri}{\alfofourtri} \CLCB{Saw}{\alfofoursaw} \CLCB{RevSw}{\alfofourrevsw} \CLCB{Sqr}{\alfofoursqr} \CLCB{Rnd}{\alfofourrnd} Frequency\,\LLN{\alfofourfreq} Amount\,\LLN{\alfofouramt} Destination\,\LLN[7em]{\alfofourdest} Clk\,sync\,\CCB{\alfofourclksync} Key\,sync\,\CCB{\alfofourkeysync}\linebreak
+\textbf{Effect}\linebreak
+On\,\CCB{\afxon} Effect\,\LLN[7em]{\afx} Mix\,\LLN[7em]{\afxmix}\linebreak
+Clk\,sync\,\CCB{\afxclksync} Param\,1\,\LLN[7em]{\afxparamone} Param\,2\,\LLN[7em]{\afxparamtwo}\linebreak
+\textbf{Clock\,and\,arp}\linebreak
+BPM\,\LLN[7em]{\aarpbpm} Divide\,\LLN[7em]{\aarpdivide} Arp\,on\,\CCB{\aarpon} Arp\,mode\,\LLN[7em]{\aarpmode}\linebreak
+%\vspace*{-0.7em}
+\textbf{Sequencer}\linebreak
+Type\,\CLCB{Gated}{\agatedtype}\,\CLCB{Poly}{\apolytype}\linebreak
+\textbf{Auxiliary\,envelope}\vspace*{-0.4cm}\linebreak
+Destination\,\LLN[6em]{\aauxdest} Env\,amount\,\LLN[6em]{\aauxenvamt} Velocity\,\LLN[6em]{\aauxvel} Delay\,\LLN[6em]{\aauxdelay} Repeat\,\CLCB{(misc par)}{\aauxrepeat}\linebreak
+Attack\,\LLN[7em]{\aauxattack} Decay\,\LLN[7em]{\aauxdecay} Sustain\,\LLN[7em]{\aauxsustain} Release\,\LLN[7em]{\aauxrelease}\linebreak
+\textbf{Modulation\,matrix}\linebreak
+Source\,1\,\LLN[7em]{\amodonesrc} Destination\,\LLN[7em]{\amodonedst} Amount\,\LLN[7em]{\amodoneamt}\linebreak
+Source\,2\,\LLN[7em]{\amodtwosrc} Destination\,\LLN[7em]{\amodtwodst} Amount\,\LLN[7em]{\amodtwoamt}\linebreak
+Source\,3\,\LLN[7em]{\amodthreesrc} Destination\,\LLN[7em]{\amodthreedst} Amount\,\LLN[7em]{\amodthreeamt}\linebreak
+Source\,4\,\LLN[7em]{\amodfoursrc} Destination\,\LLN[7em]{\amodfourdst} Amount\,\LLN[7em]{\amodfouramt}\linebreak
+Source\,5\,\LLN[7em]{\amodfivesrc} Destination\,\LLN[7em]{\amodfivedst} Amount\,\LLN[7em]{\amodfiveamt}\linebreak
+Source\,6\,\LLN[7em]{\amodsixsrc} Destination\,\LLN[7em]{\amodsixdst} Amount\,\LLN[7em]{\amodsixamt}\linebreak
+Source\,7\,\LLN[7em]{\amodsevensrc} Destination\,\LLN[7em]{\amodsevendst} Amount\,\LLN[7em]{\amodsevenamt}\linebreak
+Source\,8\,\LLN[7em]{\amodeightsrc} Destination\,\LLN[7em]{\amodeightdst} Amount\,\LLN[7em]{\amodeightamt}\linebreak
+\textbf{Controls}\linebreak
+Mod\,wheel\,destination\,\LLN[27em]{\amodwheeldst} Amount\,\,\LLN[7em]{\amodwheelamt} \linebreak
+Breath\,control\,destination\,\LLN[25.5em]{\abreathdst} Amount\,\,\LLN[7em]{\abreathamt} \linebreak
+Velocity\,destination\,\LLN[28.3em]{\aveldst} Amount\,\,\LLN[7em]{\avelamt} \linebreak
+Foot\,pedal\,destination\,\LLN[27.5em]{\afootdst} Amount\,\,\LLN[7em]{\avelamt} \linebreak
+\textbf{Gated\,step\,sequencer}\linebreak
+Trk\,1\,destination\,\LLN[14em]{\atrkonedest}\linebreak 
+1:\LLN[1em]{\atrkoneone} 2:\LLN[1em]{\atrkonetwo} 3:\LLN[1em]{\atrkonethree} 4:\LLN[1em]{\atrkonefour} 5:\LLN[1em]{\atrkonefive} 6:\LLN[1em]{\atrkonesix} 7:\LLN[1em]{\atrkoneseven} 8:\LLN[1em]{\atrkoneeight} 9:\LLN[1em]{\atrkonenine} 10:\LLN[1em]{\atrkoneten} 11:\LLN[1em]{\atrkoneeleven} 12:\LLN[1em]{\atrkonetwelve} 13:\LLN[1em]{\atrkonethirteen} 14:\LLN[1em]{\atrkonefourteen} 15:\LLN[1em]{\atrkonefifteen} 16:\LLN[1em]{\atrkonesixteen}\linebreak
+Trk\,2\,destination\,\LLN[14em]{\atrktwodest}\linebreak
+1:\LLN[1em]{\atrktwoone} 2:\LLN[1em]{\atrktwotwo} 3:\LLN[1em]{\atrktwothree} 4:\LLN[1em]{\atrktwofour} 5:\LLN[1em]{\atrktwofive} 6:\LLN[1em]{\atrktwosix} 7:\LLN[1em]{\atrktwoseven} 8:\LLN[1em]{\atrktwoeight} 9:\LLN[1em]{\atrktwonine} 10:\LLN[1em]{\atrktwoten} 11:\LLN[1em]{\atrktwoeleven} 12:\LLN[1em]{\atrktwotwelve} 13:\LLN[1em]{\atrktwothirteen} 14:\LLN[1em]{\atrktwofourteen} 15:\LLN[1em]{\atrktwofifteen} 16:\LLN[1em]{\atrktwosixteen}\linebreak
+Trk\,3\,destination\,\LLN[14em]{\atrkthreedest}\linebreak
+1:\LLN[1em]{\atrkthreeone} 2:\LLN[1em]{\atrkthreetwo} 3:\LLN[1em]{\atrkthreethree} 4:\LLN[1em]{\atrkthreefour} 5:\LLN[1em]{\atrkthreefive} 6:\LLN[1em]{\atrkthreesix} 7:\LLN[1em]{\atrkthreeseven} 8:\LLN[1em]{\atrkthreeeight} 9:\LLN[1em]{\atrkthreenine} 10:\LLN[1em]{\atrkthreeten} 11:\LLN[1em]{\atrkthreeeleven} 12:\LLN[1em]{\atrkthreetwelve} 13:\LLN[1em]{\atrkthreethirteen} 14:\LLN[1em]{\atrkthreefourteen} 15:\LLN[1em]{\atrkthreefifteen} 16:\LLN[1em]{\atrkthreesixteen}\linebreak
+Trk\,4\,destination\,\LLN[14em]{\atrkfourdest}\linebreak
+1:\LLN[1em]{\atrkfourone} 2:\LLN[1em]{\atrkfourtwo} 3:\LLN[1em]{\atrkfourthree} 4:\LLN[1em]{\atrkfourfour} 5:\LLN[1em]{\atrkonefive} 6:\LLN[1em]{\atrkonesix} 7:\LLN[1em]{\atrkoneseven} 8:\LLN[1em]{\atrkoneeight} 9:\LLN[1em]{\atrkfournine} 10:\LLN[1em]{\atrkfourten} 11:\LLN[1em]{\atrkfoureleven} 12:\LLN[1em]{\atrkfourtwelve} 13:\LLN[1em]{\atrkfourthirteen} 14:\LLN[1em]{\atrkfourfourteen} 15:\LLN[1em]{\atrkfourfifteen} 16:\LLN[1em]{\atrkfoursixteen}\pagebreak\linebreak
+Layer\,B Name\,\LLN[15em]{\bname} Bank\,\LLN[3em]{\bbank} Prg\,\LLN[3em]{\bprogram}  Unison\,\CCB{\bunison} Voices\,\LLN[5em]{\bvoices} Detune\,\LLN[5em]{\adetune} \linebreak
+%%\vspace*{-0.7em}
+\textbf{Oscillator\,1}\linebreak
+Freq\,\LLN{\bfreqone} Fine\,tune\,\LLN{\bfinetuneone} Shape\,\CLCB{Saw}{\bfreqonesawone} \CLCB{Tri}{\bfreqonetrione} \CLCB{SwTr}{\bfreqoneswtrone} \CLCB{Pls}{\bfreqonepulseone} \CLCB{Off}{\bfreqoneoffone} Shape\,mod\,\LLN{\bshapemodone} Sub\,oct\,\LLN{\bsuboct} Noise\,\LLN{\bnoise} Keybd\,\CCB{\bkeybdoneone}\linebreak
+%%\vspace*{-0.7em}
+%\begin{mdframemd}[backgroundcolor=blue!20]
+\textbf{Oscillator\,2}\linebreak
+Freq\,\LLN{\bfreqtwo} Fine\,tune\,\LLN{\bfinetunetwo} Shape\,\CLCB{Saw}{\bfreqonesawtwo} \CLCB{Tri}{\bfreqonetritwo} \CLCB{SwTr}{\bfreqoneswtrtwo} \CLCB{Pls}{\bfreqonepulsetwo} \LCB{Off} Shape\,mod\,\LLN{\bshapemodtwo} Osc\,mix\,\LLN{\boscmix} Slop\,\tikz{\draw (0,0)--(2em,0) node[above=0.4em, right=-2em, fill=yellow, opacity=.8] {\textbf{\textit{\bslop}}}  node[above=0.7em] {Sync\,\CCB{\bsync}}} Keybd\,\CCB{\bkeybdonetwo}\linebreak
+\textbf{Low\,pass\,filter}\linebreak
+Cutoff\,\LLN{\blpfcutoff} Resonance\,\LLN{\blpfreson} Env\,amount\,\LLN{\blpfenvamt} Velocity\,\LLN{\blpfvel} Key\,amount\,\LLN{\blpfkeyamt} Audio\,mod\,\LLN{\blpfaudiomod}\linebreak
+4\,pole\,\CCB{\bfourpole} Delay\,\LLN{\blpfdelay} Attack\,\LLN{\blpfattack} Decay\,\LLN{\blpfdecay} Sustain\,\LLN{\blpfsustain} Release\,\LLN{\blpfrelease}\linebreak
+\textbf{Amplifier}\linebreak
+Pan\,spread\,\LLN{\bamppanspread} Env\,amount\,\LLN{\bampenvamt} Velocity\,\LLN{\bampvel} Delay\,\LLN{\bampdelay}\linebreak
+Attack\,\LLN{\bampattack} Decay\,\LLN{\bampdecay} Sustain\,\LLN{\bampsustain} Release\,\LLN{\bamprelease}\linebreak
+%\end{mdframemd}
+%%\vspace*{-0.7em}
+\textbf{LFOs}\linebreak
+1 Shape\,\CLCB{Tri}{\blfoonetri} \CLCB{Saw}{\blfoonesaw} \CLCB{RevSw}{\blfoonerevsw} \CLCB{Sqr}{\blfoonesqr} \CLCB{Rnd}{\blfoonernd} Frequency\,\LLN{\blfoonefreq} Amount\,\LLN{\blfooneamt} Destination\,\LLN[7em]{\blfoonedest} Clk\,sync\,\CCB{\blfooneclksync} Key\,sync\,\CCB{\blfoonekeysync}\linebreak
+2 Shape\,\CLCB{Tri}{\blfotwotri} \CLCB{Saw}{\blfotwosaw} \CLCB{RevSw}{\blfotworevsw} \CLCB{Sqr}{\blfotwosqr} \CLCB{Rnd}{\blfotwornd} Frequency\,\LLN{\blfotwofreq} Amount\,\LLN{\blfotwoamt} Destination\,\LLN[7em]{\blfotwodest} Clk\,sync\,\CCB{\blfotwoclksync} Key\,sync\,\CCB{\blfotwokeysync}\linebreak
+3 Shape\,\CLCB{Tri}{\blfothreetri} \CLCB{Saw}{\blfothreesaw} \CLCB{RevSw}{\blfothreerevsw} \CLCB{Sqr}{\blfothreesqr} \CLCB{Rnd}{\blfothreernd} Frequency\,\LLN{\blfothreefreq} Amount\,\LLN{\blfothreeamt} Destination\,\LLN[7em]{\blfothreedest} Clk\,sync\,\CCB{\blfothreeclksync} Key\,sync\,\CCB{\blfothreekeysync}\linebreak
+4 Shape\,\CLCB{Tri}{\blfofourtri} \CLCB{Saw}{\blfofoursaw} \CLCB{RevSw}{\blfofourrevsw} \CLCB{Sqr}{\blfofoursqr} \CLCB{Rnd}{\blfofourrnd} Frequency\,\LLN{\blfofourfreq} Amount\,\LLN{\blfofouramt} Destination\,\LLN[7em]{\blfofourdest} Clk\,sync\,\CCB{\blfofourclksync} Key\,sync\,\CCB{\blfofourkeysync}\linebreak
+\textbf{Effect}\linebreak
+On\,\CCB{\bfxon} Effect\,\LLN[7em]{\bfx} Mix\,\LLN[7em]{\bfxmix}\linebreak
+Clk\,sync\,\CCB{\bfxclksync} Param\,1\,\LLN[7em]{\bfxparamone} Param\,2\,\LLN[7em]{\bfxparamtwo}\linebreak
+\textbf{Clock\,and\,arp}\linebreak
+BPM\,\LLN[7em]{\barpbpm} Divide\,\LLN[7em]{\barpdivide} Arp\,on\,\CCB{\barpon} Arp\,mode\,\LLN[7em]{\barpmode}\linebreak
+%\vspace*{-0.7em}
+\textbf{Sequencer}\linebreak
+Type\,\CLCB{Gated}{\bgatedtype}\,\CLCB{Poly}{\bpolytype}\linebreak
+\textbf{Auxiliary\,envelope}\vspace*{-0.4cm}\linebreak
+Destination\,\LLN[6em]{\bauxdest} Env\,amount\,\LLN[6em]{\bauxenvamt} Velocity\,\LLN[6em]{\bauxvel} Delay\,\LLN[6em]{\bauxdelay} Repeat\,\CLCB{(misc par)}{\bauxrepeat}\linebreak
+Attack\,\LLN[7em]{\bauxattack} Decay\,\LLN[7em]{\bauxdecay} Sustain\,\LLN[7em]{\bauxsustain} Release\,\LLN[7em]{\bauxrelease}\linebreak
+\textbf{Modulation\,matrix}\linebreak
+Source\,1\,\LLN[7em]{\bmodonesrc} Destination\,\LLN[7em]{\bmodonedst} Amount\,\LLN[7em]{\bmodoneamt}\linebreak
+Source\,2\,\LLN[7em]{\bmodtwosrc} Destination\,\LLN[7em]{\bmodtwodst} Amount\,\LLN[7em]{\bmodtwoamt}\linebreak
+Source\,3\,\LLN[7em]{\bmodthreesrc} Destination\,\LLN[7em]{\bmodthreedst} Amount\,\LLN[7em]{\bmodthreeamt}\linebreak
+Source\,4\,\LLN[7em]{\bmodfoursrc} Destination\,\LLN[7em]{\bmodfourdst} Amount\,\LLN[7em]{\bmodfouramt}\linebreak
+Source\,5\,\LLN[7em]{\bmodfivesrc} Destination\,\LLN[7em]{\bmodfivedst} Amount\,\LLN[7em]{\bmodfiveamt}\linebreak
+Source\,6\,\LLN[7em]{\bmodsixsrc} Destination\,\LLN[7em]{\bmodsixdst} Amount\,\LLN[7em]{\bmodsixamt}\linebreak
+Source\,7\,\LLN[7em]{\bmodsevensrc} Destination\,\LLN[7em]{\bmodsevendst} Amount\,\LLN[7em]{\bmodsevenamt}\linebreak
+Source\,8\,\LLN[7em]{\bmodeightsrc} Destination\,\LLN[7em]{\bmodeightdst} Amount\,\LLN[7em]{\bmodeightamt}\linebreak
+\textbf{Controls}\linebreak
+Mod\,wheel\,destination\,\LLN[27em]{\bmodwheeldst} Amount\,\,\LLN[7em]{\bmodwheelamt} \linebreak
+Breath\,control\,destination\,\LLN[25.5em]{\bbreathdst} Amount\,\,\LLN[7em]{\bbreathamt} \linebreak
+Velocity\,destination\,\LLN[28.3em]{\bveldst} Amount\,\,\LLN[7em]{\bvelamt} \linebreak
+Foot\,pedal\,destination\,\LLN[27.5em]{\bfootdst} Amount\,\,\LLN[7em]{\bvelamt} \linebreak
+\textbf{Gated\,step\,sequencer}\linebreak
+Trk\,1\,destination\,\LLN[14em]{\btrkonedest}\linebreak
+1:\LLN[1em]{\btrkoneone} 2:\LLN[1em]{\btrkonetwo} 3:\LLN[1em]{\btrkonethree} 4:\LLN[1em]{\btrkonefour} 5:\LLN[1em]{\btrkonefive} 6:\LLN[1em]{\btrkonesix} 7:\LLN[1em]{\btrkoneseven} 8:\LLN[1em]{\btrkoneeight} 9:\LLN[1em]{\btrkonenine} 10:\LLN[1em]{\btrkoneten} 11:\LLN[1em]{\btrkoneeleven} 12:\LLN[1em]{\btrkonetwelve} 13:\LLN[1em]{\btrkonethirteen} 14:\LLN[1em]{\btrkonefourteen} 15:\LLN[1em]{\btrkonefifteen} 16:\LLN[1em]{\btrkonesixteen}\linebreak
+Trk\,2\,destination\,\LLN[14em]{\btrktwodest}\linebreak
+1:\LLN[1em]{\btrktwoone} 2:\LLN[1em]{\btrktwotwo} 3:\LLN[1em]{\btrktwothree} 4:\LLN[1em]{\btrktwofour} 5:\LLN[1em]{\btrktwofive} 6:\LLN[1em]{\btrktwosix} 7:\LLN[1em]{\btrktwoseven} 8:\LLN[1em]{\btrktwoeight} 9:\LLN[1em]{\btrktwonine} 10:\LLN[1em]{\btrktwoten} 11:\LLN[1em]{\btrktwoeleven} 12:\LLN[1em]{\btrktwotwelve} 13:\LLN[1em]{\btrktwothirteen} 14:\LLN[1em]{\btrktwofourteen} 15:\LLN[1em]{\btrktwofifteen} 16:\LLN[1em]{\btrktwosixteen}\linebreak
+Trk\,3\,destination\,\LLN[14em]{\btrkthreedest}\linebreak
+1:\LLN[1em]{\btrkthreeone} 2:\LLN[1em]{\btrkthreetwo} 3:\LLN[1em]{\btrkthreethree} 4:\LLN[1em]{\btrkthreefour} 5:\LLN[1em]{\btrkthreefive} 6:\LLN[1em]{\btrkthreesix} 7:\LLN[1em]{\btrkthreeseven} 8:\LLN[1em]{\btrkthreeeight} 9:\LLN[1em]{\btrkthreenine} 10:\LLN[1em]{\btrkthreeten} 11:\LLN[1em]{\btrkthreeeleven} 12:\LLN[1em]{\btrkthreetwelve} 13:\LLN[1em]{\btrkthreethirteen} 14:\LLN[1em]{\btrkthreefourteen} 15:\LLN[1em]{\btrkthreefifteen} 16:\LLN[1em]{\btrkthreesixteen}\linebreak
+Trk\,4\,destination\,\LLN[14em]{\btrkfourdest}\linebreak
+1:\LLN[1em]{\btrkfourone} 2:\LLN[1em]{\btrkfourtwo} 3:\LLN[1em]{\btrkfourthree} 4:\LLN[1em]{\btrkfourfour} 5:\LLN[1em]{\btrkonefive} 6:\LLN[1em]{\btrkonesix} 7:\LLN[1em]{\btrkoneseven} 8:\LLN[1em]{\btrkoneeight} 9:\LLN[1em]{\btrkfournine} 10:\LLN[1em]{\btrkfourten} 11:\LLN[1em]{\btrkfoureleven} 12:\LLN[1em]{\btrkfourtwelve} 13:\LLN[1em]{\btrkfourthirteen} 14:\LLN[1em]{\btrkfourfourteen} 15:\LLN[1em]{\btrkfourfifteen} 16:\LLN[1em]{\btrkfoursixteen}\linebreak
+\pagebreak
+% 
+% \begin{tikzpicture}
+%   \centering
+%   \begin{axis}[
+%         xbar, 
+%         axis on top,
+%         title={Poly seq notes, Poly seq velocities},
+%         height=20cm,width=20cm,
+%         bar width=0.1cm,
+%         ymajorgrids, tick align=inside,
+%         %xmajorgrids, tick align=inside,
+%         %major grid style={draw=white},
+%         %enlarge y limits={value=.1,upper},
+%         ymin=0, ymax=127,
+%         xmin=1, xmax=64,
+%         axis x line*=bottom,
+%         axis y line*=middle,
+%         y axis line style={opacity=0},
+%         ybar interval=0.5,
+%         tickwidth=0pt,
+%         enlarge x limits=true,
+%         legend style={
+%             at={(0.5,-0.2)},
+%             anchor=north,
+%             legend columns=-1,
+%             /tikz/every even column/.append style={column sep=0.5cm}
+%         },
+%         ylabel={Note},
+%         xtick=data,
+%         nodes near coords={
+%          \pgfmathprintnumber[precision=0]{\pgfplotspointmeta}
+%         }
+%     ]
+%     \addplot [draw=none, fill=black!90] coordinates {
+%       (1, 75.4064)
+%       (2, 72.7961) 
+%       (3,94.4597)
+%       (4,66.6786) 
+%       (5,67.5600) 
+%       (6,88.2339)
+%       (7,78.6138) 
+%       (8,58.9129) 
+%       (9,58.9129) 
+%       (10,58.9129) 
+%       (11,58.9129) 
+%       (12,58.9129) 
+%       (13,58.9129) 
+%       (14,58.9129) 
+%       (15,58.9129) 
+%       (16,58.9129) 
+%       (17,58.9129) 
+%       (18,58.9129) 
+%       (19,58.9129) 
+%       (20,58.9129) 
+%       (21,58.9129) 
+%       (22,58.9129) 
+%       (23,58.9129) 
+%       (24,58.9129) 
+%       (25,58.9129) 
+%       (26,58.9129) 
+%       (27,58.9129) 
+%       (28,58.9129) 
+%       (29,58.9129) 
+%       (30,58.9129) 
+%       (31,58.9129) 
+%       (32,58.9129) 
+%       (33,0)
+%       (34,0) 
+%       (35,0)
+%       (36,0) 
+%       (37,67.5600) 
+%       (38,88.2339)
+%       (39,78.6138) 
+%       (40,58.9129) 
+%       (41,58.9129) 
+%       (42,58.9129) 
+%       (43,58.9129) 
+%       (44,58.9129) 
+%       (45,58.9129) 
+%       (46,58.9129) 
+%       (47,58.9129) 
+%       (48,58.9129) 
+%       (49,58.9129) 
+%       (50,58.9129) 
+%       (51,58.9129) 
+%       (52,58.9129) 
+%       (53,58.9129) 
+%       (54,58.9129) 
+%       (55,58.9129) 
+%       (56,58.9129) 
+%       (57,58.9129) 
+%       (58,58.9129) 
+%       (59,58.9129) 
+%       (60,58.9129) 
+%       (61,58.9129) 
+%       (62,58.9129) 
+%       (63,58.9129) 
+%       (64,58.9129) 
+%     };
+%    \addplot [draw=red, fill=red!60] coordinates {
+%       (1, 75.4064)
+%       (2, 72.7961) 
+%       (3,94.4597)
+%       (4,66.6786) 
+%       (5,67.5600) 
+%       (6,88.2339)
+%       (7,78.6138) 
+%       (8,58.9129) 
+%       (9,58.9129) 
+%       (10,58.9129) 
+%       (11,58.9129) 
+%       (12,58.9129) 
+%       (13,58.9129) 
+%       (14,58.9129) 
+%       (15,58.9129) 
+%       (16,58.9129) 
+%       (17,58.9129) 
+%       (18,58.9129) 
+%       (19,58.9129) 
+%       (20,58.9129) 
+%       (21,58.9129) 
+%       (22,58.9129) 
+%       (23,58.9129) 
+%       (24,58.9129) 
+%       (25,58.9129) 
+%       (26,58.9129) 
+%       (27,58.9129) 
+%       (28,58.9129) 
+%       (29,58.9129) 
+%       (30,58.9129) 
+%       (31,58.9129) 
+%       (32,58.9129) 
+%       (33,75.4064)
+%       (34,72.7961) 
+%       (35,94.4597)
+%       (36,66.6786) 
+%       (37,67.5600) 
+%       (38,88.2339)
+%       (39,78.6138) 
+%       (40,58.9129) 
+%       (41,58.9129) 
+%       (42,58.9129) 
+%       (43,58.9129) 
+%       (44,58.9129) 
+%       (45,58.9129) 
+%       (46,57.9129) 
+%       (47,56.9129) 
+%       (48,55.9129) 
+%       (49,54.9129) 
+%       (50,53.9129) 
+%       (51,52.9129) 
+%       (52,51.9129) 
+%       (53,50.9129) 
+%       (54,42.9129) 
+%       (55,43.9129) 
+%       (56,44.9129) 
+%       (57,45.9129) 
+%       (58,58.9129) 
+%       (59,58.9129) 
+%       (60,58.9129) 
+%       (61,58.9129) 
+%       (62,58.9129) 
+%       (63,58.9129) 
+%       (64,58.9129) 
+%     };
+%     \legend{Note, Velocity}
+%   \end{axis}
+%   \end{tikzpicture}
+\end{document}
