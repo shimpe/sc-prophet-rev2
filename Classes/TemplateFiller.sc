@@ -463,7 +463,7 @@ TemplateFiller {
 		substitutions.keys.do {
 			| key, idx |
 			//("replacing "++key++" with "++substitutions[key]).postln;
-			template = template.replace(key, substitutions[key]);
+			template = template.replace(key, substitutions[key].replace("#","\\#"));
 		};
 
 		File.use(resultfilepath, "w", {
