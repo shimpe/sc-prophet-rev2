@@ -17,8 +17,9 @@ TemplateFiller {
 	}
 
 	generate {
-		| bank, program, resultfilepath |
+		| bank, program, resultfilelocation, resultfilename |
 		var path = PathName(TemplateFiller.class.filenameSymbol.asString).parentPath +/+ "template" +/+ "template.tex";
+
 		var template = File.readAllString(path.standardizePath);
 		var patchdumper = PatchDumper.new;
 		var t = NrpnTable.new;
@@ -34,6 +35,28 @@ TemplateFiller {
 			bname = bname ++ patchdumper.charlut(t.str2num('cLAYERA_CHAR1') + i, 2048);
 		});
 
+		aname = aname.replace("\\","\\textbackslash")
+		.replace("#","\\#")
+		.replace("&", "\\&")
+		.replace("$", "\\$")
+		.replace("_", "\\_")
+		.replace("{", "\\{")
+		.replace("}", "\\}")
+		.replace("~", "\\textasciitilde")
+		.replace("^", "\\textasciicircum")
+		.replace("%","\\%");
+		bname = bname.replace("\\","\\textbackslash")
+		.replace("#","\\#")
+		.replace("&", "\\&")
+		.replace("$", "\\$")
+		.replace("_", "\\_")
+		.replace("{", "\\{")
+		.replace("}", "\\}")
+		.replace("~", "\\textasciitilde")
+		.replace("^", "\\textasciicircum")
+		.replace("%","\\%");
+
+
 		substitutions = IdentityDictionary.newFrom([
 			"\\newcommand*{\\aname}{}%" : "\\newcommand*{\\aname}{%}\\%".format(aname),
 			"\\newcommand*{\\bname}{}%" : "\\newcommand*{\\bname}{%}\\%".format(bname),
@@ -44,7 +67,7 @@ TemplateFiller {
 			"\\newcommand*{\\aunison}{0}%" : "\\newcommand*{\\aunison}{%}\\%".format(patchdumper.lutt("On",t.str2num('UNISON_OFFON'), norange:true)),
 			"\\newcommand*{\\avoices}{}%" : "\\newcommand*{\\avoices}{%}\\%".format(patchdumper.lut(t.str2num('UNISON_MODE'), norange:true)),
 			"\\newcommand*{\\adetune}{}%" : "\\newcommand*{\\adetune}{%}\\%".format(patchdumper.lutb(t.str2num('UNISON_DETUNE'), norange:true)),
-			"\\newcommand*{\\afreqone}{}%": "\\newcommand*{\\afreqone}{%}\\%".format(patchdumper.lut(t.str2num('OSC1_FREQ'), norange:true)),
+			"\\newcommand*{\\afreqone}{}%": "\\newcommand*{\\afreqone}{%}\\%".format(patchdumper.lut(t.str2num('OSC1_FREQ'), norange:true)).replace("#","\\#"),
 			"\\newcommand*{\\afinetuneone}{}%" : "\\newcommand*{\\afinetuneone}{%}\\%".format(patchdumper.lut(t.str2num('OSC1_FINE'), norange:true)),
 			"\\newcommand*{\\afreqonesawone}{0}%" : "\\newcommand*{\\afreqonesawone}{%}\\%".format(patchdumper.lutt("Saw", t.str2num('OSC1_SHAPE'),norange:true)),
 			"\\newcommand*{\\afreqonetrione}{0}%" : "\\newcommand*{\\afreqonetrione}{%}\\%".format(patchdumper.lutt("Triangle", t.str2num('OSC1_SHAPE'), norange:true)),
@@ -55,7 +78,7 @@ TemplateFiller {
 			"\\newcommand*{\\asuboct}{}%" : "\\newcommand*{\\asuboct}{%}\\%".format(patchdumper.lut(t.str2num('OSC1_SUBOSC'), norange:true)),
 			"\\newcommand*{\\anoise}{}%" : "\\newcommand*{\\anoise}{%}\\%".format(patchdumper.lut(t.str2num('OSC1_NOISE'), norange:true)),
 			"\\newcommand*{\\akeybdoneone}{0}%" : "\\newcommand*{\\akeybdoneone}{%}\\%".format(patchdumper.lutt("On", t.str2num('OSC1_KBD'), norange:true)),
-			"\\newcommand*{\\afreqtwo}{}%": "\\newcommand*{\\afreqtwo}{%}\\%".format(patchdumper.lut(t.str2num('OSC2_FREQ'), norange:true)),
+			"\\newcommand*{\\afreqtwo}{}%": "\\newcommand*{\\afreqtwo}{%}\\%".format(patchdumper.lut(t.str2num('OSC2_FREQ'), norange:true).replace("#","\\#")),
 			"\\newcommand*{\\afinetunetwo}{}%" : "\\newcommand*{\\afinetunetwo}{%}\\%".format(patchdumper.lut(t.str2num('OSC2_FINE'), norange:true)),
 			"\\newcommand*{\\afreqonesawtwo}{0}%" : "\\newcommand*{\\afreqonesawtwo}{%}\\%".format(patchdumper.lutt("Saw", t.str2num('OSC2_SHAPE'), norange:true)),
 			"\\newcommand*{\\afreqonetritwo}{0}%" : "\\newcommand*{\\afreqonetritwo}{%}\\%".format(patchdumper.lutt("Triangle", t.str2num('OSC2_SHAPE'), norange:true)),
@@ -253,7 +276,7 @@ TemplateFiller {
 			"\\newcommand*{\\bunison}{0}%" : "\\newcommand*{\\bunison}{%}\\%".format(patchdumper.lutbt("On", t.str2num('UNISON_OFFON'), norange:true)),
 			"\\newcommand*{\\bvoices}{}%" : "\\newcommand*{\\bvoices}{%}\\%".format(patchdumper.lutb(t.str2num('UNISON_MODE'), norange:true)),
 			"\\newcommand*{\\bdetune}{}%" : "\\newcommand*{\\bdetune}{%}\\%".format(patchdumper.lutb(t.str2num('UNISON_DETUNE'), norange:true)),
-			"\\newcommand*{\\bfreqone}{}%": "\\newcommand*{\\bfreqone}{%}\\%".format(patchdumper.lutb(t.str2num('OSC1_FREQ'), norange:true)),
+			"\\newcommand*{\\bfreqone}{}%": "\\newcommand*{\\bfreqone}{%}\\%".format(patchdumper.lutb(t.str2num('OSC1_FREQ'), norange:true).replace("#","\\#")),
 			"\\newcommand*{\\bfinetuneone}{}%" : "\\newcommand*{\\bfinetuneone}{%}\\%".format(patchdumper.lutb(t.str2num('OSC1_FINE'), norange:true)),
 			"\\newcommand*{\\bfreqonesawone}{0}%" : "\\newcommand*{\\bfreqonesawone}{%}\\%".format(patchdumper.lutbt("Saw", t.str2num('OSC1_SHAPE'),norange:true)),
 			"\\newcommand*{\\bfreqonetrione}{0}%" : "\\newcommand*{\\bfreqonetrione}{%}\\%".format(patchdumper.lutbt("Triangle", t.str2num('OSC1_SHAPE'), norange:true)),
@@ -264,7 +287,7 @@ TemplateFiller {
 			"\\newcommand*{\\bsuboct}{}%" : "\\newcommand*{\\bsuboct}{%}\\%".format(patchdumper.lutb(t.str2num('OSC1_SUBOSC'), norange:true)),
 			"\\newcommand*{\\bnoise}{}%" : "\\newcommand*{\\bnoise}{%}\\%".format(patchdumper.lutb(t.str2num('OSC1_NOISE'), norange:true)),
 			"\\newcommand*{\\bkeybdoneone}{0}%" : "\\newcommand*{\\bkeybdoneone}{%}\\%".format(patchdumper.lutbt("On", t.str2num('OSC1_KBD'), norange:true)),
-			"\\newcommand*{\\bfreqtwo}{}%": "\\newcommand*{\\bfreqtwo}{%}\\%".format(patchdumper.lutb(t.str2num('OSC2_FREQ'), norange:true)),
+			"\\newcommand*{\\bfreqtwo}{}%": "\\newcommand*{\\bfreqtwo}{%}\\%".format(patchdumper.lutb(t.str2num('OSC2_FREQ'), norange:true).replace("#","\\#")),
 			"\\newcommand*{\\bfinetunetwo}{}%" : "\\newcommand*{\\bfinetunetwo}{%}\\%".format(patchdumper.lutb(t.str2num('OSC2_FINE'), norange:true)),
 			"\\newcommand*{\\bfreqonesawtwo}{0}%" : "\\newcommand*{\\bfreqonesawtwo}{%}\\%".format(patchdumper.lutbt("Saw", t.str2num('OSC2_SHAPE'), norange:true)),
 			"\\newcommand*{\\bfreqonetritwo}{0}%" : "\\newcommand*{\\bfreqonetritwo}{%}\\%".format(patchdumper.lutbt("Triangle", t.str2num('OSC2_SHAPE'), norange:true)),
@@ -463,10 +486,11 @@ TemplateFiller {
 		substitutions.keys.do {
 			| key, idx |
 			//("replacing "++key++" with "++substitutions[key]).postln;
-			template = template.replace(key, substitutions[key].replace("#","\\#"));
+			// & % $ # _ { } ~ ^ \
+			template = template.replace(key, substitutions[key]);
 		};
 
-		File.use(resultfilepath, "w", {
+		File.use(resultfilelocation++resultfilename, "w", {
 			|f|
 			f.write(template);
 		});
