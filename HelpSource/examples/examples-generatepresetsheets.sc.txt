@@ -4,9 +4,11 @@
 )
 (
 ~banks = ["U1", "U2", "U3", "U4", "F1", "F2", "F3", "F4"];
+~collectedpatches = [];
 fork {
 	"Waiting 2 seconds to get the next patch.".postln;
 	2.wait;
+
 	(4..7).do({
 		|bank|
 		(0..127).do({
@@ -17,13 +19,28 @@ fork {
 			~synth.get_patch_from_synth(bank, patch, {
 				~synth.get_global_parameters_from_synth({
 					~expl = TemplateFiller.new(~synth.rev2);
-					~expl.generate(b, p, "/home/shimpe/documents/rev2presets/"++"patch-"++b++"-"++p++".tex");
+					~expl.generate(b, p, "/home/shimpe/documents/rev2presets/", "patch-"++b++"-"++p++".tex");
 				});
 			});
+			~collectedpatches = ~collectedpatches.add("\\includepdf[pages=-,pagecommand={}]{patch-"++b++"-"++p++".pdf}\n");
 			"Waiting 1 seconds to get the next patch.".postln;
 			1.wait;
 		});
 	});
+
 	"Finished.".postln;
+
+	File.use("/home/shimpe/documents/rev2presets/output/unite.tex", "w", { |f|
+		f.write("\\documentclass[a4paper,10pt]{article}\n");
+		f.write("\\usepackage{pdfpages}\n");
+		f.write("\\begin{document}\n");
+		f.write("\\includepdf[pages=-,pagecommand={}]{title.pdf}\n");
+		~collectedpatches.do({
+			|el|
+			f.write(el);
+		});
+		f.write("\\end{document}");
+	});
 };
+
 )
