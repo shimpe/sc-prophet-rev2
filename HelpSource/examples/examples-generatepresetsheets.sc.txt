@@ -1,17 +1,25 @@
+// first run this and wait until connected
 (
 ~synth = ScProphetRev2.new;
 ~synth.connect;
 )
+
+// then run this
 (
 ~banks = ["U1", "U2", "U3", "U4", "F1", "F2", "F3", "F4"];
 ~collectedpatches = [];
+~filecontents = [];
 fork {
-	"Waiting 2 seconds to get the next patch.".postln;
-	2.wait;
+	var prepath = PathName(TemplateFiller.class.filenameSymbol.asString).parentPath +/+ "template" +/+ "template-preamble.tex";
+	var postpath = PathName(TemplateFiller.class.filenameSymbol.asString).parentPath +/+ "template" +/+ "template-postamble.tex";
+	var pngpath = PathName(TemplateFiller.class.filenameSymbol.asString).parentPath +/+ "template" +/+ "rev2.png";
+	var outputpath = PathName("/home/shimpe/documents/rev2presets/output/");
 
-	(4..7).do({
+	~collectedpatches = ~collectedpatches.add(File.readAllString(prepath));
+
+	(4..7).do({ // banks 4,5,6,7
 		|bank|
-		(0..127).do({
+		(0..127).do({ // programs 1..128
 			| patch |
 			var b = ~banks[bank];
 			var p = "P"++(patch+1);
@@ -19,28 +27,24 @@ fork {
 			~synth.get_patch_from_synth(bank, patch, {
 				~synth.get_global_parameters_from_synth({
 					~expl = TemplateFiller.new(~synth.rev2);
-					~expl.generate(b, p, "/home/shimpe/documents/rev2presets/", "patch-"++b++"-"++p++".tex");
+					~collectedpatches = ~collectedpatches.add(~expl.generate_string(b, p));
 				});
 			});
-			~collectedpatches = ~collectedpatches.add("\\includepdf[pages=-,pagecommand={}]{patch-"++b++"-"++p++".pdf}\n");
 			"Waiting 1 seconds to get the next patch.".postln;
 			1.wait;
 		});
 	});
+	~collectedpatches = ~collectedpatches.add(File.readAllString(postpath));
 
 	"Finished.".postln;
 
-	File.use("/home/shimpe/documents/rev2presets/output/unite.tex", "w", { |f|
-		f.write("\\documentclass[a4paper,10pt]{article}\n");
-		f.write("\\usepackage{pdfpages}\n");
-		f.write("\\begin{document}\n");
-		f.write("\\includepdf[pages=-,pagecommand={}]{title.pdf}\n");
+	File.use(outputpath +/+ "specsheets.tex", "w", { |f|
 		~collectedpatches.do({
 			|el|
 			f.write(el);
 		});
-		f.write("\\end{document}");
 	});
-};
 
+	File.copy(pngpath, outputpath +/+ "rev2.png");
+};
 )
