@@ -12,7 +12,6 @@
 fork {
 	var prepath = PathName(TemplateFiller.class.filenameSymbol.asString).parentPath +/+ "template" +/+ "template-preamble.tex";
 	var postpath = PathName(TemplateFiller.class.filenameSymbol.asString).parentPath +/+ "template" +/+ "template-postamble.tex";
-	var pngpath = PathName(TemplateFiller.class.filenameSymbol.asString).parentPath +/+ "template" +/+ "rev2.png";
 	var outputpath = PathName("/home/shimpe/documents/music/rev2presets/output/");
 
 	~collectedpatches = ~collectedpatches.add(File.readAllString(prepath));
@@ -26,7 +25,9 @@ fork {
 			("Processing patch "++b++p).postln;
 			~synth.get_patch_from_synth(bank, patch, {
 				~synth.get_global_parameters_from_synth({
-					~expl = TemplateFiller.new(~synth.rev2);
+					~expl = TemplateFiller.new(~synth.rev2, ~synth.last_patch_sysex_stream);
+					//~copyrev = ~synth.rev2.copy();
+					//~copysysex = ~synth.last_patch_sysex_stream.copy();
 					~collectedpatches = ~collectedpatches.add(~expl.generate_string(b, p));
 				});
 			});
@@ -34,17 +35,31 @@ fork {
 			1.wait;
 		});
 	});
+
 	~collectedpatches = ~collectedpatches.add(File.readAllString(postpath));
 
 	"Finished.".postln;
+};
+)
 
-	File.use(outputpath +/+ "specsheets.tex", "w", { |f|
-		~collectedpatches.do({
-			|el|
-			f.write(el);
-		});
+// finally run this
+(
+var pngpath = PathName(TemplateFiller.class.filenameSymbol.asString).parentPath +/+ "template" +/+ "rev2.png";
+
+"Copying image.".postln;
+
+//	File.copy(pngpath, "/home/shimpe/documents/music/rev2presets/output/rev2.png"); // crashes in latest SC!?!?!
+
+"Writing to file.".postln;
+
+File.use("/home/shimpe/documents/music/rev2presets/output/specsheets.tex", "w", { |f|
+	~collectedpatches.do({
+		|el|
+		el.postln;
+		f.write(el);
 	});
 
-	File.copy(pngpath, outputpath +/+ "rev2.png");
-};
+});
+
+"Finished".postln;
 )
