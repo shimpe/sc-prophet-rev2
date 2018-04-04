@@ -1,5 +1,6 @@
 TemplateFiller {
 	var <>rev2;
+	var <>sysexstream;
 	var <>substitutions;
 	var <>templatepath;
 	var template;
@@ -7,13 +8,14 @@ TemplateFiller {
 	var <>prOffset;
 
 	*new {
-		| rev2 |
-		^super.new.init(rev2);
+		| rev2, sysexstream |
+		^super.new.init(rev2, sysexstream);
 	}
 
 	init {
-		| rev2 |
+		| rev2, sysexstream |
 		this.rev2 = rev2.copy();
+		this.sysexstream = sysexstream.copy();
 	}
 
 	generate_string {
@@ -28,6 +30,7 @@ TemplateFiller {
 		var substitutions;
 
 		patchdumper.rev2 = this.rev2;
+		patchdumper.sysex_stream = this.sysexstream;
 
 		20.do({
 			|i|
@@ -198,6 +201,8 @@ TemplateFiller {
 			"\\renewcommand*{\\amodeightamt}{}%" : "\\renewcommand*{\\amodeightamt}{%}\\%".format(patchdumper.lut(t.str2num('MOD8_AMT'), norange:true)),
 			"\\renewcommand*{\\amodwheeldst}{}%" : "\\renewcommand*{\\amodwheeldst}{%}\\%".format(patchdumper.lut(t.str2num('MODWHEEL_DST'), mask:127, norange:true)),
 			"\\renewcommand*{\\amodwheelamt}{}%" : "\\renewcommand*{\\amodwheelamt}{%}\\%".format(patchdumper.lut(t.str2num('MODWHEEL_AMT'), norange:true)),
+			"\\renewcommand*{\\apressdst}{}%" : "\\renewcommand*{\\apressdst}{%}\\%".format(patchdumper.lut(t.str2num('PRESSURE_DST'), mask:127, norange:true)),
+			"\\renewcommand*{\\apressamt}{}%" : "\\renewcommand*{\\apressamt}{%}\\%".format(patchdumper.lut(t.str2num('PRESSURE_AMT'), norange:true)),
 			"\\renewcommand*{\\abreathdst}{}%" : "\\renewcommand*{\\abreathdst}{%}\\%".format(patchdumper.lut(t.str2num('BREATH_DST'), mask:127, norange:true)),
 			"\\renewcommand*{\\abreathamt}{}%" : "\\renewcommand*{\\abreathamt}{%}\\%".format(patchdumper.lut(t.str2num('BREATH_AMT'), norange:true)),
 			"\\renewcommand*{\\aveldst}{}%" : "\\renewcommand*{\\aveldst}{%}\\%".format(patchdumper.lut(t.str2num('VELOCITY_DST'), mask:127, norange:true)),
@@ -407,6 +412,8 @@ TemplateFiller {
 			"\\renewcommand*{\\bmodeightamt}{}%" : "\\renewcommand*{\\bmodeightamt}{%}\\%".format(patchdumper.lutb(t.str2num('MOD8_AMT'), norange:true)),
 			"\\renewcommand*{\\bmodwheeldst}{}%" : "\\renewcommand*{\\bmodwheeldst}{%}\\%".format(patchdumper.lutb(t.str2num('MODWHEEL_DST'), mask:127, norange:true)),
 			"\\renewcommand*{\\bmodwheelamt}{}%" : "\\renewcommand*{\\bmodwheelamt}{%}\\%".format(patchdumper.lutb(t.str2num('MODWHEEL_AMT'), norange:true)),
+			"\\renewcommand*{\\bpressdst}{}%" : "\\renewcommand*{\\bpressdst}{%}\\%".format(patchdumper.lutb(t.str2num('PRESSURE_DST'), mask:127, norange:true)),
+			"\\renewcommand*{\\bpressamt}{}%" : "\\renewcommand*{\\bpressamt}{%}\\%".format(patchdumper.lutb(t.str2num('PRESSURE_AMT'), norange:true)),
 			"\\renewcommand*{\\bbreathdst}{}%" : "\\renewcommand*{\\bbreathdst}{%}\\%".format(patchdumper.lutb(t.str2num('BREATH_DST'), mask:127, norange:true)),
 			"\\renewcommand*{\\bbreathamt}{}%" : "\\renewcommand*{\\bbreathamt}{%}\\%".format(patchdumper.lutb(t.str2num('BREATH_AMT'), norange:true)),
 			"\\renewcommand*{\\bveldst}{}%" : "\\renewcommand*{\\bveldst}{%}\\%".format(patchdumper.lutb(t.str2num('VELOCITY_DST'), mask:127, norange:true)),

@@ -45,6 +45,7 @@ ScProphetRev2 {
 	var <>global_sysex_bytepos;
 	var <>util;
 	var <>last_sysex_stream;
+	var <>last_patch_sysex_stream;
 
 	*new {
 		^super.new.init();
@@ -171,8 +172,8 @@ ScProphetRev2 {
 			2066 : (\layer:"B", \min:0, \max:127, \name:"Audio Mod", \sysexpos:1049),
 			19 : (\layer:"A", \min:0, \max:1, \name:"2 pole/4 pole mode", \hint:this.filter_poles, \sysexpos:26),
 			2067 : (\layer:"B", \min:0, \max:1, \name:"2 pole/4 pole mode", \hint:this.filter_poles, \sysexpos:1050),
-			20 : (\layer:"A", \min:0, \max:254, \name:"Filter Envelope Amt", \sysexpos:32, \signed:true),
-			2068 : (\layer:"B", \min:0, \max:254, \name:"Filter Envelope Amt", \sysexpos:1056, \signed:true),
+			20 : (\layer:"A", \min:0, \max:254, \name:"Filter Envelope Amt", \sysexpos:32, \sysexsignpos:30, \signed:true),
+			2068 : (\layer:"B", \min:0, \max:254, \name:"Filter Envelope Amt", \sysexpos:1056, \sysexsignpos:1050, \signed:true),
 			21 : (\layer:"A", \min:0, \max:127, \name:"Filter Envelope Vel", \sysexpos:35),
 			2069 : (\layer:"B", \min:0, \max:127, \name:"Filter Envelope Vel", \sysexpos:1059),
 			22 : (\layer:"A", \min:0, \max:127, \name:"Filter Envelope Dly", \sysexpos:38),
@@ -245,8 +246,8 @@ ScProphetRev2 {
 			2104 : (\layer:"B", \min:0, \max:1, \name:"LFO 4 Clock Sync", \hint:this.off_on, \sysexpos:1096),
 			57 : (\layer:"A", \min:0, \max:52, \name:"Env. 3 Dest.", \hint:this.mod_dest_53, \sysexpos:30),
 			2105 : (\layer:"B", \min:0, \max:52, \name:"Env. 3 Dest.", \hint:this.mod_dest_53, \sysexpos:1054),
-			58 : (\layer:"A", \min:0, \max:254, \name:"Env. 3 Amt.", \sysexpos:34, \signed:true),
-			2106 : (\layer:"B", \min:0, \max:254, \name:"Env. 3 Amt.", \sysexpos:1058, \signed:true),
+			58 : (\layer:"A", \min:0, \max:254, \name:"Env. 3 Amt.", \sysexpos:34, \sysexsignpos:28, \signed:true),
+			2106 : (\layer:"B", \min:0, \max:254, \name:"Env. 3 Amt.", \sysexpos:1058, \sysexsignpos:1058, \signed:true),
 			59 : (\layer:"A", \min:0, \max:127, \name:"Env. 3 Velo.", \sysexpos:37),
 			2107 : (\layer:"B", \min:0, \max:127, \name:"Env. 3 Velo.", \sysexpos:1061),
 			60 : (\layer:"A", \min:0, \max:127, \name:"Env. 3 Del.", \sysexpos:40),
@@ -261,50 +262,50 @@ ScProphetRev2 {
 			2112 : (\layer:"B", \min:0, \max:127, \name:"Env. 3 R", \sysexpos:1076),
 			65 : (\layer:"A", \min:0, \max:22, \name:"Mod 1 Source", \hint:this.mod_source, \sysexpos:77),
 			2113 : (\layer:"B", \min:0, \max:22, \name:"Mod 1 Source", \hint:this.mod_source, \sysexpos:1101),
-			66 : (\layer:"A", \min:0, \max:254, \name:"Mod 1 Amount", \sysexpos:85, \signed:true),
-			2114 : (\layer:"B", \min:0, \max:254, \name:"Mod 1 Amount", \sysexpos:1109, \signed:true),
+			66 : (\layer:"A", \min:0, \max:254, \name:"Mod 1 Amount", \sysexpos:85, \sysexsignpos: 89, \signed:true),
+			2114 : (\layer:"B", \min:0, \max:254, \name:"Mod 1 Amount", \sysexpos:1109, \sysexsignpos:1109, \signed:true),
 			67 : (\layer:"A", \min:0, \max:52, \name:"Mod 1 Destination", \hint:this.mod_dest_53, \sysexpos:93),
 			2115 : (\layer:"B", \min:0, \max:52, \name:"Mod 1 Destination", \hint:this.mod_dest_53, \sysexpos:1117),
 			68 : (\layer:"A", \min:0, \max:22, \name:"Mod 2 Source", \hint:this.mod_source, \sysexpos:78),
 			2116 : (\layer:"B", \min:0, \max:22, \name:"Mod 2 Source", \hint:this.mod_source, \sysexpos:1102),
-			69 : (\layer:"A", \min:0, \max:254, \name:"Mod 2 Amount", \sysexpos:86, \signed:true),
-			2117 : (\layer:"B", \min:0, \max:254, \name:"Mod 2 Amount", \sysexpos:1110, \signed:true),
+			69 : (\layer:"A", \min:0, \max:254, \name:"Mod 2 Amount", \sysexpos:86, \sysexsignpos: 88, \signed:true),
+			2117 : (\layer:"B", \min:0, \max:254, \name:"Mod 2 Amount", \sysexpos:1110, \sysexsignpos:1108, \signed:true),
 			70 : (\layer:"A", \min:0, \max:52, \name:"Mod 2 Destination", \hint:this.mod_dest_53, \sysexpos:94),
 			2118 : (\layer:"B", \min:0, \max:52, \name:"Mod 2 Destination", \hint:this.mod_dest_53, \sysexpos:1118),
 			71 : (\layer:"A", \min:0, \max:22, \name:"Mod 3 Source", \hint:this.mod_source, \sysexpos:79),
 			2119 : (\layer:"B", \min:0, \max:22, \name:"Mod 3 Source", \hint:this.mod_source, \sysexpos:1103),
-			72 : (\layer:"A", \min:0, \max:254, \name:"Mod 3 Amount", \sysexpos:87, \signed:true),
-			2120 : (\layer:"B", \min:0, \max:254, \name:"Mod 3 Amount", \sysexpos:1111, \signed:true),
+			72 : (\layer:"A", \min:0, \max:254, \name:"Mod 3 Amount", \sysexpos:87, \sysexsignpos:87, \signed:true),
+			2120 : (\layer:"B", \min:0, \max:254, \name:"Mod 3 Amount", \sysexpos:1111, \sysexsignpos:1107, \signed:true),
 			73 : (\layer:"A", \min:0, \max:52, \name:"Mod 3 Destination", \hint:this.mod_dest_53, \sysexpos:95),
 			2121 : (\layer:"B", \min:0, \max:52, \name:"Mod 3 Destination", \hint:this.mod_dest_53, \sysexpos:1119),
 			74 : (\layer:"A", \min:0, \max:22, \name:"Mod 4 Source", \hint:this.mod_source, \sysexpos:80),
 			2122 : (\layer:"B", \min:0, \max:22, \name:"Mod 4 Source", \hint:this.mod_source, \sysexpos:1104),
-			75 : (\layer:"A", \min:0, \max:254, \name:"Mod 4 Amount", \sysexpos:88, \signed:true),
-			2123 : (\layer:"B", \min:0, \max:254, \name:"Mod 4 Amount", \sysexpos:1112, \signed:true),
+			75 : (\layer:"A", \min:0, \max:254, \name:"Mod 4 Amount", \sysexpos:88, \sysexsignpos:86, \signed:true),
+			2123 : (\layer:"B", \min:0, \max:254, \name:"Mod 4 Amount", \sysexpos:1112, \sysexsignpos:1106, \signed:true),
 			76 : (\layer:"A", \min:0, \max:52, \name:"Mod 4 Destination", \hint:this.mod_dest_53, \sysexpos:96),
 			2124 : (\layer:"B", \min:0, \max:52, \name:"Mod 4 Destination", \hint:this.mod_dest_53, \sysexpos:1120),
 			77 : (\layer:"A", \min:0, \max:22, \name:"Mod 5 Source", \hint:this.mod_source, \sysexpos:81),
 			2125 : (\layer:"B", \min:0, \max:22, \name:"Mod 5 Source", \hint:this.mod_source, \sysexpos:1105),
-			78 : (\layer:"A", \min:0, \max:254, \name:"Mod 5 Amount", \sysexpos:89, \signed:true),
-			2126 : (\layer:"B", \min:0, \max:254, \name:"Mod 5 Amount", \sysexpos:1113, \signed:true),
+			78 : (\layer:"A", \min:0, \max:254, \name:"Mod 5 Amount", \sysexpos:89, \sysexsignpos: 85, \signed:true),
+			2126 : (\layer:"B", \min:0, \max:254, \name:"Mod 5 Amount", \sysexpos:1113, \sysexsignpos:1119, \signed:true),
 			79 : (\layer:"A", \min:0, \max:52, \name:"Mod 5 Destination", \hint:this.mod_dest_53, \sysexpos:97),
 			2127 : (\layer:"B", \min:0, \max:52, \name:"Mod 5 Destination", \hint:this.mod_dest_53, \sysexpos:1121),
 			80 : (\layer:"A", \min:0, \max:22, \name:"Mod 6 Source", \hint:this.mod_source, \sysexpos:82),
 			2128 : (\layer:"B", \min:0, \max:22, \name:"Mod 6 Source", \hint:this.mod_source, \sysexpos:1106),
-			81 : (\layer:"A", \min:0, \max:254, \name:"Mod 6 Amount", \sysexpos:90, \signed:true),
-			2129 : (\layer:"B", \min:0, \max:254, \name:"Mod 6 Amount", \sysexpos:1114, \signed:true),
+			81 : (\layer:"A", \min:0, \max:254, \name:"Mod 6 Amount", \sysexpos:90, \sysexsignpos:84, \signed:true),
+			2129 : (\layer:"B", \min:0, \max:254, \name:"Mod 6 Amount", \sysexpos:1114, \sysexsignpos:1118, \signed:true),
 			82 : (\layer:"A", \min:0, \max:52, \name:"Mod 6 Destination", \hint:this.mod_dest_53, \sysexpos:98),
 			2130 : (\layer:"B", \min:0, \max:52, \name:"Mod 6 Destination", \hint:this.mod_dest_53, \sysexpos:1122),
 			83 : (\layer:"A", \min:0, \max:22, \name:"Mod 7 Source", \hint:this.mod_source, \sysexpos:83),
 			2131 : (\layer:"B", \min:0, \max:22, \name:"Mod 7 Source", \hint:this.mod_source, \sysexpos:1107),
-			84 : (\layer:"A", \min:0, \max:254, \name:"Mod 7 Amount", \sysexpos:91, \signed:true),
-			2132 : (\layer:"B", \min:0, \max:254, \name:"Mod 7 Amount", \sysexpos:1115, \signed:true),
+			84 : (\layer:"A", \min:0, \max:254, \name:"Mod 7 Amount", \sysexpos:91, \sysexsignpos:97, \signed:true),
+			2132 : (\layer:"B", \min:0, \max:254, \name:"Mod 7 Amount", \sysexpos:1115, \sysexsignpos:1117, \signed:true),
 			85 : (\layer:"A", \min:0, \max:52, \name:"Mod 7 Destination", \hint:this.mod_dest_53, \sysexpos:99),
 			2133 : (\layer:"B", \min:0, \max:52, \name:"Mod 7 Destination", \hint:this.mod_dest_53, \sysexpos:1123),
 			86 : (\layer:"A", \min:0, \max:22, \name:"Mod 8 Source", \hint:this.mod_source, \sysexpos:84),
 			2134 : (\layer:"B", \min:0, \max:22, \name:"Mod 8 Source", \hint:this.mod_source, \sysexpos:1108),
-			87 : (\layer:"A", \min:0, \max:254, \name:"Mod 8 Amount", \sysexpos:92, \signed:true),
-			2135 : (\layer:"B", \min:0, \max:254, \name:"Mod 8 Amount", \sysexpos:1116, \signed:true),
+			87 : (\layer:"A", \min:0, \max:254, \name:"Mod 8 Amount", \sysexpos:92, \sysexsignpos:96, \signed:true),
+			2135 : (\layer:"B", \min:0, \max:254, \name:"Mod 8 Amount", \sysexpos:1116, \sysexsignpos:1116, \signed:true),
 			88 : (\layer:"A", \min:0, \max:52, \name:"Mod 8 Destination", \hint:this.mod_dest_53, \sysexpos:100),
 			2136 : (\layer:"B", \min:0, \max:52, \name:"Mod 8 Destination", \hint:this.mod_dest_53, \sysexpos:1124),
 			97 : (\layer:"A", \min:0, \max:1, \name:"Env. 3 Rpt. on/off", \hint:this.off_on, \sysexpos:31),
@@ -335,24 +336,24 @@ ScProphetRev2 {
 			2161 : (\layer:"B", \min:0, \max:12, \name:"Pitch Bend Range", \sysexpos:1044),
 			114 : (\layer:"A", \min:0, \max:1, \name:"Pan Mode", \hint:this.pan_mode, \sysexpos:209),
 			2162 : (\layer:"B", \min:0, \max:1, \name:"Pan Mode", \hint:this.pan_mode, \sysexpos:1233),
-			116 : (\layer:"A", \min:0, \max:254, \name:"Mod Wheel Amt.", \sysexpos:101, \signed:true),
-			2164 : (\layer:"B", \min:0, \max:254, \name:"Mod Wheel Amt.", \sysexpos:1125, \signed:true),
+			116 : (\layer:"A", \min:0, \max:254, \name:"Mod Wheel Amt.", \sysexpos:101, \sysexsignpos:101, \signed:true), // no sysexsignpos: range from 0-254
+			2164 : (\layer:"B", \min:0, \max:254, \name:"Mod Wheel Amt.", \sysexpos:1125, \sysexsignpos:1121, \signed:true),
 			117 : (\layer:"A", \min:0, \max:52, \name:"Mod Wheel Dest.", \hint:this.mod_dest_53, \sysexpos:102),
 			2165 : (\layer:"B", \min:0, \max:52, \name:"Mod Wheel Dest.", \hint:this.mod_dest_53, \sysexpos:1126),
-			118 : (\layer:"A", \min:0, \max:254, \name:"Pressure Amt.", \sysexpos:103, \signed:true),
-			2166 : (\layer:"B", \min:0, \max:254, \name:"Pressure Amt.", \sysexpos:1127, \signed:true),
+			118 : (\layer:"A", \min:0, \max:254, \name:"Pressure Amt.", \sysexpos:103, \sysexsignpos:99, \signed:true),
+			2166 : (\layer:"B", \min:0, \max:254, \name:"Pressure Amt.", \sysexpos:1127, \sysexsignpos:1133, \signed:true),
 			119 : (\layer:"A", \min:0, \max:52, \name:"Pressure Dest.", \hint:this.mod_dest_53, \sysexpos:104),
 			2167 : (\layer:"B", \min:0, \max:52, \name:"Pressure Dest.", \hint:this.mod_dest_53, \sysexpos:1128),
-			120 : (\layer:"A", \min:0, \max:254, \name:"Breath Amt.", \sysexpos:105, \signed:true),
-			2168 : (\layer:"B", \min:0, \max:254, \name:"Breath Amt.", \sysexpos:1129, \signed:true),
+			120 : (\layer:"A", \min:0, \max:254, \name:"Breath Amt.", \sysexpos:105, \sysexsignpos:111, \signed:true),
+			2168 : (\layer:"B", \min:0, \max:254, \name:"Breath Amt.", \sysexpos:1129, \sysexsignpos:1131, \signed:true),
 			121 : (\layer:"A", \min:0, \max:52, \name:"Breath Dest.", \hint:this.mod_dest_53, \sysexpos:106),
 			2169 : (\layer:"B", \min:0, \max:52, \name:"Breath Dest.", \hint:this.mod_dest_53, \sysexpos:1130),
-			122 : (\layer:"A", \min:0, \max:254, \name:"Velocity Amt.", \sysexpos:107, \signed:true),
-			2170 : (\layer:"B", \min:0, \max:254, \name:"Velocity Amt.", \sysexpos:1131, \signed:true),
+			122 : (\layer:"A", \min:0, \max:254, \name:"Velocity Amt.", \sysexpos:107, \sysexsignpos:109, \signed:true),
+			2170 : (\layer:"B", \min:0, \max:254, \name:"Velocity Amt.", \sysexpos:1131, \sysexsignpos:1129, \signed:true),
 			123 : (\layer:"A", \min:0, \max:52, \name:"Velocity Dest.", \hint:this.mod_dest_53, \sysexpos:108),
 			2171 : (\layer:"B", \min:0, \max:52, \name:"Velocity Dest.", \hint:this.mod_dest_53, \sysexpos:1132),
-			124 : (\layer:"A", \min:0, \max:254, \name:"Foot Cntrlr Amt.", \sysexpos:109, \signed:true),
-			2172 : (\layer:"B", \min:0, \max:254, \name:"Foot Cntrlr Amt.", \sysexpos:1133, \signed:true),
+			124 : (\layer:"A", \min:0, \max:254, \name:"Foot Cntrlr Amt.", \sysexpos:109, \sysexsignpos:107, \signed:true),
+			2172 : (\layer:"B", \min:0, \max:254, \name:"Foot Cntrlr Amt.", \sysexpos:1133, \sysexsignpos:1127, \signed:true),
 			125 : (\layer:"A", \min:0, \max:52, \name:"Foot Cntrlr Dest.", \hint:this.mod_dest_53, \sysexpos:110),
 			2173 : (\layer:"B", \min:0, \max:52, \name:"Foot Cntrlr Dest.", \hint:this.mod_dest_53, \sysexpos:1134),
 			153 : (\layer:"A", \min:0, \max:1, \name:"FX on/off", \hint:this.off_on, \sysexpos:116),
@@ -4451,6 +4452,7 @@ ScProphetRev2 {
 			});
 
 			this.last_sysex_stream = sysex_unpacked.copy();
+			this.last_patch_sysex_stream = sysex_unpacked.copy();
 
 			MIDIIn.sysex = {};
 
@@ -4504,6 +4506,7 @@ ScProphetRev2 {
 			});
 
 			this.last_sysex_stream = sysex_unpacked.copy();
+			this.last_patch_sysex_stream = sysex_unpacked.copy();
 
 			MIDIIn.sysex = {};
 

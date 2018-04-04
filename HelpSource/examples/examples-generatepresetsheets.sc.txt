@@ -13,7 +13,7 @@ fork {
 	var prepath = PathName(TemplateFiller.class.filenameSymbol.asString).parentPath +/+ "template" +/+ "template-preamble.tex";
 	var postpath = PathName(TemplateFiller.class.filenameSymbol.asString).parentPath +/+ "template" +/+ "template-postamble.tex";
 	var pngpath = PathName(TemplateFiller.class.filenameSymbol.asString).parentPath +/+ "template" +/+ "rev2.png";
-	var outputpath = PathName("/home/shimpe/documents/rev2presets/output/");
+	var outputpath = PathName("/home/shimpe/documents/music/rev2presets/output/");
 
 	~collectedpatches = ~collectedpatches.add(File.readAllString(prepath));
 

@@ -1,14 +1,19 @@
 PatchDumper {
 
 	var <>rev2;
+	var <>sysex_stream;
 	var <>rev2_nrpn_globals;
 	var <>note_name;
 
 	*new {
-		^super.new.init();
+		| rev2, sysexstream |
+		^super.new.init(rev2, sysexstream);
 	}
 
 	init {
+		| rev2, sysexstream |
+		this.sysex_stream = sysexstream;
+		this.rev2 = rev2;
 	}
 
 	lut {
@@ -62,9 +67,25 @@ PatchDumper {
 					if (midivalue.not) {
 						if (this.rev2[constant+offset][\signed].notNil) {
 							if (this.rev2[constant+offset][\signed]) {
-								//("BEFORE SIGN: "++value).postln;
-								value = value - (this.rev2[constant+offset][\max]/2).ceil.asInt;
-								//("AFTER SIGN: "++value++" (max is "++ this.rev2[constant+offset][\max] ++")").postln;
+								if (this.rev2[constant+offset][\sysexsignpos].notNil) {
+									var signbit = (this.sysex_stream[this.rev2[constant+offset][\sysexsignpos]] & 128) >> 7;
+									//("SIGNBIT: " ++ signbit).postln;
+									if (signbit == 1) {
+										// positive amount
+										//("SIGNBIT POS BEFORE SIGN: "++value).postln;
+										value = ((value&127) + 1);
+										//("SIGNBIT POS AFTER SIGN: "++value).postln;
+									} {
+										// negative amount
+										//("SIGNBIT NEG BEFORE SIGN: "++value).postln;
+										value = (value&127) - 127;
+										//("SIGNBIT NEG AFTER SIGN: "++value).postln;
+									}
+								} {
+									//("BEFORE SIGN: "++value).postln;
+									value = value - (this.rev2[constant+offset][\max]/2).ceil.asInt;
+									//("AFTER SIGN: "++value++" (max is "++ this.rev2[constant+offset][\max] ++")").postln;
+								}
 							};
 						};
 					};
