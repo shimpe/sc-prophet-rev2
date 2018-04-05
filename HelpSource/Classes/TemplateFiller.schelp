@@ -1,0 +1,158 @@
+TITLE:: TemplateFiller
+summary:: (put short description here)
+categories:: Undocumented classes
+related:: Classes/ScProphetRev2, Classes/PatchDumper
+
+DESCRIPTION::
+TemplateFiller generates LaTeX code that explains the anatomy of a patch.
+
+
+CLASSMETHODS::
+
+METHOD:: new
+this creates a new TemplateFiller
+
+ARGUMENT:: rev2
+rev2 is information available from the ScProphetRev2 class. It has to be initialized by the ScProphetRev2 class by calling one of the methods that requests a patch from the synthesizer.
+
+ARGUMENT:: sysexstream
+sysexstream is information available from the ScProphetRev2 class. It has to be initialized by the ScProphetRev2 class by calling one of the methods that requests a patch for the synthesizer.
+
+returns:: (describe returnvalue here)
+a new TemplateFiller
+
+INSTANCEMETHODS::
+
+METHOD:: rev2
+Allows to reinitialize an existing TemplateFiller with information for a new patch.
+
+returns:: (describe returnvalue here)
+
+METHOD:: generate_string
+This method generates the LaTeX code as a string.
+
+ARGUMENT:: bank
+This is the string that will be put in the "bank" field of the sheet. (It is not part of the rev2 datastructure information)
+
+ARGUMENT:: program
+This is the string that will be put in the "program" field of the sheet. (It is not part of the rev2 datastructure information)
+
+
+METHOD:: generate
+This method generates LaTeX code to a file.
+
+ARGUMENT:: bank
+This is the string that will be put in the "bank" field of the sheet. (It is not part of the rev2 datastructure information)
+
+ARGUMENT:: program
+This is the string that will be put in the "program" field of the sheet. (It is not part of the rev2 datastructure information)
+
+ARGUMENT:: resultfilelocation
+Location where the LaTeX code will be saved.
+
+ARGUMENT:: resultfilename
+Filename under which the LateX code will be saved. Be sure the target doesn't exist already as currently this makes supercollider crash.
+
+returns:: generates a file and returns the generated template as a string
+
+METHOD:: sysexstream
+this is needed in the PatchDumper (used internally in TemplateFiller) to perform the correct analysis of parameter values
+
+returns:: (internal stuff)
+
+METHOD:: init
+(describe method here)
+
+ARGUMENT:: rev2
+Information about a patch, collected by a ScProphetRev2 instance.
+
+ARGUMENT:: sysexstream
+Information about a patch, collected by a ScProphetRev2 instance.
+
+returns:: initialized TemplateFiller
+
+METHOD:: substitutions
+defines which substitutions will be done to transform a LaTeX template file into a full blown LaTeX document. Internal stuff - don't touch.
+
+returns:: (describe returnvalue here)
+
+METHOD:: templatepath
+location of LaTeX template. Internal stuff - don't touch.
+
+returns:: (describe returnvalue here)
+
+METHOD:: prOffset
+Internal stuff - don' touch
+
+returns:: (describe returnvalue here)
+
+
+EXAMPLES::
+
+code::
+// first run this and wait until connected
+(
+~synth = ScProphetRev2.new;
+~synth.connect;
+)
+
+// then run this
+(
+~banks = ["U1", "U2", "U3", "U4", "F1", "F2", "F3", "F4"];
+~collectedpatches = [];
+~filecontents = [];
+fork {
+	var prepath = PathName(TemplateFiller.class.filenameSymbol.asString).parentPath +/+ "template" +/+ "template-preamble.tex";
+	var postpath = PathName(TemplateFiller.class.filenameSymbol.asString).parentPath +/+ "template" +/+ "template-postamble.tex";
+	var outputpath = PathName("/home/shimpe/documents/music/rev2presets/output/");
+
+	~collectedpatches = ~collectedpatches.add(File.readAllString(prepath));
+
+	(4..7).do({ // banks 4,5,6,7
+		|bank|
+		(0..127).do({ // programs 1..128
+			| patch |
+			var b = ~banks[bank];
+			var p = "P"++(patch+1);
+			("Processing patch "++b++p).postln;
+			~synth.get_patch_from_synth(bank, patch, {
+				~synth.get_global_parameters_from_synth({
+					~expl = TemplateFiller.new(~synth.rev2, ~synth.last_patch_sysex_stream);
+					//~copyrev = ~synth.rev2.copy();
+					//~copysysex = ~synth.last_patch_sysex_stream.copy();
+					~collectedpatches = ~collectedpatches.add(~expl.generate_string(b, p));
+				});
+			});
+			"Waiting 1 seconds to get the next patch.".postln;
+			1.wait;
+		});
+	});
+
+	~collectedpatches = ~collectedpatches.add(File.readAllString(postpath));
+
+	"Finished.".postln;
+};
+)
+
+// finally run this
+(
+var pngpath = PathName(TemplateFiller.class.filenameSymbol.asString).parentPath +/+ "template" +/+ "rev2.png";
+
+"Copying image.".postln;
+
+//	File.copy(pngpath, "/home/shimpe/documents/music/rev2presets/output/rev2.png"); // crashes if target exists!?!?!
+
+"Writing to file.".postln;
+
+File.use("/home/shimpe/documents/music/rev2presets/output/specsheets.tex", "w", { |f|
+	~collectedpatches.do({
+		|el|
+		el.postln;
+		f.write(el);
+	});
+
+});
+
+"Finished".postln;
+)
+::

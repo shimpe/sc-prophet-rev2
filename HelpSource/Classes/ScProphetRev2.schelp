@@ -74,12 +74,6 @@ Do something when upload is complete
 returns:: ScProphetRev2
 
 
-METHOD:: patch_explainer
-Display last downloaded patch in a text report.
-
-returns:: list of strings
-
-
 METHOD:: makeNRPNResponder
 creates a CCResponder that can react to all incoming rev2 NRPN messages.
 
