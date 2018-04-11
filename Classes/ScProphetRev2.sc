@@ -115,7 +115,7 @@ ScProphetRev2 {
 		this.kbd_mode = ["Low", "High",  "Last", "LowR", "HiR", "LastR"];
 		this.ab_mode = ["Layer A", "Split A|B", "Stack A|B",	"Layer B"];
 		this.arp_mode = ["Up", "Down", "Up+Down", "Random", "Assign"];
-		this.unison_mode = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "Chord"];
+		this.unison_mode = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "Chord"];
 		this.divide = ["half", "quarter", "8th", "8th dot", "8th swing", "8th Triplet", "16th", "16th dot", "16th swing",
 			"16th triplet", "32nd", "32nd triplet", "64th triplet"];
 		this.arp_range = ["1 octave", "2 octaves", "3 octaves"];
