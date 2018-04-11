@@ -27,6 +27,8 @@ TemplateFiller {
 		var t = NrpnTable.new;
 		var aname = "";
 		var bname = "";
+		var anameidx = "";
+		var bnameidx = "";
 		var substitutions;
 
 		patchdumper.rev2 = this.rev2;
@@ -48,6 +50,10 @@ TemplateFiller {
 		.replace("~", "\\textasciitilde")
 		.replace("^", "\\textasciicircum")
 		.replace("%","\\%");
+		anameidx = aname
+		.replace("!", "\"!")
+		.replace("@", "\"@")
+		.replace("|", "\"|");
 		bname = bname.replace("\\","\\textbackslash")
 		.replace("#","\\#")
 		.replace("&", "\\&")
@@ -58,11 +64,14 @@ TemplateFiller {
 		.replace("~", "\\textasciitilde")
 		.replace("^", "\\textasciicircum")
 		.replace("%","\\%");
-
+		bnameidx = bname
+		.replace("!", "\"!")
+		.replace("@", "\"@")
+		.replace("|", "\"|");
 
 		substitutions = IdentityDictionary.newFrom([
-			"\\renewcommand*{\\aname}{}%" : "\\renewcommand*{\\aname}{%%}\\%".format(aname,"\\index{%}".format(aname)),
-			"\\renewcommand*{\\bname}{}%" : "\\renewcommand*{\\bname}{%%}\\%".format(bname,"\\index{%}".format(bname)),
+			"\\renewcommand*{\\aname}{}%" : "\\renewcommand*{\\aname}{%%}\\%".format(aname,"\\index{%}".format(anameidx)),
+			"\\renewcommand*{\\bname}{}%" : "\\renewcommand*{\\bname}{%%}\\%".format(bname,"\\index{%}".format(bnameidx)),
 			"\\renewcommand*{\\abank}{}%" : "\\renewcommand*{\\abank}{%}\\%".format(bank ++ " (A)"),
 			"\\renewcommand*{\\aprogram}{}%" : "\\renewcommand*{\\aprogram}{%}\\%".format(program),
 			"\\renewcommand*{\\bbank}{}%" : "\\renewcommand*{\\bbank}{%}\\%".format(bank ++ " (B)"),
