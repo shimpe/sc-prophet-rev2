@@ -68,7 +68,7 @@ TemplateFiller {
 			"\\renewcommand*{\\bbank}{}%" : "\\renewcommand*{\\bbank}{%}\\%".format(bank ++ " (B)"),
 			"\\renewcommand*{\\bprogram}{}%" : "\\renewcommand*{\\bprogram}{%}\\%".format(program),
 			"\\renewcommand*{\\aunison}{0}%" : "\\renewcommand*{\\aunison}{%}\\%".format(patchdumper.lutt("On",t.str2num('UNISON_OFFON'), norange:true)),
-			"\\renewcommand*{\\avoices}{}%" : "\\renewcommand*{\\avoices}{%}\\%".format(patchdumper.lut(t.str2num('UNISON_MODE'), norange:true)),
+			"\\renewcommand*{\\avoices}{}%" : "\\renewcommand*{\\avoices}{%}\\%".format(patchdumper.lut(t.str2num('UNISON_MODE'), norange:true, mask:31)),
 			"\\renewcommand*{\\adetune}{}%" : "\\renewcommand*{\\adetune}{%}\\%".format(patchdumper.lutb(t.str2num('UNISON_DETUNE'), norange:true)),
 			"\\renewcommand*{\\afreqone}{}%": "\\renewcommand*{\\afreqone}{%}\\%".format(patchdumper.lut(t.str2num('OSC1_FREQ'), norange:true)).replace("#","\\#"),
 			"\\renewcommand*{\\afinetuneone}{}%" : "\\renewcommand*{\\afinetuneone}{%}\\%".format(patchdumper.lut(t.str2num('OSC1_FINE'), norange:true)),
@@ -279,7 +279,7 @@ TemplateFiller {
 			"\\renewcommand*{\\atrkfoursixteen}{}%" : "\\renewcommand*{\\atrkfoursixteen}{%}\\%".format(patchdumper.lut(t.str2num('SEQ1_GATED_STEP16_TRACK4'), norange:true)),
 
 			"\\renewcommand*{\\bunison}{0}%" : "\\renewcommand*{\\bunison}{%}\\%".format(patchdumper.lutbt("On", t.str2num('UNISON_OFFON'), norange:true)),
-			"\\renewcommand*{\\bvoices}{}%" : "\\renewcommand*{\\bvoices}{%}\\%".format(patchdumper.lutb(t.str2num('UNISON_MODE'), norange:true)),
+			"\\renewcommand*{\\bvoices}{}%" : "\\renewcommand*{\\bvoices}{%}\\%".format(patchdumper.lutb(t.str2num('UNISON_MODE'), norange:true, mask:31)),
 			"\\renewcommand*{\\bdetune}{}%" : "\\renewcommand*{\\bdetune}{%}\\%".format(patchdumper.lutb(t.str2num('UNISON_DETUNE'), norange:true)),
 			"\\renewcommand*{\\bfreqone}{}%": "\\renewcommand*{\\bfreqone}{%}\\%".format(patchdumper.lutb(t.str2num('OSC1_FREQ'), norange:true).replace("#","\\#")),
 			"\\renewcommand*{\\bfinetuneone}{}%" : "\\renewcommand*{\\bfinetuneone}{%}\\%".format(patchdumper.lutb(t.str2num('OSC1_FINE'), norange:true)),
