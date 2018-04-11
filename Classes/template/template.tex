@@ -6,6 +6,7 @@
 \renewcommand*{\avoices}{}%
 \renewcommand*{\adetune}{}%
 \renewcommand*{\afreqone}{}%
+\renewcommand*{\aglideone}{}%
 \renewcommand*{\afinetuneone}{}%
 \renewcommand*{\afreqonesawone}{0}%
 \renewcommand*{\afreqonetrione}{0}%
@@ -17,6 +18,7 @@
 \renewcommand*{\anoise}{}%
 \renewcommand*{\akeybdoneone}{0}%
 \renewcommand*{\afreqtwo}{}%
+\renewcommand*{\aglidetwo}{}%
 \renewcommand*{\afinetunetwo}{}%
 \renewcommand*{\afreqonesawtwo}{0}%
 \renewcommand*{\afreqonetritwo}{0}%
@@ -219,6 +221,7 @@
 \renewcommand*{\bvoices}{}%
 \renewcommand*{\bdetune}{}%
 \renewcommand*{\bfreqone}{}%
+\renewcommand*{\bglideone}{}%
 \renewcommand*{\bfinetuneone}{}%
 \renewcommand*{\bfreqonesawone}{0}%
 \renewcommand*{\bfreqonetrione}{0}%
@@ -230,6 +233,7 @@
 \renewcommand*{\bnoise}{}%
 \renewcommand*{\bkeybdoneone}{0}%
 \renewcommand*{\bfreqtwo}{}%
+\renewcommand*{\bglidetwo}{}%
 \renewcommand*{\bfinetunetwo}{}%
 \renewcommand*{\bfreqonesawtwo}{0}%
 \renewcommand*{\bfreqonetritwo}{0}%
@@ -432,11 +436,11 @@ Layer\,A\footnote{generated with supercollider and \LaTeX using \url{https://git
  Name\,\LLN[15em]{\aname} Bank\,\LLN[3em]{\abank} Prg\,\LLN[3em]{\aprogram} Unison\,\CCB{\aunison} Voices\,\LLN[5em]{\avoices} Detune\,\LLN[5em]{\adetune} \linebreak
 %%\vspace*{-0.7em}
 \textbf{Oscillator\,1}\linebreak
-Freq\,\LLN{\afreqone} Fine\,tune\,\LLN{\afinetuneone} Shape\,\CLCB{Saw}{\afreqonesawone} \CLCB{Tri}{\afreqonetrione} \CLCB{SwTr}{\afreqoneswtrone} \CLCB{Pls}{\afreqonepulseone} \CLCB{Off}{\afreqoneoffone} Shape\,mod\,\LLN{\ashapemodone} Sub\,oct\,\LLN{\asuboct} Noise\,\LLN{\anoise} Keybd\,\CCB{\akeybdoneone}\linebreak
+Freq\,\LLN{\afreqone} Fine\,tune\,\LLN{\afinetuneone} Shape\,\CLCB{Saw}{\afreqonesawone} \CLCB{Tri}{\afreqonetrione} \CLCB{SwTr}{\afreqoneswtrone} \CLCB{Pls}{\afreqonepulseone} \CLCB{Off}{\afreqoneoffone} Shape\,mod\,\LLN{\ashapemodone} Sub\,oct\,\LLN{\asuboct} Noise\,\LLN{\anoise} Glide\,\LLN{\aglideone} Keybd\,\CCB{\akeybdoneone}\linebreak
 %%\vspace*{-0.7em}
 %\begin{mdframemd}[backgroundcolor=blue!20]
 \textbf{Oscillator\,2}\linebreak
-Freq\,\LLN{\afreqtwo} Fine\,tune\,\LLN{\afinetunetwo} Shape\,\CLCB{Saw}{\afreqonesawtwo} \CLCB{Tri}{\afreqonetritwo} \CLCB{SwTr}{\afreqoneswtrtwo} \CLCB{Pls}{\afreqonepulsetwo} \LCB{Off} Shape\,mod\,\LLN{\ashapemodtwo} Osc\,mix\,\LLN{\aoscmix} Slop\,\tikz{\draw (0,0)--(2em,0) node[above=0.4em, right=-2em, fill=yellow, opacity=.8] {\textbf{\textit{\aslop}}}  node[above=0.7em] {Sync\,\CCB{\async}}} Keybd\,\CCB{\akeybdonetwo}\linebreak
+Freq\,\LLN{\afreqtwo} Fine\,tune\,\LLN{\afinetunetwo} Shape\,\CLCB{Saw}{\afreqonesawtwo} \CLCB{Tri}{\afreqonetritwo} \CLCB{SwTr}{\afreqoneswtrtwo} \CLCB{Pls}{\afreqonepulsetwo} \LCB{Off} Shape\,mod\,\LLN{\ashapemodtwo} Osc\,mix\,\LLN{\aoscmix} Slop\,\tikz{\draw (0,0)--(2em,0) node[above=0.4em, right=-2em, fill=yellow, opacity=.8] {\textbf{\textit{\aslop}}}  node[above=0.7em] {Sync\,\CCB{\async}}} Glide\,\LLN{\aglidetwo} Keybd\,\CCB{\akeybdonetwo}\linebreak
 \textbf{Low\,pass\,filter}\linebreak
 Cutoff\,\LLN{\alpfcutoff} Resonance\,\LLN{\alpfreson} Env\,amount\,\LLN{\alpfenvamt} Velocity\,\LLN{\alpfvel} Key\,amount\,\LLN{\alpfkeyamt} Audio\,mod\,\LLN{\alpfaudiomod}\linebreak
 4\,pole\,\CCB{\afourpole} Delay\,\LLN{\alpfdelay} Attack\,\LLN{\alpfattack} Decay\,\LLN{\alpfdecay} Sustain\,\LLN{\alpfsustain} Release\,\LLN{\alpfrelease}\linebreak
@@ -491,11 +495,11 @@ Trk\,4\,destination\,\LLN[14em]{\atrkfourdest}\linebreak
 Layer\,B\footnote{made by Stefaan Himpe, based on a template by Gerry Havinga available under Attribution-NonCommercial 4.0 International (CC BY-NC 4.0) license} Name\,\LLN[15em]{\bname} Bank\,\LLN[3em]{\bbank} Prg\,\LLN[3em]{\bprogram}  Unison\,\CCB{\bunison} Voices\,\LLN[5em]{\bvoices} Detune\,\LLN[5em]{\adetune} \linebreak
 %%\vspace*{-0.7em}
 \textbf{Oscillator\,1}\linebreak
-Freq\,\LLN{\bfreqone} Fine\,tune\,\LLN{\bfinetuneone} Shape\,\CLCB{Saw}{\bfreqonesawone} \CLCB{Tri}{\bfreqonetrione} \CLCB{SwTr}{\bfreqoneswtrone} \CLCB{Pls}{\bfreqonepulseone} \CLCB{Off}{\bfreqoneoffone} Shape\,mod\,\LLN{\bshapemodone} Sub\,oct\,\LLN{\bsuboct} Noise\,\LLN{\bnoise} Keybd\,\CCB{\bkeybdoneone}\linebreak
+Freq\,\LLN{\bfreqone} Fine\,tune\,\LLN{\bfinetuneone} Shape\,\CLCB{Saw}{\bfreqonesawone} \CLCB{Tri}{\bfreqonetrione} \CLCB{SwTr}{\bfreqoneswtrone} \CLCB{Pls}{\bfreqonepulseone} \CLCB{Off}{\bfreqoneoffone} Shape\,mod\,\LLN{\bshapemodone} Sub\,oct\,\LLN{\bsuboct} Noise\,\LLN{\bnoise} Glide\,\LLN{\bglideone} Keybd\,\CCB{\bkeybdoneone}\linebreak
 %%\vspace*{-0.7em}
 %\begin{mdframemd}[backgroundcolor=blue!20]
 \textbf{Oscillator\,2}\linebreak
-Freq\,\LLN{\bfreqtwo} Fine\,tune\,\LLN{\bfinetunetwo} Shape\,\CLCB{Saw}{\bfreqonesawtwo} \CLCB{Tri}{\bfreqonetritwo} \CLCB{SwTr}{\bfreqoneswtrtwo} \CLCB{Pls}{\bfreqonepulsetwo} \LCB{Off} Shape\,mod\,\LLN{\bshapemodtwo} Osc\,mix\,\LLN{\boscmix} Slop\,\tikz{\draw (0,0)--(2em,0) node[above=0.4em, right=-2em, fill=yellow, opacity=.8] {\textbf{\textit{\bslop}}}  node[above=0.7em] {Sync\,\CCB{\bsync}}} Keybd\,\CCB{\bkeybdonetwo}\linebreak
+Freq\,\LLN{\bfreqtwo} Fine\,tune\,\LLN{\bfinetunetwo} Shape\,\CLCB{Saw}{\bfreqonesawtwo} \CLCB{Tri}{\bfreqonetritwo} \CLCB{SwTr}{\bfreqoneswtrtwo} \CLCB{Pls}{\bfreqonepulsetwo} \LCB{Off} Shape\,mod\,\LLN{\bshapemodtwo} Osc\,mix\,\LLN{\boscmix} Slop\,\tikz{\draw (0,0)--(2em,0) node[above=0.4em, right=-2em, fill=yellow, opacity=.8] {\textbf{\textit{\bslop}}}  node[above=0.7em] {Sync\,\CCB{\bsync}}} Glide\,\LLN{\bglidetwo} Keybd\,\CCB{\bkeybdonetwo}\linebreak
 \textbf{Low\,pass\,filter}\linebreak
 Cutoff\,\LLN{\blpfcutoff} Resonance\,\LLN{\blpfreson} Env\,amount\,\LLN{\blpfenvamt} Velocity\,\LLN{\blpfvel} Key\,amount\,\LLN{\blpfkeyamt} Audio\,mod\,\LLN{\blpfaudiomod}\linebreak
 4\,pole\,\CCB{\bfourpole} Delay\,\LLN{\blpfdelay} Attack\,\LLN{\blpfattack} Decay\,\LLN{\blpfdecay} Sustain\,\LLN{\blpfsustain} Release\,\LLN{\blpfrelease}\linebreak

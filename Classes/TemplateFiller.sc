@@ -72,6 +72,8 @@ TemplateFiller {
 		substitutions = IdentityDictionary.newFrom([
 			"\\renewcommand*{\\aname}{}%" : "\\renewcommand*{\\aname}{%%}\\%".format(aname,"\\index{%}".format(anameidx)),
 			"\\renewcommand*{\\bname}{}%" : "\\renewcommand*{\\bname}{%%}\\%".format(bname,"\\index{%}".format(bnameidx)),
+			"\\renewcommand*{\\aglideone}{}%" : "\\renewcommand*{\\aglideone}{%%}\\%".format(patchdumper.lut(t.str2num('OSC1_GLIDE'), norange:true)),
+			"\\renewcommand*{\\aglidetwo}{}%" : "\\renewcommand*{\\aglidetwo}{%%}\\%".format(patchdumper.lut(t.str2num('OSC2_GLIDE'), norange:true)),
 			"\\renewcommand*{\\abank}{}%" : "\\renewcommand*{\\abank}{%}\\%".format(bank ++ " (A)"),
 			"\\renewcommand*{\\aprogram}{}%" : "\\renewcommand*{\\aprogram}{%}\\%".format(program),
 			"\\renewcommand*{\\bbank}{}%" : "\\renewcommand*{\\bbank}{%}\\%".format(bank ++ " (B)"),
@@ -289,6 +291,8 @@ TemplateFiller {
 
 			"\\renewcommand*{\\bunison}{0}%" : "\\renewcommand*{\\bunison}{%}\\%".format(patchdumper.lutbt("On", t.str2num('UNISON_OFFON'), norange:true)),
 			"\\renewcommand*{\\bvoices}{}%" : "\\renewcommand*{\\bvoices}{%}\\%".format(patchdumper.lutb(t.str2num('UNISON_MODE'), norange:true, mask:31)),
+			"\\renewcommand*{\\bglideone}{}%" : "\\renewcommand*{\\bglideone}{%%}\\%".format(patchdumper.lutb(t.str2num('OSC1_GLIDE'), norange:true)),
+			"\\renewcommand*{\\bglidetwo}{}%" : "\\renewcommand*{\\bglidetwo}{%%}\\%".format(patchdumper.lutb(t.str2num('OSC2_GLIDE'), norange:true)),
 			"\\renewcommand*{\\bdetune}{}%" : "\\renewcommand*{\\bdetune}{%}\\%".format(patchdumper.lutb(t.str2num('UNISON_DETUNE'), norange:true)),
 			"\\renewcommand*{\\bfreqone}{}%": "\\renewcommand*{\\bfreqone}{%}\\%".format(patchdumper.lutb(t.str2num('OSC1_FREQ'), norange:true).replace("#","\\#")),
 			"\\renewcommand*{\\bfinetuneone}{}%" : "\\renewcommand*{\\bfinetuneone}{%}\\%".format(patchdumper.lutb(t.str2num('OSC1_FINE'), norange:true)),
