@@ -19,7 +19,7 @@ TemplateFiller {
 	}
 
 	generate_string {
-		| bank, program, resultfilelocation |
+		| bank, program, resultfilelocation, lookupvalues=true |
 		var path = PathName(TemplateFiller.class.filenameSymbol.asString).parentPath +/+ "template" +/+ "template.tex";
 
 		var template = File.readAllString(path.standardizePath);
@@ -499,11 +499,13 @@ TemplateFiller {
 			"\\renewcommand*{\\btrkfoursixteen}{}%" : "\\renewcommand*{\\btrkfoursixteen}{%}\\%".format(patchdumper.lutb(t.str2num('SEQ1_GATED_STEP16_TRACK4'), norange:true))
 		]);
 
-		substitutions.keys.do {
-			| key, idx |
-			//("replacing "++key++" with "++substitutions[key]).postln;
-			// & % $ # _ { } ~ ^ \
-			template = template.replace(key, substitutions[key]);
+		if (lookupvalues) {
+			substitutions.keys.do {
+				| key, idx |
+				//("replacing "++key++" with "++substitutions[key]).postln;
+				// & % $ # _ { } ~ ^ \
+				template = template.replace(key, substitutions[key]);
+			};
 		};
 
 		^template;
