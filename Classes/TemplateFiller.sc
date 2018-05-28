@@ -19,8 +19,8 @@ TemplateFiller {
 	}
 
 	generate_string {
-		| bank, program, resultfilelocation, lookupvalues=true |
-		var path = PathName(TemplateFiller.class.filenameSymbol.asString).parentPath +/+ "template" +/+ "template.tex";
+		| bank, program, templatefile, lookupvalues=true |
+		var path = PathName.new(templatefile);
 
 		var template = File.readAllString(path.standardizePath);
 		var patchdumper = PatchDumper.new;
@@ -516,8 +516,8 @@ TemplateFiller {
 	}
 
 	generate {
-		| bank, program, resultfilelocation, resultfilename |
-		var str = this.generate_string(bank, program);
+		| bank, program, resultfilelocation, resultfilename, templatefile |
+		var str = this.generate_string(bank, program, templatefile);
 		File.use(resultfilelocation++resultfilename, "w", {
 			|f|
 			f.write(str);
