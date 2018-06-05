@@ -17,7 +17,7 @@ PatchDumper {
 	}
 
 	lut {
-		| constant, offset=0, mask = 16rFFFFFFFF, norange = false, midivalue = false |
+		| constant, offset=0, mask = 16rFFFFFFFF, norange = false, midivalue = false, includeunit=true |
 		/*
 		if (mask != -1) {
 		("constant "++constant).postln;
@@ -49,7 +49,11 @@ PatchDumper {
 						^("Warning: lut couldn't translate value "++(this.rev2[constant+offset][\curval] & mask)++
 							" for nrpn constant "++(constant+offset)++". Perhaps you need to specify a mask in call to lut.");
 					} {
-						^(this.rev2[constant+offset][\hint][value]);
+						if (midivalue.not) {
+							^(this.rev2[constant+offset][\hint][value]);
+						} {
+							^value;
+						};
 					}
 				} {
 					var unit = "";
@@ -90,7 +94,11 @@ PatchDumper {
 						};
 					};
 					if (norange) {
-						^(value.asString ++ unit);
+						if (includeunit) {
+							^(value.asString ++ unit);
+						} {
+							^value.asString;
+						};
 					} {
 						var percentage = value.linlin(this.rev2[constant+offset][\min], this.rev2[constant+offset][\max], 0, 100);
 						^(value.asString ++ unit ++ " ("++percentage.round(1)++"% of range)");

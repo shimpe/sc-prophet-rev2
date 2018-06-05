@@ -4433,21 +4433,18 @@ ScProphetRev2 {
 			sysex_unpacked = this.util.midi_unpack(sysex_raw_data);
 			sysex_unpacked.do({
 				| el, idx |
-				//("IDX= "++idx).postln;
-				if ((this.sysex_bytepos[idx][\key].isNil) || (this.sysex_bytepos[idx][\key] != 1.neg)) {
-					//("sysex_bytepos[idx]= "++sysex_bytepos[idx]).postln;
-					//("sysex_bytepos[idx][\key]= "++sysex_bytepos[idx][\key]).postln;
-					//("sysex_bytepos[idx][\nrpn]= "++sysex_bytepos[idx][\nrpn]).postln;
-					if (sysex_bytepos[idx][\nrpn].isNil) {
-						//("sysex_bytepos[idx] = "++sysex_bytepos[idx]++" at idx= "++idx++" has no nrpn assigned");
+				var index = idx%2048;
+				if ((this.sysex_bytepos[index][\key].isNil) || (this.sysex_bytepos[index][\key] != 1.neg)) {
+					if (sysex_bytepos[index][\nrpn].isNil) {
+						//("sysex_bytepos[index] = "++sysex_bytepos[index]++" at idx= "++index++" has no nrpn assigned");
 					} /* else */ {
-						var ev = (this.rev2[(this.sysex_bytepos[idx][\nrpn])]).copy();
+						var ev = (this.rev2[(this.sysex_bytepos[index][\nrpn])]).copy();
 						ev[\curval] = el.copy();
-						this.rev2[(this.sysex_bytepos[idx][\nrpn])] = ev;
+						this.rev2[(this.sysex_bytepos[index][\nrpn])] = ev;
 
 					};
 				} /* else */ {
-					//("byte "++el++" at idx "++idx++" has no known meaning.").postln;
+					//("byte "++el++" at index "++index++" has no known meaning.").postln;
 				};
 			});
 
@@ -4492,16 +4489,17 @@ ScProphetRev2 {
 			sysex_unpacked = this.util.midi_unpack(sysex_raw_data);
 			sysex_unpacked.do({
 				| el, idx |
-				if ((this.sysex_bytepos[idx][\key].isNil) || (this.sysex_bytepos[idx][\key] != 1.neg)) {
-					if (sysex_bytepos[idx][\nrpn].isNil) {
+				var index = idx%2048;
+				if ((this.sysex_bytepos[index][\key].isNil) || (this.sysex_bytepos[index][\key] != 1.neg)) {
+					if (sysex_bytepos[index][\nrpn].isNil) {
 					} /* else */ {
-						var ev = (this.rev2[(this.sysex_bytepos[idx][\nrpn])]).copy();
+						var ev = (this.rev2[(this.sysex_bytepos[index][\nrpn])]).copy();
 						ev[\curval] = el.copy();
-						this.rev2[(this.sysex_bytepos[idx][\nrpn])] = ev;
+						this.rev2[(this.sysex_bytepos[index][\nrpn])] = ev;
 
 					};
 				} /* else */ {
-					//("byte "++el++" at idx "++idx++" has no known meaning.").postln;
+					//("byte "++el++" at idx "++index++" has no known meaning.").postln;
 				};
 			});
 

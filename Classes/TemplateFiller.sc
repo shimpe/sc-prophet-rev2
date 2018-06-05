@@ -22,7 +22,7 @@ TemplateFiller {
 		| bank, program, templatefile, lookupvalues=true |
 		var path = PathName.new(templatefile);
 
-		var template = File.readAllString(path.standardizePath);
+		var template = File.readAllString(path.fullPath.standardizePath);
 		var patchdumper = PatchDumper.new;
 		var t = NrpnTable.new;
 		var aname = "";
@@ -174,6 +174,11 @@ TemplateFiller {
 			"\\renewcommand*{\\aarpdivide}{}%" : "\\renewcommand*{\\aarpdivide}{%}\\%".format(patchdumper.lut(t.str2num('ARP_CLK_DIV'), norange:true)),
 			"\\renewcommand*{\\aarpon}{0}%" : "\\renewcommand*{\\aarpon}{%}\\%".format(patchdumper.lutt("On", t.str2num('ARP_OFFON'), norange:true)),
 			"\\renewcommand*{\\aarpmode}{}%" : "\\renewcommand*{\\aarpmode}{%}\\%".format(patchdumper.lut(t.str2num('ARP_MODE'), norange:true)),
+
+			"\\renewcommand*{\\aarprange}{}%" : "\\renewcommand*{\\aarprange}{%}\\%".format(patchdumper.lut(t.str2num('ARP_RANGE'), norange:true)),
+			"\\renewcommand*{\\aarprepeats}{}%" : "\\renewcommand*{\\aarprepeats}{%}\\%".format(patchdumper.lut(t.str2num('ARP_RPTS'), norange:true)),
+			"\\renewcommand*{\\aarprelatch}{0}%" : "\\renewcommand*{\\aarprelatch}{%}\\%".format(patchdumper.lutt("On", t.str2num('ARP_RELATCH'), norange:true)),
+
 			"\\renewcommand*{\\aseqmode}{}%" : "\\renewcommand*{\\aseqmode}{%}\\%".format(patchdumper.lut(t.str2num('GATED_SEQMODE'), norange:true)),
 			"\\renewcommand*{\\agatedtype}{0}%" : "\\renewcommand*{\\agatedtype}{%}\\%".format(patchdumper.lutt("Gated", t.str2num('SEQ_GATEDPOLY'), norange:true)),
 			"\\renewcommand*{\\apolytype}{0}%" : "\\renewcommand*{\\apolytype}{%}\\%".format(patchdumper.lutt("Poly", t.str2num('SEQ_GATEDPOLY'), norange:true)),
@@ -387,6 +392,12 @@ TemplateFiller {
 			"\\renewcommand*{\\barpdivide}{}%" : "\\renewcommand*{\\barpdivide}{%}\\%".format(patchdumper.lutb(t.str2num('ARP_CLK_DIV'), norange:true)),
 			"\\renewcommand*{\\barpon}{0}%" : "\\renewcommand*{\\barpon}{%}\\%".format(patchdumper.lutbt("On", t.str2num('ARP_OFFON'), norange:true)),
 			"\\renewcommand*{\\barpmode}{}%" : "\\renewcommand*{\\barpmode}{%}\\%".format(patchdumper.lutb(t.str2num('ARP_MODE'), norange:true)),
+
+			"\\renewcommand*{\\barprange}{}%" : "\\renewcommand*{\\barprange}{%}\\%".format(patchdumper.lutb(t.str2num('ARP_RANGE'), norange:true)),
+			"\\renewcommand*{\\barprepeats}{}%" : "\\renewcommand*{\\barprepeats}{%}\\%".format(patchdumper.lutb(t.str2num('ARP_RPTS'), norange:true)),
+			"\\renewcommand*{\\barprelatch}{0}%" : "\\renewcommand*{\\barprelatch}{%}\\%".format(patchdumper.lutbt("On", t.str2num('ARP_RELATCH'), norange:true)),
+
+
 			"\\renewcommand*{\\bseqmode}{}%" : "\\renewcommand*{\\bseqmode}{%}\\%".format(patchdumper.lutb(t.str2num('GATED_SEQMODE'), norange:true)),
 			"\\renewcommand*{\\bgatedtype}{0}%" : "\\renewcommand*{\\bgatedtype}{%}\\%".format(patchdumper.lutbt("Gated", t.str2num('SEQ_GATEDPOLY'), norange:true)),
 			"\\renewcommand*{\\bpolytype}{0}%" : "\\renewcommand*{\\bpolytype}{%}\\%".format(patchdumper.lutbt("Poly", t.str2num('SEQ_GATEDPOLY'), norange:true)),

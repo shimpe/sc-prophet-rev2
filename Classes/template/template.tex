@@ -100,6 +100,9 @@
 \renewcommand*{\aarpdivide}{}%
 \renewcommand*{\aarpon}{0}%
 \renewcommand*{\aarpmode}{}%
+\renewcommand*{\aarprange}{}%
+\renewcommand*{\aarprepeats}{}%
+\renewcommand*{\aarprelatch}{0}%
 \renewcommand*{\aseqmode}{}%
 \renewcommand*{\agatedtype}{0}%
 \renewcommand*{\apolytype}{0}%
@@ -316,6 +319,9 @@
 \renewcommand*{\barpdivide}{}%
 \renewcommand*{\barpon}{0}%
 \renewcommand*{\barpmode}{}%
+\renewcommand*{\barprange}{}%
+\renewcommand*{\barprepeats}{}%
+\renewcommand*{\barprelatch}{0}%
 \renewcommand*{\bseqmode}{}%
 \renewcommand*{\bgatedtype}{0}%
 \renewcommand*{\bpolytype}{0}%
@@ -437,10 +443,11 @@ Layer\,A\footnote{generated with supercollider and \LaTeX using \url{https://git
 %%\vspace*{-0.7em}
 \textbf{Oscillator\,1}\linebreak
 Freq\,\LLN{\afreqone} Fine\,tune\,\LLN{\afinetuneone} Shape\,\CLCB{Saw}{\afreqonesawone} \CLCB{Tri}{\afreqonetrione} \CLCB{SwTr}{\afreqoneswtrone} \CLCB{Pls}{\afreqonepulseone} \CLCB{Off}{\afreqoneoffone} Shape\,mod\,\LLN{\ashapemodone} Sub\,oct\,\LLN{\asuboct} Noise\,\LLN{\anoise} Glide\,\LLN{\aglideone} Keybd\,\CCB{\akeybdoneone}\linebreak
+Osc\,Sync\,\CCB{\async}\linebreak
 %%\vspace*{-0.7em}
 %\begin{mdframemd}[backgroundcolor=blue!20]
 \textbf{Oscillator\,2}\linebreak
-Freq\,\LLN{\afreqtwo} Fine\,tune\,\LLN{\afinetunetwo} Shape\,\CLCB{Saw}{\afreqonesawtwo} \CLCB{Tri}{\afreqonetritwo} \CLCB{SwTr}{\afreqoneswtrtwo} \CLCB{Pls}{\afreqonepulsetwo} \LCB{Off} Shape\,mod\,\LLN{\ashapemodtwo} Osc\,mix\,\LLN{\aoscmix} Slop\,\tikz{\draw (0,0)--(2em,0) node[above=0.4em, right=-2em, fill=yellow, opacity=.8] {\textbf{\textit{\aslop}}}  node[above=0.7em] {Sync\,\CCB{\async}}} Glide\,\LLN{\aglidetwo} Keybd\,\CCB{\akeybdonetwo}\linebreak
+Freq\,\LLN{\afreqtwo} Fine\,tune\,\LLN{\afinetunetwo} Shape\,\CLCB{Saw}{\afreqonesawtwo} \CLCB{Tri}{\afreqonetritwo} \CLCB{SwTr}{\afreqoneswtrtwo} \CLCB{Pls}{\afreqonepulsetwo} \LCB{Off} Shape\,mod\,\LLN{\ashapemodtwo} Osc\,mix\,\LLN{\aoscmix} Slop\,\LLN{\aslop}\,Glide\,\LLN{\aglidetwo} Keybd\,\CCB{\akeybdonetwo}\linebreak
 \textbf{Low\,pass\,filter}\linebreak
 Cutoff\,\LLN{\alpfcutoff} Resonance\,\LLN{\alpfreson} Env\,amount\,\LLN{\alpfenvamt} Velocity\,\LLN{\alpfvel} Key\,amount\,\LLN{\alpfkeyamt} Audio\,mod\,\LLN{\alpfaudiomod}\linebreak
 4\,pole\,\CCB{\afourpole} Delay\,\LLN{\alpfdelay} Attack\,\LLN{\alpfattack} Decay\,\LLN{\alpfdecay} Sustain\,\LLN{\alpfsustain} Release\,\LLN{\alpfrelease}\linebreak
@@ -461,7 +468,7 @@ Attack\,\LLN{\aampattack} Decay\,\LLN{\aampdecay} Sustain\,\LLN{\aampsustain} Re
 On\,\CCB{\afxon} Effect\,\LLN[7em]{\afx} Mix\,\LLN[7em]{\afxmix}\linebreak
 Clk\,sync\,\CCB{\afxclksync} Param\,1\,\LLN[7em]{\afxparamone} Param\,2\,\LLN[7em]{\afxparamtwo}\linebreak
 \textbf{Clock\,and\,arp}\linebreak
-BPM\,\LLN[7em]{\aarpbpm} Divide\,\LLN[7em]{\aarpdivide} Arp\,on\,\CCB{\aarpon} Arp\,mode\,\LLN[7em]{\aarpmode}\linebreak
+BPM\,\LLN[7em]{\aarpbpm} Divide\,\LLN[7em]{\aarpdivide} Arp\,on\,\CCB{\aarpon} Arp\,mode\,\LLN[7em]{\aarpmode} Arp\,range\,\LLN[7em]{\aarprange} Arp\,repeats\,\LLN{\aarprepeats} Arp\,relatch\,\CCB{\aarprelatch}\linebreak
 %\vspace*{-0.7em}
 \textbf{Sequencer}\linebreak
 Type\,\CLCB{Gated}{\agatedtype}\,\CLCB{Poly}{\apolytype}\,Mode\,\LLN{\aseqmode}\linebreak
@@ -496,10 +503,11 @@ Layer\,B\footnote{made by Stefaan Himpe, based on a template by Gerry Havinga av
 %%\vspace*{-0.7em}
 \textbf{Oscillator\,1}\linebreak
 Freq\,\LLN{\bfreqone} Fine\,tune\,\LLN{\bfinetuneone} Shape\,\CLCB{Saw}{\bfreqonesawone} \CLCB{Tri}{\bfreqonetrione} \CLCB{SwTr}{\bfreqoneswtrone} \CLCB{Pls}{\bfreqonepulseone} \CLCB{Off}{\bfreqoneoffone} Shape\,mod\,\LLN{\bshapemodone} Sub\,oct\,\LLN{\bsuboct} Noise\,\LLN{\bnoise} Glide\,\LLN{\bglideone} Keybd\,\CCB{\bkeybdoneone}\linebreak
+Osc\,Sync\,\CCB{\async}\linebreak
 %%\vspace*{-0.7em}
 %\begin{mdframemd}[backgroundcolor=blue!20]
 \textbf{Oscillator\,2}\linebreak
-Freq\,\LLN{\bfreqtwo} Fine\,tune\,\LLN{\bfinetunetwo} Shape\,\CLCB{Saw}{\bfreqonesawtwo} \CLCB{Tri}{\bfreqonetritwo} \CLCB{SwTr}{\bfreqoneswtrtwo} \CLCB{Pls}{\bfreqonepulsetwo} \LCB{Off} Shape\,mod\,\LLN{\bshapemodtwo} Osc\,mix\,\LLN{\boscmix} Slop\,\tikz{\draw (0,0)--(2em,0) node[above=0.4em, right=-2em, fill=yellow, opacity=.8] {\textbf{\textit{\bslop}}}  node[above=0.7em] {Sync\,\CCB{\bsync}}} Glide\,\LLN{\bglidetwo} Keybd\,\CCB{\bkeybdonetwo}\linebreak
+Freq\,\LLN{\bfreqtwo} Fine\,tune\,\LLN{\bfinetunetwo} Shape\,\CLCB{Saw}{\bfreqonesawtwo} \CLCB{Tri}{\bfreqonetritwo} \CLCB{SwTr}{\bfreqoneswtrtwo} \CLCB{Pls}{\bfreqonepulsetwo} \LCB{Off} Shape\,mod\,\LLN{\bshapemodtwo} Osc\,mix\,\LLN{\boscmix} Slop\,\LLN{\bslop}\,Glide\,\LLN{\bglidetwo} Keybd\,\CCB{\bkeybdonetwo}\linebreak
 \textbf{Low\,pass\,filter}\linebreak
 Cutoff\,\LLN{\blpfcutoff} Resonance\,\LLN{\blpfreson} Env\,amount\,\LLN{\blpfenvamt} Velocity\,\LLN{\blpfvel} Key\,amount\,\LLN{\blpfkeyamt} Audio\,mod\,\LLN{\blpfaudiomod}\linebreak
 4\,pole\,\CCB{\bfourpole} Delay\,\LLN{\blpfdelay} Attack\,\LLN{\blpfattack} Decay\,\LLN{\blpfdecay} Sustain\,\LLN{\blpfsustain} Release\,\LLN{\blpfrelease}\linebreak
@@ -517,7 +525,7 @@ Attack\,\LLN{\bampattack} Decay\,\LLN{\bampdecay} Sustain\,\LLN{\bampsustain} Re
 On\,\CCB{\bfxon} Effect\,\LLN[7em]{\bfx} Mix\,\LLN[7em]{\bfxmix}\linebreak
 Clk\,sync\,\CCB{\bfxclksync} Param\,1\,\LLN[7em]{\bfxparamone} Param\,2\,\LLN[7em]{\bfxparamtwo}\linebreak
 \textbf{Clock\,and\,arp}\linebreak
-BPM\,\LLN[7em]{\barpbpm} Divide\,\LLN[7em]{\barpdivide} Arp\,on\,\CCB{\barpon} Arp\,mode\,\LLN[7em]{\barpmode}\linebreak
+BPM\,\LLN[7em]{\barpbpm} Divide\,\LLN[7em]{\barpdivide} Arp\,on\,\CCB{\barpon} Arp\,mode\,\LLN[7em]{\barpmode} Arp\,range\,\LLN[7em]{\barprange} Arp\,repeats\,\LLN{\barprepeats} Arp\,relatch\,\CCB{\barprelatch}\linebreak
 %\vspace*{-0.7em}
 \textbf{Sequencer}\linebreak
 Type\,\CLCB{Gated}{\bgatedtype}\,\CLCB{Poly}{\bpolytype}\,Mode\,\LLN{\bseqmode}\linebreak
