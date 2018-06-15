@@ -2,7 +2,7 @@
 s.waitForBoot({
 	var u,w;
 	var make_checkbox;
-	var make_layer_controls, make_checkbox_responder, make_labeled_combobox, make_labeled_textfield, make_delegating_textfield, make_label, make_layer_layout, make_nudge_button, make_randomize_button, make_rnd_buttons;
+	var make_parameter_controls, make_checkbox_responder, make_labeled_combobox, make_labeled_textfield, make_delegating_textfield, make_label, make_parameter_layout, make_nudge_button, make_randomize_button, make_rnd_buttons, make_delegating_combobox;
 	var layers = Dictionary.new;
 	var p = ScProphetRev2.new;
 	var n = NrpnTable.new;
@@ -15,6 +15,10 @@ s.waitForBoot({
 	var condition;
 	var tabrow, tablayout, envknobs1, envknobs2;
 	var parameters, envelopeviewers;
+	var delegation_controls_a = IdentityDictionary.new;
+	var delegation_controls_b = IdentityDictionary.new;
+	var gatedsequencer, make_gated_sequencer_controls, seqviewa, seqviewb, seq1dest, seq2dest, seq3dest, seq4dest, make_seq_combos,
+	make_plotter, make_plotters;
 
 	var drawenv = {
 		| parent, color, minx, maxx, miny, maxy, linewidth, delay, attack, decay, sustain, release, amount=1 |
@@ -31,7 +35,7 @@ s.waitForBoot({
 		};
 		var mapver = {
 			| y |
-			y.linlin(bottom, top, ((miny+maxy)/2) + (maxy*finalamount.abs/6), ((miny+maxy)/2 - (maxy*finalamount.abs/6)));
+			y.linlin(bottom, top, ((miny+maxy)/2) + (maxy*finalamount.abs/5), ((miny+maxy)/2 - (maxy*finalamount.abs/5)));
 		};
 
 		var extreme_amount=127;
@@ -114,11 +118,23 @@ s.waitForBoot({
 		p.get_current_patch_state(completionHandler:{
 			key_to_default_a.keysValuesDo({
 				| key, value, i |
-				{ controlsa[key].value_(key_to_default_a[key].()) }.defer;
+				{
+					controlsa[key].value_(key_to_default_a[key].());
+					if (key.asString.find("plotter").notNil) {
+						controlsa[key].specs_(specstore[key][\specs]).domainSpecs_(specstore[key][\domainspecs]);
+						controlsa[key].interactionView.refresh;
+					}
+				}.defer;
 			});
 			key_to_default_b.keysValuesDo({
 				| key, value, i |
-				{ controlsb[key].value_(key_to_default_b[key].()) }.defer;
+				{
+					controlsb[key].value_(key_to_default_b[key].());
+					if (key.asString.find("plotter").notNil) {
+						controlsb[key].specs_(specstore[key][\specs]).domainSpecs_(specstore[key][\domainspecs]);
+						controlsb[key].interactionView.refresh;
+					}
+				}.defer;
 			});
 		});
 	});
@@ -148,7 +164,7 @@ s.waitForBoot({
 	};
 
 	make_labeled_combobox = {
-		| parent, controls, controlspecstore, keystore, key, prophet, nrpn, label, items |
+		| parent, delegationcontrols, controls, controlspecstore, keystore, key, prophet, nrpn, label, items |
 		var labelkey = ("label_"++key.asString).asSymbol;
 		var combokey = ("control_"++key.asString).asSymbol;
 		var defaultidx;
@@ -165,7 +181,11 @@ s.waitForBoot({
 		controls[labelkey] = StaticText.new(parent, Rect()).string_(label);
 		controls[combokey] = PopUpMenu.new(parent, Rect()).items_(items).action_({
 			| combo |
-			{ prophet.sendNRPN(nrpn, combo.value); }.defer;
+			{
+				prophet.sendNRPN(nrpn, combo.value);
+				if (delegationcontrols[combokey].notNil) { controls[delegationcontrols[combokey]].value_(combo.value); parent.refresh; };
+			}.defer;
+
 		}).value_(defaultidx).allowsReselection_(true);
 		prophet.makeNRPNResponder(nrpn, {
 			| value, nrpn |
@@ -174,8 +194,29 @@ s.waitForBoot({
 		controls[combokey];
 	};
 
+	make_delegating_combobox = {
+		| parent, delegationcontrols, controls, controlspecstore, keystore, delegatetokey, prophet, nrpn, items |
+		var combokey = ("control_"++delegatetokey).asSymbol;
+		var ownkey = ("delegating_control_"++delegatetokey).asSymbol;
+		var defaultidx = keystore[combokey].();
+		keystore[ownkey] = {
+			var val = keystore[combokey].(); // delegate to master control
+			val;
+		};
+		controls[ownkey] = PopUpMenu.new(parent, Rect()).items_(items).action_({
+			| combo |
+			{ controls[combokey].valueAction_(combo.value).value_(defaultidx).allowsReselection_(true) }.defer;
+		});
+		prophet.makeNRPNResponder(nrpn, {
+			| value, nrpn |
+			{ controls[ownkey].value_(value) }.defer;
+		});
+		delegationcontrols[combokey] = ownkey;
+		controls[ownkey];
+	};
+
 	make_labeled_textfield = {
-		| parent, controls, controlspecstore, keystore, key, prophet, nrpn, label, min, max, nrpnoffset=0 |
+		| parent, delegationcontrols, controls, controlspecstore, keystore, key, prophet, nrpn, label, min, max, nrpnoffset=0 |
 		var labelkey = ("label_"++key.asString).asSymbol;
 		var textfieldkey = ("control_"++key.asString).asSymbol;
 		var default;
@@ -194,7 +235,10 @@ s.waitForBoot({
 			if ((combo.value.asInt) > (max.asInt)) {
 				combo.value_(max.asInt);
 			};
-			{ prophet.sendNRPN(nrpn, combo.value.asInt+nrpnoffset); }.defer;
+			{
+				prophet.sendNRPN(nrpn, combo.value.asInt+nrpnoffset);
+				if (delegationcontrols[textfieldkey].notNil) { controls[delegationcontrols[textfieldkey]].value_(combo.value.asInt); parent.refresh;};
+			}.defer;
 		}).value_(default);
 		prophet.makeNRPNResponder(nrpn, {
 			| value, nrpn |
@@ -204,14 +248,12 @@ s.waitForBoot({
 	};
 
 	make_delegating_textfield = {
-		| parent, controls, controlspecstore, keystore, delegatetokey, prophet, nrpn, nrpnoffset=0 |
+		| parent, delegationcontrols, controls, controlspecstore, keystore, delegatetokey, prophet, nrpn, nrpnoffset=0 |
 		var textfieldkey = ("control_"++delegatetokey).asSymbol;
 		var ownkey = ("delegating_control_"++delegatetokey).asSymbol;
 		var default = keystore[textfieldkey].();
-		var min;
-		var max;
-		min = controlspecstore[textfieldkey][\min];
-		max = controlspecstore[textfieldkey][\max];
+		var min = controlspecstore[textfieldkey][\min];
+		var max = controlspecstore[textfieldkey][\max];
 		keystore[ownkey] = {
 			var val = keystore[textfieldkey].();
 			{ parent.refresh; }.defer;
@@ -237,6 +279,7 @@ s.waitForBoot({
 				parent.refresh;
 			}.defer;
 		});
+		delegationcontrols[textfieldkey] = ownkey;
 		controls[ownkey];
 	};
 
@@ -328,62 +371,62 @@ s.waitForBoot({
 		make_randomize_button.(parent, controls, controlspecstore, key2, "Randomize", listofcontrolids);
 	};
 
-	make_layer_controls = {
-		| parent, controls, specstore, keystore, prophet, layer="A" |
+	make_parameter_controls = {
+		| parent, delegationcontrols, controls, specstore, keystore, prophet, layer="A" |
 		var pd = PatchDumper.new(prophet.rev2, prophet.last_patch_sysex_stream);
 		make_checkbox.(parent, controls, specstore, keystore,  \unison, prophet, n.str2num('UNISON_OFFON', layer), "Unison");
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \voices, prophet, n.str2num('UNISON_MODE', layer), "Voices", prophet.unison_mode);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \detune, prophet, n.str2num('UNISON_DETUNE', layer), "Detune", 0, 16);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \voices, prophet, n.str2num('UNISON_MODE', layer), "Voices", prophet.unison_mode);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \detune, prophet, n.str2num('UNISON_DETUNE', layer), "Detune", 0, 16);
 
 		make_label.(parent, controls, \osc1, "Oscillators 1&2");
 		make_rnd_buttons.(parent, controls, specstore, \osc, [\osc1freq, \osc1fine, \osc1shape, \osc1mod, \osc1sub, \osc1noise, \osc1glide, \osc1keyb, \sync, \osc2freq, \osc2fine, \osc2shape, \osc2mod, \oscmix, \slop, \osc2glide, \osc2keyb]);
 
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \osc1freq, prophet, n.str2num('OSC1_FREQ', layer), "Freq", prophet.note_name);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \osc1fine, prophet, n.str2num('OSC1_FINE', layer), "Fine Tune", -50, 50, 50);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \osc1shape, prophet, n.str2num('OSC1_SHAPE', layer), "Shape", prophet.osc_shape);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \osc1mod, prophet, n.str2num('OSC1_SHAPEMOD', layer), "Shape Mod", 0, 99);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \osc1sub, prophet, n.str2num('OSC1_SUBOSC', layer), "Sub Oct", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \osc1noise, prophet, n.str2num('OSC1_NOISE', layer), "Noise", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \osc1glide, prophet, n.str2num('OSC1_GLIDE', layer), "Glide", 0, 127);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \osc1freq, prophet, n.str2num('OSC1_FREQ', layer), "Freq", prophet.note_name);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \osc1fine, prophet, n.str2num('OSC1_FINE', layer), "Fine Tune", -50, 50, 50);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \osc1shape, prophet, n.str2num('OSC1_SHAPE', layer), "Shape", prophet.osc_shape);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \osc1mod, prophet, n.str2num('OSC1_SHAPEMOD', layer), "Shape Mod", 0, 99);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \osc1sub, prophet, n.str2num('OSC1_SUBOSC', layer), "Sub Oct", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \osc1noise, prophet, n.str2num('OSC1_NOISE', layer), "Noise", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \osc1glide, prophet, n.str2num('OSC1_GLIDE', layer), "Glide", 0, 127);
 		make_checkbox.(parent, controls, specstore, keystore,  \osc1keyb, prophet, n.str2num('OSC1_KBD', layer), "Keyb");
 		make_checkbox.(parent, controls, specstore, keystore,  \sync, prophet, n.str2num('SYNC', layer), "Sync");
 
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \osc2freq, prophet, n.str2num('OSC2_FREQ', layer), "Freq", prophet.note_name);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \osc2fine, prophet, n.str2num('OSC2_FINE', layer), "Fine Tune", -50, 50, 50);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \osc2shape, prophet, n.str2num('OSC2_SHAPE', layer), "Shape", prophet.osc_shape);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \osc2mod, prophet, n.str2num('OSC2_SHAPEMOD', layer), "Shape Mod", 0, 99);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \oscmix, prophet, n.str2num('OSC_MIX', layer), "Osc Mix", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \slop, prophet, n.str2num('SLOP', layer), "Slop", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \osc2glide, prophet, n.str2num('OSC2_GLIDE', layer), "Glide", 0, 127);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \osc2freq, prophet, n.str2num('OSC2_FREQ', layer), "Freq", prophet.note_name);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \osc2fine, prophet, n.str2num('OSC2_FINE', layer), "Fine Tune", -50, 50, 50);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \osc2shape, prophet, n.str2num('OSC2_SHAPE', layer), "Shape", prophet.osc_shape);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \osc2mod, prophet, n.str2num('OSC2_SHAPEMOD', layer), "Shape Mod", 0, 99);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \oscmix, prophet, n.str2num('OSC_MIX', layer), "Osc Mix", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \slop, prophet, n.str2num('SLOP', layer), "Slop", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \osc2glide, prophet, n.str2num('OSC2_GLIDE', layer), "Glide", 0, 127);
 		make_checkbox.(parent, controls, specstore, keystore, \osc2keyb, prophet, n.str2num('OSC2_KBD', layer), "Keyb");
 
 		make_label.(parent, controls, \lpf, "Low pass filter");
 		make_rnd_buttons.(parent, controls, specstore, \lpf, [\cutoff, \resonance, \lpfenvamt, \lpfenvvel, \lpfkeyamt, \lpfaudiomod,
 			\lpfpoles, \lpfdelay, \lpfattack, \lpfdecay, \lpfsustain, \lpfrelease]);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \cutoff, prophet, n.str2num('LPF_CUTOFF', layer), "Cut Off", 0, 164);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \resonance, prophet, n.str2num('LPF_RESONANCE', layer), "Resonance", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \lpfenvamt, prophet, n.str2num('LPF_ENV_AMT', layer), "Env Amt", -127, 127, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \lpfenvvel, prophet, n.str2num('LPF_ENV_VEL', layer), "Env Vel", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \lpfkeyamt, prophet, n.str2num('LPF_KBD_TRACKING', layer), "Key Amt", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \lpfaudiomod, prophet, n.str2num('LPF_AUDIO_MOD', layer), "Audio Mod", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \cutoff, prophet, n.str2num('LPF_CUTOFF', layer), "Cut Off", 0, 164);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \resonance, prophet, n.str2num('LPF_RESONANCE', layer), "Resonance", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \lpfenvamt, prophet, n.str2num('LPF_ENV_AMT', layer), "Env Amt", -127, 127, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \lpfenvvel, prophet, n.str2num('LPF_ENV_VEL', layer), "Env Vel", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \lpfkeyamt, prophet, n.str2num('LPF_KBD_TRACKING', layer), "Key Amt", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \lpfaudiomod, prophet, n.str2num('LPF_AUDIO_MOD', layer), "Audio Mod", 0, 127);
 
 		make_checkbox.(parent, controls, specstore, keystore,  \lpfpoles, prophet, n.str2num('LPF_POLES', layer), "4 Pole");
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \lpfdelay, prophet, n.str2num('LPF_ENV_DLY', layer), "Delay", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \lpfattack, prophet, n.str2num('LPF_ENV_ATT', layer), "Attack", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \lpfdecay, prophet, n.str2num('LPF_ENV_DEC', layer), "Decay", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \lpfsustain, prophet, n.str2num('LPF_ENV_SUS', layer), "Sustain", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \lpfrelease, prophet, n.str2num('LPF_ENV_REL', layer), "Release", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \lpfdelay, prophet, n.str2num('LPF_ENV_DLY', layer), "Delay", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \lpfattack, prophet, n.str2num('LPF_ENV_ATT', layer), "Attack", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \lpfdecay, prophet, n.str2num('LPF_ENV_DEC', layer), "Decay", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \lpfsustain, prophet, n.str2num('LPF_ENV_SUS', layer), "Sustain", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \lpfrelease, prophet, n.str2num('LPF_ENV_REL', layer), "Release", 0, 127);
 
 		make_label.(parent, controls, \amp, "Amplifier");
 		make_rnd_buttons.(parent, controls, specstore, \amp, [\amppanspread, \ampenvamt, \ampvel, \ampdelay, \ampattack, \ampdecay, \ampsustain, \amprelease]);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \amppanspread, prophet, n.str2num('PAN_SPREAD', layer), "Pan spread", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \ampenvamt, prophet, n.str2num('AMP_ENVAMT', layer), "Env Amt", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \ampvel, prophet, n.str2num('AMP_VELOCITY', layer), "Velocity", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \ampdelay, prophet, n.str2num('AMP_DLY', layer), "Delay", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \ampattack, prophet, n.str2num('AMP_ATT', layer), "Attack", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \ampdecay, prophet, n.str2num('AMP_DEC', layer), "Decay", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \ampsustain, prophet, n.str2num('AMP_SUS', layer), "Sustain", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \amprelease, prophet, n.str2num('AMP_REL', layer), "Release", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \amppanspread, prophet, n.str2num('PAN_SPREAD', layer), "Pan spread", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \ampenvamt, prophet, n.str2num('AMP_ENVAMT', layer), "Env Amt", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \ampvel, prophet, n.str2num('AMP_VELOCITY', layer), "Velocity", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \ampdelay, prophet, n.str2num('AMP_DLY', layer), "Delay", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \ampattack, prophet, n.str2num('AMP_ATT', layer), "Attack", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \ampdecay, prophet, n.str2num('AMP_DEC', layer), "Decay", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \ampsustain, prophet, n.str2num('AMP_SUS', layer), "Sustain", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \amprelease, prophet, n.str2num('AMP_REL', layer), "Release", 0, 127);
 
 		make_label.(parent, controls, \lfos, "LFOs");
 		make_rnd_buttons.(parent, controls, specstore, \lfos, [
@@ -392,31 +435,31 @@ s.waitForBoot({
 			\lfo3shape, \lfo3freq, \lfo3amt, \lfo3dest, \lfo3clksync, \lfo3keysync,
 			\lfo4shape, \lfo4freq, \lfo4amt, \lfo4dest, \lfo4clksync, \lfo4keysync,
 		]);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \lfo1shape, prophet, n.str2num('LFO1_SHAPE', layer), "1 Shape", prophet.lfo_shape);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \lfo1freq, prophet, n.str2num('LFO1_FREQ', layer), "Freq", 0, 150);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \lfo1amt, prophet, n.str2num('LFO1_AMT', layer), "Amount", 0, 127);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \lfo1dest, prophet, n.str2num('LFO1_DEST', layer), "Destination", prophet.mod_dest_53);
+		make_labeled_combobox.(parent,  delegationcontrols,controls, specstore, keystore,  \lfo1shape, prophet, n.str2num('LFO1_SHAPE', layer), "1 Shape", prophet.lfo_shape);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \lfo1freq, prophet, n.str2num('LFO1_FREQ', layer), "Freq", 0, 150);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \lfo1amt, prophet, n.str2num('LFO1_AMT', layer), "Amount", 0, 127);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \lfo1dest, prophet, n.str2num('LFO1_DEST', layer), "Destination", prophet.mod_dest_53);
 		make_checkbox.(parent, controls, specstore, keystore,  \lfo1clksync, prophet, n.str2num('LFO1_CLKSYNC', layer), "Clk Sync");
 		make_checkbox.(parent, controls, specstore, keystore,  \lfo1keysync, prophet, n.str2num('LFO1_KEYSYNC', layer), "Key Sync");
 
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \lfo2shape, prophet, n.str2num('LFO2_SHAPE', layer), "2 Shape", prophet.lfo_shape);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \lfo2freq, prophet, n.str2num('LFO2_FREQ', layer), "Freq", 0, 150);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \lfo2amt, prophet, n.str2num('LFO2_AMT', layer), "Amount", 0, 127);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \lfo2dest, prophet, n.str2num('LFO2_DEST', layer), "Destination", prophet.mod_dest_53);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \lfo2shape, prophet, n.str2num('LFO2_SHAPE', layer), "2 Shape", prophet.lfo_shape);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \lfo2freq, prophet, n.str2num('LFO2_FREQ', layer), "Freq", 0, 150);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \lfo2amt, prophet, n.str2num('LFO2_AMT', layer), "Amount", 0, 127);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \lfo2dest, prophet, n.str2num('LFO2_DEST', layer), "Destination", prophet.mod_dest_53);
 		make_checkbox.(parent, controls, specstore, keystore,  \lfo2clksync, prophet, n.str2num('LFO2_CLKSYNC', layer), "Clk Sync");
 		make_checkbox.(parent, controls, specstore, keystore,  \lfo2keysync, prophet, n.str2num('LFO2_KEYSYNC', layer), "Key Sync");
 
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \lfo3shape, prophet, n.str2num('LFO3_SHAPE', layer), "3 Shape", prophet.lfo_shape);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \lfo3freq, prophet, n.str2num('LFO3_FREQ', layer), "Freq", 0, 150);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \lfo3amt, prophet, n.str2num('LFO3_AMT', layer), "Amount", 0, 127);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \lfo3dest, prophet, n.str2num('LFO3_DEST', layer), "Destination", prophet.mod_dest_53);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \lfo3shape, prophet, n.str2num('LFO3_SHAPE', layer), "3 Shape", prophet.lfo_shape);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \lfo3freq, prophet, n.str2num('LFO3_FREQ', layer), "Freq", 0, 150);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \lfo3amt, prophet, n.str2num('LFO3_AMT', layer), "Amount", 0, 127);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \lfo3dest, prophet, n.str2num('LFO3_DEST', layer), "Destination", prophet.mod_dest_53);
 		make_checkbox.(parent, controls, specstore, keystore,  \lfo3clksync, prophet, n.str2num('LFO3_CLKSYNC', layer), "Clk Sync");
 		make_checkbox.(parent, controls, specstore, keystore,  \lfo3keysync, prophet, n.str2num('LFO3_KEYSYNC', layer), "Key Sync");
 
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \lfo4shape, prophet, n.str2num('LFO4_SHAPE', layer), "4 Shape", prophet.lfo_shape);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \lfo4freq, prophet, n.str2num('LFO4_FREQ', layer), "Freq", 0, 150);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \lfo4amt, prophet, n.str2num('LFO4_AMT', layer), "Amount", 0, 127);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \lfo4dest, prophet, n.str2num('LFO4_DEST', layer), "Destination", prophet.mod_dest_53);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \lfo4shape, prophet, n.str2num('LFO4_SHAPE', layer), "4 Shape", prophet.lfo_shape);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \lfo4freq, prophet, n.str2num('LFO4_FREQ', layer), "Freq", 0, 150);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \lfo4amt, prophet, n.str2num('LFO4_AMT', layer), "Amount", 0, 127);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \lfo4dest, prophet, n.str2num('LFO4_DEST', layer), "Destination", prophet.mod_dest_53);
 		make_checkbox.(parent, controls, specstore, keystore,  \lfo4clksync, prophet, n.str2num('LFO4_CLKSYNC', layer), "Clk Sync");
 		make_checkbox.(parent, controls, specstore, keystore,  \lfo4keysync, prophet, n.str2num('LFO4_KEYSYNC', layer), "Key Sync");
 
@@ -425,43 +468,43 @@ s.waitForBoot({
 			\fxselect, \fxmix, \fxclksync, \fxparam1, \fxparam2
 		]);
 		make_checkbox.(parent, controls, specstore, keystore,  \fxon, prophet, n.str2num('FX_ONOFF', layer), "On");
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \fxselect, prophet, n.str2num('FX_SELECT', layer), "Effect", prophet.fx_select);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \fxmix, prophet, n.str2num('FX_MIX', layer), "Mix", 0, 127);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \fxselect, prophet, n.str2num('FX_SELECT', layer), "Effect", prophet.fx_select);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \fxmix, prophet, n.str2num('FX_MIX', layer), "Mix", 0, 127);
 		make_checkbox.(parent, controls, specstore, keystore,  \fxclksync, prophet, n.str2num('FX_CLKSYNC', layer), "Clk Sync");
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \fxparam1, prophet, n.str2num('FX_PARAM1', layer), "Param 1", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \fxparam2, prophet, n.str2num('FX_PARAM2', layer), "Param 2", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \fxparam1, prophet, n.str2num('FX_PARAM1', layer), "Param 1", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \fxparam2, prophet, n.str2num('FX_PARAM2', layer), "Param 2", 0, 127);
 
 		make_label.(parent, controls, \arp, "Clock and arp");
 		make_rnd_buttons.(parent, controls, specstore, \arp, [
 			\arpon, \arpbpm, \arpdivide, \arpmode, \arprange, \arprepeats, \arprelatch
 		]);
 		make_checkbox.(parent, controls, specstore, keystore,  \arpon, prophet, n.str2num('ARP_OFFON', layer), "Arp On");
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \arpbpm, prophet, n.str2num('BPM_TEMPO', layer), "BPM", 30, 250);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \arpdivide, prophet, n.str2num('ARP_CLK_DIV', layer), "Divide", prophet.divide);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \arpmode, prophet, n.str2num('ARP_MODE', layer), "Mode", prophet.arp_mode);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \arprange, prophet, n.str2num('ARP_RANGE', layer), "Range", prophet.arp_range); //!!! missing in book
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \arprepeats, prophet, n.str2num('ARP_RPTS', layer), "Repeats", 0, 3); //!!! missing in book
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \arpbpm, prophet, n.str2num('BPM_TEMPO', layer), "BPM", 30, 250);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \arpdivide, prophet, n.str2num('ARP_CLK_DIV', layer), "Divide", prophet.divide);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \arpmode, prophet, n.str2num('ARP_MODE', layer), "Mode", prophet.arp_mode);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \arprange, prophet, n.str2num('ARP_RANGE', layer), "Range", prophet.arp_range); //!!! missing in book
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \arprepeats, prophet, n.str2num('ARP_RPTS', layer), "Repeats", 0, 3); //!!! missing in book
 		make_checkbox.(parent, controls, specstore, keystore,  \arprelatch, prophet, n.str2num('ARP_RELATCH', layer), "Relatch"); //!!! missing in book
 
 		make_label.(parent, controls, \seq, "Sequencer");
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \seqtype, prophet, n.str2num('SEQ_GATEDPOLY', layer), "Type", prophet.sequencer_type);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \seqmode, prophet, n.str2num('GATED_SEQMODE', layer), "Type", prophet.sequencer_mode);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \seqtype, prophet, n.str2num('SEQ_GATEDPOLY', layer), "Type", prophet.sequencer_type);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \seqmode, prophet, n.str2num('GATED_SEQMODE', layer), "Type", prophet.sequencer_mode);
 
 		make_label.(parent, controls, \aux, "Aux Envelope");
 		make_rnd_buttons.(parent, controls, specstore, \aux, [
 			\auxdst, \auxenvamt, \auxvel, \auxdel, \auxrpt,
 			\auxattack, \auxdecay, \auxsustain, \auxrelease
 		]);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \auxdst, prophet, n.str2num('ENV3_DST', layer), "Dest", prophet.mod_dest_53);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \auxenvamt, prophet, n.str2num('ENV3_AMT', layer), "Env Amt", -127, 127, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \auxvel, prophet, n.str2num('ENV3_VEL', layer), "Vel", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \auxdel, prophet, n.str2num('ENV3_DEL', layer), "Delay", 0, 127);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \auxdst, prophet, n.str2num('ENV3_DST', layer), "Dest", prophet.mod_dest_53);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \auxenvamt, prophet, n.str2num('ENV3_AMT', layer), "Env Amt", -127, 127, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \auxvel, prophet, n.str2num('ENV3_VEL', layer), "Vel", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \auxdel, prophet, n.str2num('ENV3_DEL', layer), "Delay", 0, 127);
 		make_checkbox.(parent, controls, specstore, keystore,  \auxrpt, prophet, n.str2num('ENV3_RPT', layer), "Repeat");
 
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \auxattack, prophet, n.str2num('ENV3_ATT', layer), "Attack", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \auxdecay, prophet, n.str2num('ENV3_DEC', layer), "Decay", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \auxsustain, prophet, n.str2num('ENV3_SUS', layer), "Sustain", 0, 127);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \auxrelease, prophet, n.str2num('ENV3_REL', layer), "Release", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \auxattack, prophet, n.str2num('ENV3_ATT', layer), "Attack", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \auxdecay, prophet, n.str2num('ENV3_DEC', layer), "Decay", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \auxsustain, prophet, n.str2num('ENV3_SUS', layer), "Sustain", 0, 127);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \auxrelease, prophet, n.str2num('ENV3_REL', layer), "Release", 0, 127);
 
 		make_label.(parent, controls, \mod, "Mod Matrix");
 		make_rnd_buttons.(parent, controls, specstore, \mod, [
@@ -474,51 +517,51 @@ s.waitForBoot({
 			\mod7src, \mod7dst, \mod7amt,
 			\mod8src, \mod8dst, \mod8amt,
 		]);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \mod1src, prophet, n.str2num('MOD1_SRC', layer), "1 Source", prophet.mod_source);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \mod1dst, prophet, n.str2num('MOD1_DST', layer), "Dest", prophet.mod_dest_53);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \mod1amt, prophet, n.str2num('MOD1_AMT', layer), "Amount", -127, 127, 127);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \mod5src, prophet, n.str2num('MOD5_SRC', layer), "5 Source", prophet.mod_source);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \mod5dst, prophet, n.str2num('MOD5_DST', layer), "Dest", prophet.mod_dest_53);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \mod5amt, prophet, n.str2num('MOD5_AMT', layer), "Amount", -127, 127, 127);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \mod1src, prophet, n.str2num('MOD1_SRC', layer), "1 Source", prophet.mod_source);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \mod1dst, prophet, n.str2num('MOD1_DST', layer), "Dest", prophet.mod_dest_53);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \mod1amt, prophet, n.str2num('MOD1_AMT', layer), "Amount", -127, 127, 127);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \mod5src, prophet, n.str2num('MOD5_SRC', layer), "5 Source", prophet.mod_source);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \mod5dst, prophet, n.str2num('MOD5_DST', layer), "Dest", prophet.mod_dest_53);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \mod5amt, prophet, n.str2num('MOD5_AMT', layer), "Amount", -127, 127, 127);
 
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \mod2src, prophet, n.str2num('MOD2_SRC', layer), "2 Source", prophet.mod_source);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \mod2dst, prophet, n.str2num('MOD2_DST', layer), "Dest", prophet.mod_dest_53);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \mod2amt, prophet, n.str2num('MOD2_AMT', layer), "Amount", -127, 127, 127);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \mod6src, prophet, n.str2num('MOD6_SRC', layer), "6 Source", prophet.mod_source);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \mod6dst, prophet, n.str2num('MOD6_DST', layer), "Dest", prophet.mod_dest_53);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \mod6amt, prophet, n.str2num('MOD6_AMT', layer), "Amount", -127, 127, 127);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \mod2src, prophet, n.str2num('MOD2_SRC', layer), "2 Source", prophet.mod_source);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \mod2dst, prophet, n.str2num('MOD2_DST', layer), "Dest", prophet.mod_dest_53);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \mod2amt, prophet, n.str2num('MOD2_AMT', layer), "Amount", -127, 127, 127);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \mod6src, prophet, n.str2num('MOD6_SRC', layer), "6 Source", prophet.mod_source);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \mod6dst, prophet, n.str2num('MOD6_DST', layer), "Dest", prophet.mod_dest_53);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \mod6amt, prophet, n.str2num('MOD6_AMT', layer), "Amount", -127, 127, 127);
 
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \mod3src, prophet, n.str2num('MOD3_SRC', layer), "3 Source", prophet.mod_source);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \mod3dst, prophet, n.str2num('MOD3_DST', layer), "Dest", prophet.mod_dest_53);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \mod3amt, prophet, n.str2num('MOD3_AMT', layer), "Amount", -127, 127, 127);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \mod7src, prophet, n.str2num('MOD7_SRC', layer), "7 Source", prophet.mod_source);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \mod7dst, prophet, n.str2num('MOD7_DST', layer), "Dest", prophet.mod_dest_53);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \mod7amt, prophet, n.str2num('MOD7_AMT', layer), "Amount", -127, 127, 127);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \mod3src, prophet, n.str2num('MOD3_SRC', layer), "3 Source", prophet.mod_source);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \mod3dst, prophet, n.str2num('MOD3_DST', layer), "Dest", prophet.mod_dest_53);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \mod3amt, prophet, n.str2num('MOD3_AMT', layer), "Amount", -127, 127, 127);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \mod7src, prophet, n.str2num('MOD7_SRC', layer), "7 Source", prophet.mod_source);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \mod7dst, prophet, n.str2num('MOD7_DST', layer), "Dest", prophet.mod_dest_53);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \mod7amt, prophet, n.str2num('MOD7_AMT', layer), "Amount", -127, 127, 127);
 
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \mod4src, prophet, n.str2num('MOD4_SRC', layer), "4 Source", prophet.mod_source);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \mod4dst, prophet, n.str2num('MOD4_DST', layer), "Dest", prophet.mod_dest_53);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \mod4amt, prophet, n.str2num('MOD4_AMT', layer), "Amount", -127, 127, 127);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \mod8src, prophet, n.str2num('MOD8_SRC', layer), "8 Source", prophet.mod_source);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \mod8dst, prophet, n.str2num('MOD8_DST', layer), "Dest", prophet.mod_dest_53);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \mod8amt, prophet, n.str2num('MOD8_AMT', layer), "Amount", -127, 127, 127);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \mod4src, prophet, n.str2num('MOD4_SRC', layer), "4 Source", prophet.mod_source);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \mod4dst, prophet, n.str2num('MOD4_DST', layer), "Dest", prophet.mod_dest_53);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \mod4amt, prophet, n.str2num('MOD4_AMT', layer), "Amount", -127, 127, 127);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \mod8src, prophet, n.str2num('MOD8_SRC', layer), "8 Source", prophet.mod_source);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \mod8dst, prophet, n.str2num('MOD8_DST', layer), "Dest", prophet.mod_dest_53);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \mod8amt, prophet, n.str2num('MOD8_AMT', layer), "Amount", -127, 127, 127);
 
 		make_label.(parent, controls, \controls, "Controls");
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \modwheeldst, prophet, n.str2num('MODWHEEL_DST', layer), "Mod wheel dst", prophet.mod_dest_53);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \modwheelamt, prophet, n.str2num('MODWHEEL_AMT', layer), "Amount", -127, 127, 127);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \pressuredst, prophet, n.str2num('PRESSURE_DST', layer), "Pressure dst", prophet.mod_dest_53);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \pressureamt, prophet, n.str2num('PRESSURE_AMT', layer), "Amount", -127, 127, 127);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \breathdst, prophet, n.str2num('BREATH_DST', layer), "Breath dst", prophet.mod_dest_53);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \breathamt, prophet, n.str2num('BREATH_AMT', layer), "Amount", -127, 127, 127);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \velocitydst, prophet, n.str2num('VELOCITY_DST', layer), "Velocity dst", prophet.mod_dest_53);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \velocityamt, prophet, n.str2num('VELOCITY_AMT', layer), "Amount", -127, 127, 127);
-		make_labeled_combobox.(parent, controls, specstore, keystore,  \footdst, prophet, n.str2num('FOOTCTRL_DST', layer), "Foot control dst", prophet.mod_dest_53);
-		make_labeled_textfield.(parent, controls, specstore, keystore,  \footamt, prophet, n.str2num('FOOTCTRL_AMT', layer), "Amount", -127, 127, 127);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \modwheeldst, prophet, n.str2num('MODWHEEL_DST', layer), "Mod wheel dst", prophet.mod_dest_53);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \modwheelamt, prophet, n.str2num('MODWHEEL_AMT', layer), "Amount", -127, 127, 127);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \pressuredst, prophet, n.str2num('PRESSURE_DST', layer), "Pressure dst", prophet.mod_dest_53);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \pressureamt, prophet, n.str2num('PRESSURE_AMT', layer), "Amount", -127, 127, 127);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \breathdst, prophet, n.str2num('BREATH_DST', layer), "Breath dst", prophet.mod_dest_53);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \breathamt, prophet, n.str2num('BREATH_AMT', layer), "Amount", -127, 127, 127);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \velocitydst, prophet, n.str2num('VELOCITY_DST', layer), "Velocity dst", prophet.mod_dest_53);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \velocityamt, prophet, n.str2num('VELOCITY_AMT', layer), "Amount", -127, 127, 127);
+		make_labeled_combobox.(parent, delegationcontrols, controls, specstore, keystore,  \footdst, prophet, n.str2num('FOOTCTRL_DST', layer), "Foot control dst", prophet.mod_dest_53);
+		make_labeled_textfield.(parent, delegationcontrols, controls, specstore, keystore,  \footamt, prophet, n.str2num('FOOTCTRL_AMT', layer), "Amount", -127, 127, 127);
 
 		controls
 	};
 
 	make_knobs = {
-		| parent, controls, controlspecstore, keystore, prophet, layer=\a |
+		| parent, delegationcontrols, controls, controlspecstore, keystore, prophet, layer=\a |
 		var n = NrpnTable.new;
 		var lutlay = if (layer==\a) { "A" } { "B" };
 		VLayout(
@@ -603,35 +646,39 @@ s.waitForBoot({
 			),
 			HLayout(
 				StaticText().string_("VCA").stringColor_(Color.white).background_(Color.red),
-				make_delegating_textfield.(parent, controls, controlspecstore, keystore, \ampdelay, prophet, n.str2num('AMP_DLY', lutlay)),
-				make_delegating_textfield.(parent, controls, controlspecstore, keystore, \ampattack, prophet, n.str2num('AMP_ATT', lutlay)),
-				make_delegating_textfield.(parent, controls, controlspecstore, keystore, \ampdecay, prophet, n.str2num('AMP_DEC', lutlay)),
-				make_delegating_textfield.(parent, controls, controlspecstore, keystore, \ampsustain, prophet, n.str2num('AMP_SUS', lutlay)),
-				make_delegating_textfield.(parent, controls, controlspecstore, keystore, \amprelease, prophet, n.str2num('AMP_REL', lutlay)),
-				make_delegating_textfield.(parent, controls, controlspecstore, keystore, \ampenvamt, prophet, n.str2num('AMP_ENVAMT', lutlay), 127)
+				make_delegating_textfield.(parent, delegationcontrols, controls, controlspecstore, keystore, \ampdelay, prophet, n.str2num('AMP_DLY', lutlay)),
+				make_delegating_textfield.(parent, delegationcontrols, controls, controlspecstore, keystore, \ampattack, prophet, n.str2num('AMP_ATT', lutlay)),
+				make_delegating_textfield.(parent, delegationcontrols, controls, controlspecstore, keystore, \ampdecay, prophet, n.str2num('AMP_DEC', lutlay)),
+				make_delegating_textfield.(parent, delegationcontrols, controls, controlspecstore, keystore, \ampsustain, prophet, n.str2num('AMP_SUS', lutlay)),
+				make_delegating_textfield.(parent, delegationcontrols, controls, controlspecstore, keystore, \amprelease, prophet, n.str2num('AMP_REL', lutlay)),
+				make_delegating_textfield.(parent, delegationcontrols, controls, controlspecstore, keystore, \ampenvamt, prophet, n.str2num('AMP_ENVAMT', lutlay), 127)
 			),
 			HLayout(
 				StaticText().string_("LPF").stringColor_(Color.white).background_(Color.blue),
-				make_delegating_textfield.(parent, controls, controlspecstore, keystore, \lpfdelay, prophet, n.str2num('LPF_ENV_DLY', lutlay)),
-				make_delegating_textfield.(parent, controls, controlspecstore, keystore, \lpfattack, prophet, n.str2num('LPF_ENV_ATT', lutlay)),
-				make_delegating_textfield.(parent, controls, controlspecstore, keystore, \lpfdecay, prophet, n.str2num('LPF_ENV_DEC', lutlay)),
-				make_delegating_textfield.(parent, controls, controlspecstore, keystore, \lpfsustain, prophet, n.str2num('LPF_ENV_SUS', lutlay)),
-				make_delegating_textfield.(parent, controls, controlspecstore, keystore, \lpfrelease, prophet, n.str2num('LPF_ENV_REL', lutlay)),
-				make_delegating_textfield.(parent, controls, controlspecstore, keystore, \lpfenvamt, prophet, n.str2num('LPF_ENV_AMT', lutlay), 127)
+				make_delegating_textfield.(parent, delegationcontrols, controls, controlspecstore, keystore, \lpfdelay, prophet, n.str2num('LPF_ENV_DLY', lutlay)),
+				make_delegating_textfield.(parent, delegationcontrols, controls, controlspecstore, keystore, \lpfattack, prophet, n.str2num('LPF_ENV_ATT', lutlay)),
+				make_delegating_textfield.(parent, delegationcontrols, controls, controlspecstore, keystore, \lpfdecay, prophet, n.str2num('LPF_ENV_DEC', lutlay)),
+				make_delegating_textfield.(parent, delegationcontrols, controls, controlspecstore, keystore, \lpfsustain, prophet, n.str2num('LPF_ENV_SUS', lutlay)),
+				make_delegating_textfield.(parent, delegationcontrols, controls, controlspecstore, keystore, \lpfrelease, prophet, n.str2num('LPF_ENV_REL', lutlay)),
+				make_delegating_textfield.(parent, delegationcontrols, controls, controlspecstore, keystore, \lpfenvamt, prophet, n.str2num('LPF_ENV_AMT', lutlay), 127)
 			),
 			HLayout(
 				StaticText().string_("AUX").stringColor_(Color.white).background_(Color.green.darken(0.5)),
-				make_delegating_textfield.(parent, controls, controlspecstore, keystore, \auxdel, prophet, n.str2num('ENV3_DEL', lutlay)),
-				make_delegating_textfield.(parent, controls, controlspecstore, keystore, \auxattack, prophet, n.str2num('ENV3_ATT', lutlay)),
-				make_delegating_textfield.(parent, controls, controlspecstore, keystore, \auxdecay, prophet, n.str2num('ENV3_DEC', lutlay)),
-				make_delegating_textfield.(parent, controls, controlspecstore, keystore, \auxsustain, prophet, n.str2num('ENV3_SUS', lutlay)),
-				make_delegating_textfield.(parent, controls, controlspecstore, keystore, \auxrelease, prophet, n.str2num('ENV3_REL', lutlay)),
-				make_delegating_textfield.(parent, controls, controlspecstore, keystore, \auxenvamt, prophet, n.str2num('ENV3_AMT', lutlay), 127))
+				make_delegating_textfield.(parent, delegationcontrols, controls, controlspecstore, keystore, \auxdel, prophet, n.str2num('ENV3_DEL', lutlay)),
+				make_delegating_textfield.(parent, delegationcontrols, controls, controlspecstore, keystore, \auxattack, prophet, n.str2num('ENV3_ATT', lutlay)),
+				make_delegating_textfield.(parent, delegationcontrols, controls, controlspecstore, keystore, \auxdecay, prophet, n.str2num('ENV3_DEC', lutlay)),
+				make_delegating_textfield.(parent, delegationcontrols, controls, controlspecstore, keystore, \auxsustain, prophet, n.str2num('ENV3_SUS', lutlay)),
+				make_delegating_textfield.(parent, delegationcontrols, controls, controlspecstore, keystore, \auxrelease, prophet, n.str2num('ENV3_REL', lutlay)),
+				make_delegating_textfield.(parent, delegationcontrols, controls, controlspecstore, keystore, \auxenvamt, prophet, n.str2num('ENV3_AMT', lutlay), 127)),
+			HLayout(
+				make_delegating_combobox.(parent, delegationcontrols, controls, controlspecstore, keystore, \auxdst, prophet, n.str2num('ENV3_DST', lutlay), prophet.mod_dest_53),
+				nil
+			)
 		);
 	};
 
 
-	make_layer_layout = {
+	make_parameter_layout = {
 		| controls |
 		VLayout(
 			HLayout(
@@ -849,13 +896,13 @@ s.waitForBoot({
 		);
 	};
 
-	layers[\a] = make_layer_controls.(w, controlsa, specstore, key_to_default_a, p, "A");
-	layers[\b] = make_layer_controls.(w, controlsb, specstore, key_to_default_b, p, "B");
+	layers[\a] = make_parameter_controls.(w, delegation_controls_a, controlsa, specstore, key_to_default_a, p, "A");
+	layers[\b] = make_parameter_controls.(w, delegation_controls_b, controlsb, specstore, key_to_default_b, p, "B");
 
 	parameters = View().layout_(HLayout(
-		make_layer_layout.(layers[\a]),
+		make_parameter_layout.(layers[\a]),
 		nil,
-		make_layer_layout.(layers[\b])));
+		make_parameter_layout.(layers[\b])));
 
 	envview1 = UserView.new(w, Rect()).background_(Color.white);
 	envview1.drawFunc_({
@@ -905,17 +952,116 @@ s.waitForBoot({
 			aux_amt:controlsb[\control_auxenvamt].value.asInt
 		);
 	});
-
-	envknobs1 = make_knobs.(envview1, controlsa, specstore, key_to_default_a, p, \a);
-	envknobs2 = make_knobs.(envview2, controlsb, specstore, key_to_default_b, p, \b);
+	envknobs1 = make_knobs.(envview1, delegation_controls_a, controlsa, specstore, key_to_default_a, p, \a);
+	envknobs2 = make_knobs.(envview2, delegation_controls_b, controlsb, specstore, key_to_default_b, p, \b);
 	envelopeviewers = View().layout_(HLayout(
 		VLayout(envview1, envknobs1),
 		VLayout(envview2, envknobs2)));
-	tablayout=StackLayout(parameters, envelopeviewers);
+
+	make_seq_combos = {
+		| parent, delegationcontrols, controls, specstore, keystore, prophet, nrpntable, layer |
+	make_labeled_combobox.(parent,
+		delegationcontrols, controls, specstore, keystore,
+		\seq1destcombo, prophet, nrpntable.str2num('SEQ1_DST', layer),
+		"Gated Sequencer Destination Track 1", prophet.mod_dest_53);
+	make_labeled_combobox.(parent,
+		delegationcontrols, controls, specstore, keystore,
+		\seq2destcombo, prophet, nrpntable.str2num('SEQ2_DST', layer),
+		"Gated Sequencer Destination Track 2", prophet.mod_dest_54);
+		make_labeled_combobox.(parent,
+		delegationcontrols, controls, specstore, keystore,
+		\seq3destcombo, prophet, nrpntable.str2num('SEQ3_DST', layer),
+		"Gated Sequencer Destination Track 3", prophet.mod_dest_53);
+	make_labeled_combobox.(parent,
+		delegationcontrols, controls, specstore, keystore,
+		\seq4destcombo, prophet, nrpntable.str2num('SEQ4_DST', layer),
+		"Gated Sequencer Destination Track 4", prophet.mod_dest_54);
+	};
+
+	make_plotter = {
+		| name, basenrpn, parent, delegationcontrols, controls, specstore, keystore, key, prophet, nrpntable, layer |
+		var gSEQSTEPS = 16;
+		var plotkey = ("control_"++key.asString).asSymbol;
+		var defaultvalues;
+		var nrpn = nrpntable.str2num(basenrpn, layer);
+
+		keystore[plotkey] = {gSEQSTEPS.collect({
+			|step|
+			d.init(prophet.rev2, prophet.last_sysex_stream);
+			d.lut(nrpn+step, 0, 127, norange:true, midivalue:true, includeunit:false).asInt;
+		}).postln};
+
+		specstore[plotkey] = (\type:\plot, \nrpn:basenrpn, \steps:gSEQSTEPS, \specs:ControlSpec(0, 127, \lin, 1, 0, "steps"), \domainspecs:ControlSpec(0, 15, \lin, 1, 0, "steps"));
+
+		defaultvalues = keystore[plotkey].();
+		//("defaultvalues: "++defaultvalues).postln;
+		controls[plotkey] = Plotter(name, Rect(), parent)
+		.plotMode_(\bars)
+		.editMode_(true)
+		.value_(defaultvalues.postln)
+		.specs_(ControlSpec(0, 127, \lin, 1, 0, "steps"))
+		.domainSpecs_(ControlSpec(0, 15, \lin, 1, 0, "steps"))
+		.editFunc_({
+			|plotter, plotIndex, i, value |
+			{
+				var finalnrpn = nrpn + i;
+				prophet.sendNRPN(finalnrpn, value.round(1).asInt);
+				controls[plotkey].interactionView.refresh;
+			}.defer;
+		}).setProperties(\plotColor, Color.blue);
+
+		gSEQSTEPS.do({
+			|step|
+			prophet.makeNRPNResponder(nrpn+step, {
+				| value, nrpn |
+				{
+					//("DATA: "++controls[plotkey].data++" step: "++step++" nrpn: "++nrpn++" value: "++value++" plotkey: "++plotkey).postln;
+					controls[plotkey].data[0][step] = value;
+					controls[plotkey].interactionView.refresh;
+				}.defer;
+			});
+		});
+		controls[plotkey];
+	};
+
+	make_plotters = {
+		| parent, delegationcontrols, controls, specstore, keystore, prophet, nrpntable, layer |
+		make_plotter.("P1", 'SEQ1_GATED_STEP1_TRACK1', parent, delegationcontrols, controls, specstore, keystore, \plotter1, prophet, nrpntable, layer);
+		make_plotter.("P2", 'SEQ1_GATED_STEP1_TRACK2', parent, delegationcontrols, controls, specstore, keystore, \plotter2, prophet, nrpntable, layer);
+		make_plotter.("P3", 'SEQ1_GATED_STEP1_TRACK3', parent, delegationcontrols, controls, specstore, keystore, \plotter3, prophet, nrpntable, layer);
+		make_plotter.("P4", 'SEQ1_GATED_STEP1_TRACK4', parent, delegationcontrols, controls, specstore, keystore, \plotter4, prophet, nrpntable, layer);
+	};
+
+	make_gated_sequencer_controls = {
+		| parent, delegationcontrols, controls, specstore, keystore, prophet, nrpntable, layer |
+
+		make_seq_combos.(parent, delegationcontrols, controls, specstore, keystore, prophet, nrpntable, layer);
+		make_plotters.(parent, delegationcontrols, controls, specstore, keystore, prophet, nrpntable, layer);
+
+		VLayout(
+			HLayout(controls[\label_seq1destcombo], controls[\control_seq1destcombo], nil),
+			HLayout(controls[\control_plotter1].interactionView),
+			HLayout(controls[\label_seq2destcombo], controls[\control_seq2destcombo], nil),
+			HLayout(controls[\control_plotter2].interactionView),
+			HLayout(controls[\label_seq3destcombo], controls[\control_seq3destcombo], nil),
+			HLayout(controls[\control_plotter3].interactionView),
+			HLayout(controls[\label_seq4destcombo], controls[\control_seq4destcombo], nil),
+			HLayout(controls[\control_plotter4].interactionView)
+		);
+	};
+
+	seqviewa = View().layout_(make_gated_sequencer_controls.(w, delegation_controls_a, controlsa, specstore, key_to_default_a, p, n, "A"));
+	seqviewb = View().layout_(make_gated_sequencer_controls.(w, delegation_controls_b, controlsb, specstore, key_to_default_b, p, n, "B"));
+
+	gatedsequencer = View().layout_(HLayout(seqviewa, seqviewb));
+
+	tablayout=StackLayout(parameters, envelopeviewers, gatedsequencer);
 
 	tabrow = HLayout(
 		Button().string_("Parameters").action_({ tablayout.index = 0; }),
-		Button().string_("Envelopes").action_({tablayout.index = 1;}));
+		Button().string_("Envelopes").action_({tablayout.index = 1;}),
+		Button().string_("Gated Sequencer").action_({tablayout.index = 2;})
+	);
 
 	w.layout = VLayout(tabrow, tablayout);
 	w.front;
