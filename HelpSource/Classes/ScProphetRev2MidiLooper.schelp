@@ -1,0 +1,139 @@
+TITLE:: ScProphetRev2MidiLooper
+summary:: Polyphonic sequencer on steroids.
+categories:: Undocumented classes
+related:: Classes/SomeRelatedClass, Reference/SomeRelatedStuff, etc.
+
+DESCRIPTION::
+Polyphonic sequencer on steroids. Ideal for live coding.
+
+CLASSMETHODS::
+
+METHOD:: new
+(describe method here)
+
+ARGUMENT:: prophet
+a connected ScProphetRev2 instance
+
+ARGUMENT:: tracks
+number of tracks
+
+returns:: (describe returnvalue here)
+an ScProphetRev2MidiLooper instance
+
+INSTANCEMETHODS::
+
+METHOD:: asView
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: init
+(describe method here)
+
+ARGUMENT:: prophet
+(describe argument here)
+
+ARGUMENT:: tracks
+(describe argument here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: midichannelctrls
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: nrpntable
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: pr_i2key
+(describe method here)
+
+ARGUMENT:: i
+(describe argument here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: layout
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: midichannels
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: last_used_path
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: mutecheckboxes
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: pfield
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: transpose
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: durationtextfields
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: cleanUpFunc
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: nrpncache
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: prophet
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: textfields
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: ffield
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: gTRACKS
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+
+EXAMPLES::
+
+code::
+(
+w = Window("TEST", Rect(0,0,800,300));
+
+p = ScProphetRev2.new;
+p.connect;
+
+l = ScProphetRev2MidiLooper.new(p, 16);
+
+w.layout_(HLayout(l));
+w.front;
+)
+::
