@@ -15,11 +15,8 @@ s.waitForBoot({
 	CCResponder.removeAll;
 
 	studio = ScProphetRev2Studio.new(w, p);
-	w.layout = VLayout(studio);
+	w.layout_(VLayout(studio));
 	w.front;
-
-	w.onClose_(studio.cleanUpFunc);
-
+	w.onClose_(studio.cleanUpFunc.value)
 });
 )
-
