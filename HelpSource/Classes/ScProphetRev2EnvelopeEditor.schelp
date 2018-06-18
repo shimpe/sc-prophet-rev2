@@ -1,0 +1,306 @@
+TITLE:: ScProphetRev2EnvelopeEditor
+summary:: Helper widget for visualizing and editing the rev2 VCA/LPF/AUX envelopes
+categories:: Widget
+related:: ScProphetRev2, ScProphetRev2GatedSequenceEditor, ScProphetRev2LiveControlBuilder, ScProphetRev2MidiLooper, ScProphetRev2ParametersPane, ScProphetRev2Studio
+
+DESCRIPTION::
+Helper widget for visualizing and editing the VCA/LPF/AUX envelopes
+
+
+CLASSMETHODS::
+
+METHOD:: new
+create a new envelope editor, ready to be embedded in a Layout
+
+ARGUMENT:: parent
+typically a window
+
+ARGUMENT:: delegationcontrols
+an IdentityDictionary. During creation, this dictionary
+will be extended with a mapping between the name of envelope editing controls as created in a ScProphetRev2ParametersPane and the envelope editing controls as created in ScProphetRev2EnvelopeEditor.
+This mapping is used to keep both views in sync (if you update a control in an ScProphetRev2ParametersPane
+it will automatically be updated in the ScProphetRev2EnvelopeEditor and vice versa).
+
+ARGUMENT:: controls
+an IdentityDictionary. During creation, this dictionary
+will be extended with a mapping between control name and actual control widget. This can be used to
+create layouts later on.
+
+ARGUMENT:: controlspecstore
+an IdentityDictionary. During creation, this dictionary is extended with some useful information
+about the created controls, like min and max allowed values. This is useful for operations like
+randomizing control values.
+
+ARGUMENT:: keystore
+an IdentityDictionary. During creation this dictionary is extended with a mapping from control name
+to a function that gets the current value as stored in the sysex_stream of the ScProphetRev2 instance.
+This is useful for updating control values when changing the selected patch.
+
+ARGUMENT:: prophet
+a connected instance of ScProphetRev2
+
+ARGUMENT:: controlbuilder
+an instance of ScProphetRev2LiveControlBuilder, i.e. a factory for textfields, checkboxes and comboboxes that automatically react to the synthesizer's nrpn messages and that automatically send nrpn messages to the synth when their value is changed.
+
+ARGUMENT:: nrpntable
+A lookup table mapping symbolic nrpn constants to numerical values (and vice versa).
+
+ARGUMENT:: layer
+One of "A" or "B". This is used e.g. while mapping nrpn names to numeric constants.
+
+returns:: (describe returnvalue here)
+an envelope editor
+
+INSTANCEMETHODS::
+
+METHOD:: parent
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: keystore
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: controlbuilder
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: init
+(describe method here)
+
+ARGUMENT:: parent
+(describe argument here)
+
+ARGUMENT:: delegationcontrols
+(describe argument here)
+
+ARGUMENT:: controls
+(describe argument here)
+
+ARGUMENT:: controlspecstore
+(describe argument here)
+
+ARGUMENT:: keystore
+(describe argument here)
+
+ARGUMENT:: prophet
+(describe argument here)
+
+ARGUMENT:: controlbuilder
+(describe argument here)
+
+ARGUMENT:: nrpntable
+(describe argument here)
+
+ARGUMENT:: layer
+(describe argument here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: controls
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: envview
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: make_knobs
+(describe method here)
+
+ARGUMENT:: parent
+(describe argument here)
+
+ARGUMENT:: delegationcontrols
+(describe argument here)
+
+ARGUMENT:: controls
+(describe argument here)
+
+ARGUMENT:: controlspecstore
+(describe argument here)
+
+ARGUMENT:: keystore
+(describe argument here)
+
+ARGUMENT:: prophet
+(describe argument here)
+
+ARGUMENT:: bld
+(describe argument here)
+
+ARGUMENT:: n
+(describe argument here)
+
+ARGUMENT:: layer
+(describe argument here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: knobs
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: layer
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: nrpntable
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: draw_envelopes
+(describe method here)
+
+ARGUMENT:: uview
+(describe argument here)
+
+ARGUMENT:: minx
+(describe argument here)
+
+ARGUMENT:: maxx
+(describe argument here)
+
+ARGUMENT:: miny
+(describe argument here)
+
+ARGUMENT:: maxy
+(describe argument here)
+
+ARGUMENT:: margin
+(describe argument here)
+
+ARGUMENT:: amp_dly
+(describe argument here)
+
+ARGUMENT:: amp_a
+(describe argument here)
+
+ARGUMENT:: amp_d
+(describe argument here)
+
+ARGUMENT:: amp_s
+(describe argument here)
+
+ARGUMENT:: amp_r
+(describe argument here)
+
+ARGUMENT:: amp_amt
+(describe argument here)
+
+ARGUMENT:: lpf_dly
+(describe argument here)
+
+ARGUMENT:: lpf_a
+(describe argument here)
+
+ARGUMENT:: lpf_d
+(describe argument here)
+
+ARGUMENT:: lpf_s
+(describe argument here)
+
+ARGUMENT:: lpf_r
+(describe argument here)
+
+ARGUMENT:: lpf_amt
+(describe argument here)
+
+ARGUMENT:: aux_dly
+(describe argument here)
+
+ARGUMENT:: aux_a
+(describe argument here)
+
+ARGUMENT:: aux_d
+(describe argument here)
+
+ARGUMENT:: aux_s
+(describe argument here)
+
+ARGUMENT:: aux_r
+(describe argument here)
+
+ARGUMENT:: aux_amt
+(describe argument here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: drawenv
+(describe method here)
+
+ARGUMENT:: parent
+(describe argument here)
+
+ARGUMENT:: color
+(describe argument here)
+
+ARGUMENT:: minx
+(describe argument here)
+
+ARGUMENT:: maxx
+(describe argument here)
+
+ARGUMENT:: miny
+(describe argument here)
+
+ARGUMENT:: maxy
+(describe argument here)
+
+ARGUMENT:: linewidth
+(describe argument here)
+
+ARGUMENT:: delay
+(describe argument here)
+
+ARGUMENT:: attack
+(describe argument here)
+
+ARGUMENT:: decay
+(describe argument here)
+
+ARGUMENT:: sustain
+(describe argument here)
+
+ARGUMENT:: release
+(describe argument here)
+
+ARGUMENT:: amount
+(describe argument here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: prophet
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: delegationcontrols
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: controlspecstore
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: asView
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+
+EXAMPLES::
+
+code::
+(some example code)
+::

@@ -1,0 +1,174 @@
+TITLE:: ScProphetRev2Studio
+summary:: environment for sound design and live coding with the dsi rev2 synth
+categories:: IDE
+related:: ScProphetRev2, ScProphetRev2EnvelopeEditor, ScProphetRev2GatedSequenceEditor, ScProphetRev2LiveControlBuilder, ScProphetRev2MidiLooper, ScProphetRev2ParametersPane
+
+DESCRIPTION::
+environment for sound design and live coding with the dsi rev2 synth
+automatic bidirectional sync between synth and ui
+live edit all parameters
+live program the gated sequencer
+includes a software based polyphonic sequencer on steroids optimized for live coding up to 16 voices, and with automation for all synth parameters
+
+
+CLASSMETHODS::
+
+METHOD:: new
+creates an ScProphetRev2Studio object which is suitable to be embedded in a Layout
+
+ARGUMENT:: parent
+typically a window or a view
+
+ARGUMENT:: prophet
+a connected instance of ScProphetRev2
+
+returns:: an ScProphetRev2Studio
+
+
+INSTANCEMETHODS::
+
+METHOD:: envelopeviewers
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: bld
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: u
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: controls
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: d
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: gatedsequencer
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: cleanUpFunc
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: n
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: w
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: condition
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: asView
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: midilooper
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: p
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: midilooperview
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: tablayout
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: init
+(describe method here)
+
+ARGUMENT:: parent
+(describe argument here)
+
+ARGUMENT:: prophet
+(describe argument here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: parent
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: delegation_controls
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: tabrow
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: specstore
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: key_to_default
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+METHOD:: parameters
+(describe method here)
+
+returns:: (describe returnvalue here)
+
+
+EXAMPLES::
+
+code::
+(
+s.waitForBoot({
+	var w = Window.new("ScProphetRev2Studio", Rect(0,0,1800,1200));
+	var condition;
+	var p = ScProphetRev2.new;
+	var studio;
+
+	p.connect;
+
+	condition = Condition.new;
+	p.get_current_patch_state(completionHandler:{condition.unhang;}); // if this hangs up, check if midi correctly configured (on linux: use alsa sequencer)
+	condition.wait;
+
+	OSCdef.freeAll;
+	CCResponder.removeAll;
+
+	studio = ScProphetRev2Studio.new(w, p);
+	w.layout = VLayout(studio);
+	w.front;
+
+	w.onClose_(studio.cleanUpFunc);
+
+});
+)
+::
