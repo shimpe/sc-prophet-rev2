@@ -25,7 +25,7 @@ ScProphetRev2ParametersPane {
 		this.controlbuilder = controlbuilder;
 		this.nrpntable = nrpntable;
 		this.layer = layer;
-		^this.asView;
+		^this;
 	}
 
 	asView {

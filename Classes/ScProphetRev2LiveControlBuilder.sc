@@ -194,7 +194,7 @@ ScProphetRev2LiveControlBuilder {
 				if (spec[\type] == \textfield) {
 					if (0.3.coin) {
 						var oldvalue = controls[controlkey].value.asInt;
-						var perturbation = (-3).rrand(3);
+						var perturbation = (3.neg).rrand(3);
 						var finalvalue = oldvalue + perturbation;
 						if (finalvalue < spec[\min]) {
 							finalvalue = spec[\min];
@@ -204,6 +204,27 @@ ScProphetRev2LiveControlBuilder {
 						};
 						controls[controlkey].valueAction_(finalvalue);
 					};
+				};
+				if (spec[\type] == \plot) {
+					var oldvalue = controls[controlkey].value.collect({ |el| el.asInt; });
+					var newvalue = oldvalue.collect({
+						|old|
+						var proposed =  old;
+						if (0.3.coin) { proposed = proposed + (3.neg).rrand(3) };
+						if (proposed > 127) { proposed = 127; };
+						if (proposed < 0) { proposed = 0 };
+						proposed;
+					});
+
+					{
+						newvalue.do({
+							| value, i |
+							var finalnrpn = spec[\nrpn] + i;
+							spec[\prophet].sendNRPN(finalnrpn, value.round(1).asInt);
+						});
+						controls[controlkey].value_(newvalue);
+						controls[controlkey].interactionView.refresh;
+					}.defer;
 				};
 			});
 		});
@@ -228,6 +249,19 @@ ScProphetRev2LiveControlBuilder {
 				};
 				if (spec[\type] == \textfield) {
 					controls[controlkey].valueAction_((spec[\min]).rrand(spec[\max]));
+				};
+				if (spec[\type] == \plot) {
+					var steps = spec[\steps];
+					var newvalue = steps.collect({ |step| 0.rrand(127); });
+					{
+						newvalue.do({
+							| value, i |
+							var finalnrpn = spec[\nrpn] + i;
+							spec[\prophet].sendNRPN(finalnrpn, value.round(1).asInt);
+						});
+						controls[controlkey].value_(newvalue);
+						controls[controlkey].interactionView.refresh;
+					}.defer;
 				};
 			});
 		});

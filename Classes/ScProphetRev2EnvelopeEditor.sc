@@ -28,7 +28,7 @@ ScProphetRev2EnvelopeEditor {
 		this.layer = layer;
 		this.controlbuilder = controlbuilder;
 		this.nrpntable = nrpntable;
-		^this.asView()
+		^this
 	}
 
 	asView {

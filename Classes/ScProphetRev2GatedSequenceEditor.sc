@@ -29,8 +29,7 @@ ScProphetRev2GatedSequenceEditor {
 		this.prophet = prophet;
 		this.nrpntable = nrpntable;
 		this.layer = layer;
-
-		^this.asView();
+		^this;
 	}
 
 	asView {
@@ -53,18 +52,22 @@ ScProphetRev2GatedSequenceEditor {
 			delegationcontrols, controls, specstore, keystore,
 			\seq1destcombo, prophet, nrpntable.str2num('SEQ1_DST', layer),
 			"Gated Sequencer Destination Track 1", prophet.mod_dest_53);
+		bld.make_rnd_buttons(parent, controls, specstore, \seq1, [\seq1destcombo, \plotter1]);
 		bld.make_labeled_combobox(parent, patchdumper,
 			delegationcontrols, controls, specstore, keystore,
 			\seq2destcombo, prophet, nrpntable.str2num('SEQ2_DST', layer),
 			"Gated Sequencer Destination Track 2", prophet.mod_dest_54);
+		bld.make_rnd_buttons(parent, controls, specstore, \seq2, [\seq2destcombo, \plotter2]);
 		bld.make_labeled_combobox(parent, patchdumper,
 			delegationcontrols, controls, specstore, keystore,
 			\seq3destcombo, prophet, nrpntable.str2num('SEQ3_DST', layer),
 			"Gated Sequencer Destination Track 3", prophet.mod_dest_53);
+		bld.make_rnd_buttons(parent, controls, specstore, \seq3, [\seq3destcombo, \plotter3]);
 		bld.make_labeled_combobox(parent, patchdumper,
 			delegationcontrols, controls, specstore, keystore,
 			\seq4destcombo, prophet, nrpntable.str2num('SEQ4_DST', layer),
 			"Gated Sequencer Destination Track 4", prophet.mod_dest_54);
+		bld.make_rnd_buttons(parent, controls, specstore, \seq4, [\seq4destcombo, \plotter4]);
 	}
 
 	make_plotter {
@@ -80,7 +83,7 @@ ScProphetRev2GatedSequenceEditor {
 			this.patchdumper.lut(nrpn+step, 0, 127, norange:true, midivalue:true, includeunit:false).asInt;
 		})};
 
-		specstore[plotkey] = (\type:\plot, \nrpn:basenrpn, \steps:gSEQSTEPS, \specs:ControlSpec(0, 127, \lin, 1, 0, "steps"), \domainspecs:ControlSpec(0, 15, \lin, 1, 0, "steps"));
+		specstore[plotkey] = (\type:\plot, \nrpn:nrpn, \steps:gSEQSTEPS, \specs:ControlSpec(0, 127, \lin, 1, 0, "steps"), \domainspecs:ControlSpec(0, 15, \lin, 1, 0, "steps"), \prophet:prophet);
 
 		defaultvalues = keystore[plotkey].();
 		//("defaultvalues: "++defaultvalues).postln;
@@ -128,13 +131,13 @@ ScProphetRev2GatedSequenceEditor {
 		this.make_plotters(parent, delegationcontrols, controls, specstore, keystore, prophet, nrpntable, layer);
 
 		^VLayout(
-			HLayout(controls[\label_seq1destcombo], controls[\control_seq1destcombo], nil),
+			HLayout(controls[\label_seq1destcombo], controls[\control_seq1destcombo], controls[\button_perturbseq1], controls[\button_randomizeseq1], nil),
 			HLayout(controls[\control_plotter1].interactionView),
-			HLayout(controls[\label_seq2destcombo], controls[\control_seq2destcombo], nil),
+			HLayout(controls[\label_seq2destcombo], controls[\control_seq2destcombo], controls[\button_perturbseq2], controls[\button_randomizeseq2], nil),
 			HLayout(controls[\control_plotter2].interactionView),
-			HLayout(controls[\label_seq3destcombo], controls[\control_seq3destcombo], nil),
+			HLayout(controls[\label_seq3destcombo], controls[\control_seq3destcombo], controls[\button_perturbseq3], controls[\button_randomizeseq3], nil),
 			HLayout(controls[\control_plotter3].interactionView),
-			HLayout(controls[\label_seq4destcombo], controls[\control_seq4destcombo], nil),
+			HLayout(controls[\label_seq4destcombo], controls[\control_seq4destcombo], controls[\button_perturbseq4], controls[\button_randomizeseq4], nil),
 			HLayout(controls[\control_plotter4].interactionView)
 		);
 	}
