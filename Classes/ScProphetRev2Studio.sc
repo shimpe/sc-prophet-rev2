@@ -14,6 +14,8 @@ ScProphetRev2Studio {
 	var <>parameters;
 	var <>envelopeviewers;
 	var <>gatedsequencer;
+	var <>midilooper;
+	var <>midilooperview;
 	var <>tabrow;
 	var <>tablayout;
 
@@ -23,14 +25,14 @@ ScProphetRev2Studio {
 	}
 
 	cleanUpFunc {
-		^this.bld.cleanUpFunc;
+		^this.midilooper.cleanUpFunc();
 	}
 
 	init {
 		|parent, prophet|
 		this.parent = parent;
 		this.p = prophet;
-		^this.asView();
+		^this
 	}
 
 	asView {
@@ -96,12 +98,16 @@ ScProphetRev2Studio {
 				this.controls["B"], this.specstore["B"], this.key_to_default["B"],
 				this.p, this.bld, this.n, "B")));
 
-		this.tablayout=StackLayout(this.parameters, this.envelopeviewers, this.gatedsequencer);
+		this.midilooper = ScProphetRev2MidiLooper.new(this.p, 16);
+		this.midilooperview =  View().layout_(HLayout(this.midilooper));
+
+		this.tablayout=StackLayout(this.parameters, this.envelopeviewers, this.gatedsequencer, this.midilooperview);
 
 		this.tabrow = HLayout(
 			Button().string_("Parameters").action_({ this.tablayout.index = 0; }),
 			Button().string_("Envelopes").action_({this.tablayout.index = 1;}),
-			Button().string_("Gated Sequencer").action_({this.tablayout.index = 2;})
+			Button().string_("Gated Sequencer").action_({this.tablayout.index = 2;}),
+			Button().string_("Poly Seq On Steroids").action_({this.tablayout.index = 3;})
 		);
 
 		^View().layout_(VLayout(this.tabrow, this.tablayout));

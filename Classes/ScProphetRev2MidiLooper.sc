@@ -102,6 +102,7 @@ ScProphetRev2MidiLooper {
 						transppat = Padd(\midinote, Pfunc({this.transpose}), pat); // transpose as requested
 						Pdef(this.pr_i2key(i), transppat).quant_(dur).play;
 					} {
+						this.durationtextfields[i].value_(0);
 						Pdef(this.pr_i2key(i)).stop;
 					};
 				});
@@ -259,6 +260,7 @@ ScProphetRev2MidiLooper {
 			);
 		);
 
+		^this;
 	}
 
 	asView{
@@ -271,7 +273,7 @@ ScProphetRev2MidiLooper {
 	}
 
 	cleanUpFunc {
-		{
+		^{
 			this.gTRACKS.do({
 				|i|
 				Pdef(this.pr_i2key(i)).stop;
