@@ -36,7 +36,10 @@ ScProphetRev2MidiLooper {
 				var player = Pdef(this.pr_i2key(i)).player;
 				if (cbox.value) {
 					if (player.notNil) {
-						player.mute;
+						if (player.muteCount == 0) {
+							"Mute".postln;
+							player.mute;
+						};
 					} /*{
 					"warning: trying to mute nil player".postln;
 					}*/;
@@ -45,7 +48,10 @@ ScProphetRev2MidiLooper {
 					this.durationtextfields[i].background_(Color.gray.lighten(0.95));
 				} {
 					if (player.notNil) {
-						player.unmute;
+						if (player.muteCount != 0) {
+							"Unmute".postln;
+							player.unmute;
+						};
 					} /*{
 					"warning: trying to mute nil player".postln;
 					}*/;
