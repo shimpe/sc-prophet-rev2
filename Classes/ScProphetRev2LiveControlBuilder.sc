@@ -277,4 +277,66 @@ ScProphetRev2LiveControlBuilder {
 		this.make_randomize_button(parent, controls, controlspecstore, key2, "Randomize", listofcontrolids);
 	}
 
+	make_automation_control {
+		| controls, grouplabel, key, layer = "A" |
+		var tkey = ("task_"++key++"_"++layer).asSymbol;
+		var grouplabelkey = ("label_rndgrp_"++key).asSymbol;
+		var groupcheckboxkey = ("control_rndgrp_onoff_"++key).asSymbol;
+		var groupoptionskey = ("control_rndgrp_nudgerandomize_"++key).asSymbol;
+		var groupperiodlabelkey = ("label_rndgrp_period_"++key).asSymbol;
+		var groupperiodtfieldkey = ("control_rndgrp_period_"++key).asSymbol;
+		var perturbbtnkey = ("button_perturb"++key).asSymbol;
+		var randomizebtnkey = ("button_randomize"++key).asSymbol;
+
+		controls[grouplabelkey] = StaticText().string_(grouplabel).font_(Font("Monaco", 16)).background_(Color.yellow);
+		controls[groupcheckboxkey] = CheckBox().string_("On/Off").action_({
+			| cbox |
+			if (cbox.value) {
+				if (Tdef(tkey).isPlaying.not) {
+					("start playing task").postln;
+					Tdef(tkey).play;
+				};
+			} {
+				if (Tdef(tkey).isPlaying) {
+					("stop playing task").postln;
+					Tdef(tkey).stop;
+				};
+			};
+		});
+
+		controls[groupoptionskey] = PopUpMenu().items_(["Nudge", "Randomize"]);
+		controls[groupperiodlabelkey] = StaticText().string_("Refresh rate (in seconds)");
+		controls[groupperiodtfieldkey] = TextField().string_("2").action_({
+			| textfield |
+			{
+				var period = textfield.value.asFloat;
+				var actiontype = controls[groupoptionskey].value.asInt;
+				Tdef(tkey, {
+					loop {
+						if (period <= 0) {
+							period = 0;
+						};
+						if (actiontype == 0) {
+							{controls[perturbbtnkey].valueAction_(0)}.defer;
+						} {
+							{controls[randomizebtnkey].valueAction_(0)}.defer;
+						};
+						("waiting for "++period++" seconds").postln;
+						period.wait;
+					}
+				});
+			}.defer;
+		});
+		^controls;
+	}
+
+	make_automation_layout {
+		|  controls |
+		var groupkeys = ["label_rndgrp_", "control_rndgrp_onoff_", "control_rndgrp_nudgerandomize_",
+			"label_rndgrp_period_", "control_rndgrp_period_"];
+		var oscgroup = groupkeys.collect({ |key| controls[(key++"osc").asSymbol] });
+		oscgroup = oscgroup.add(nil);
+		^VLayout(HLayout(*oscgroup));
+	}
+
 }

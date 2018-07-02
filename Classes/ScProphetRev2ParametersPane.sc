@@ -33,6 +33,10 @@ ScProphetRev2ParametersPane {
 			this.controls, this.specstore, this.keystore, this.prophet, this.controlbuilder, this.nrpntable, this.layer)));
 	}
 
+	automationView {
+		^View().layout_(this.controlbuilder.make_automation_layout(this.make_automation_controls(this.controls, this.controlbuilder)));
+	}
+
 	make_parameter_controls {
 		| parent, delegationcontrols, controls, specstore, keystore, prophet, bld, n, layer |
 		var d = PatchDumper.new(this.prophet.rev2, this.prophet.last_patch_sysex_stream);
@@ -64,7 +68,7 @@ ScProphetRev2ParametersPane {
 
 		bld.make_label(parent, controls, \lpf, "Low pass filter");
 		bld.make_rnd_buttons(parent, controls, specstore, \lpf, [\cutoff, \resonance, \lpfenvamt, \lpfenvvel, \lpfkeyamt, \lpfaudiomod,
-			\lpfpoles, \lpfdelay, \lpfattack, \lpfdecay, \lpfsustain, \lpfrelease]);
+			\lpfpoles, /*\lpfdelay,*/ \lpfattack, \lpfdecay, \lpfsustain, \lpfrelease]);
 		bld.make_labeled_textfield(parent, d, delegationcontrols, controls, specstore, keystore,  \cutoff, prophet, n.str2num('LPF_CUTOFF', layer), "Cut Off", 0, 164);
 		bld.make_labeled_textfield(parent, d, delegationcontrols, controls, specstore, keystore,  \resonance, prophet, n.str2num('LPF_RESONANCE', layer), "Resonance", 0, 127);
 		bld.make_labeled_textfield(parent, d, delegationcontrols, controls, specstore, keystore,  \lpfenvamt, prophet, n.str2num('LPF_ENV_AMT', layer), "Env Amt", -127, 127, 127);
@@ -80,7 +84,7 @@ ScProphetRev2ParametersPane {
 		bld.make_labeled_textfield(parent, d, delegationcontrols, controls, specstore, keystore,  \lpfrelease, prophet, n.str2num('LPF_ENV_REL', layer), "Release", 0, 127);
 
 		bld.make_label(parent, controls, \amp, "Amplifier");
-		bld.make_rnd_buttons(parent, controls, specstore, \amp, [\amppanspread, \ampenvamt, \ampvel, \ampdelay, \ampattack, \ampdecay, \ampsustain, \amprelease]);
+		bld.make_rnd_buttons(parent, controls, specstore, \amp, [\amppanspread, \ampenvamt, \ampvel, /*\ampdelay,*/ \ampattack, \ampdecay, \ampsustain, \amprelease]);
 		bld.make_labeled_textfield(parent, d, delegationcontrols, controls, specstore, keystore,  \amppanspread, prophet, n.str2num('PAN_SPREAD', layer), "Pan spread", 0, 127);
 		bld.make_labeled_textfield(parent, d, delegationcontrols, controls, specstore, keystore,  \ampenvamt, prophet, n.str2num('AMP_ENVAMT', layer), "Env Amt", 0, 127);
 		bld.make_labeled_textfield(parent, d, delegationcontrols, controls, specstore, keystore,  \ampvel, prophet, n.str2num('AMP_VELOCITY', layer), "Velocity", 0, 127);
@@ -154,7 +158,7 @@ ScProphetRev2ParametersPane {
 
 		bld.make_label(parent, controls, \aux, "Aux Envelope");
 		bld.make_rnd_buttons(parent, controls, specstore, \aux, [
-			\auxdst, \auxenvamt, \auxvel, \auxdel, \auxrpt,
+			\auxdst, \auxenvamt, \auxvel, /*\auxdel,*/ \auxrpt,
 			\auxattack, \auxdecay, \auxsustain, \auxrelease
 		]);
 		bld.make_labeled_combobox(parent, d, delegationcontrols, controls, specstore, keystore,  \auxdst, prophet, n.str2num('ENV3_DST', layer), "Dest", prophet.mod_dest_53);
@@ -438,5 +442,11 @@ ScProphetRev2ParametersPane {
 			),
 			[nil]
 		);
+	}
+
+	make_automation_controls {
+		| controls, bld |
+		bld.make_automation_control(controls, "Oscillators 1&2", "osc", "A");
+		^controls;
 	}
 }
