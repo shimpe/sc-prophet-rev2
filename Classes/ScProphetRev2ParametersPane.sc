@@ -454,7 +454,6 @@ ScProphetRev2ParametersPane {
 			group = group.add(nil);
 			HLayout(*group);
 		});
-		hlayoutlist = hlayoutlist.add(nil);
 		^VLayout(*hlayoutlist);
 	}
 

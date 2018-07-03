@@ -304,7 +304,27 @@ ScProphetRev2LiveControlBuilder {
 			};
 		});
 
-		controls[groupoptionskey] = PopUpMenu().items_(["Nudge", "Randomize"]);
+		controls[groupoptionskey] = PopUpMenu().items_(["Nudge", "Randomize"]).action_({
+			| menu |
+			{
+				var period = controls[groupperiodtfieldkey].value.asFloat;
+				var actiontype = menu.value.asInt;
+				Tdef(tkey, {
+					loop {
+						if (period <= 0) {
+							period = 0;
+						};
+						if (actiontype == 0) {
+							{controls[perturbbtnkey].valueAction_(0)}.defer;
+						} {
+							{controls[randomizebtnkey].valueAction_(0)}.defer;
+						};
+						//("waiting for "++period++" seconds").postln;
+						period.wait;
+					}
+				}).quant_(0);
+			}.defer;
+		});
 		controls[groupperiodlabelkey] = StaticText().string_("Refresh rate (in seconds)");
 		controls[groupperiodtfieldkey] = TextField().string_("2").action_({
 			| textfield |

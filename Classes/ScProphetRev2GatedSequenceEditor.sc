@@ -141,5 +141,33 @@ ScProphetRev2GatedSequenceEditor {
 			HLayout(controls[\control_plotter4].interactionView)
 		);
 	}
+
+	automationView {
+		^View().layout_(this.make_automation_layout(this.make_automation_controls(this.controls, this.controlbuilder, this.layer)));
+	}
+
+	make_automation_layout {
+		|  controls |
+		var groupkeys = ["label_rndgrp_", "control_rndgrp_onoff_", "control_rndgrp_nudgerandomize_",
+			"label_rndgrp_period_", "control_rndgrp_period_"];
+		var hlayoutlist = ["seq1", "seq2", "seq3", "seq4"].collect({
+			| detailkey |
+			var group = groupkeys.collect({ |key| controls[(key++detailkey).asSymbol] });
+			group = group.add(nil);
+			HLayout(*group);
+		});
+		hlayoutlist = hlayoutlist.add(nil);
+		^VLayout(*hlayoutlist);
+	}
+
+	make_automation_controls {
+		| controls, bld, layer |
+		bld.make_automation_control(controls, "Gated Seq Track 1", "seq1", layer);
+		bld.make_automation_control(controls, "Gated Seq Track 2", "seq2", layer);
+		bld.make_automation_control(controls, "Gated Seq Track 3", "seq3", layer);
+		bld.make_automation_control(controls, "Gated Seq Track 4", "seq4", layer);
+		^controls;
+	}
+
 }
 

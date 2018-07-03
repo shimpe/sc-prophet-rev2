@@ -22,6 +22,8 @@ ScProphetRev2Studio {
 	var <>location;
 	var <>ppane1;
 	var <>ppane2;
+	var <>gseq1;
+	var <>gseq2;
 
 	*new {
 		| parent, prophet |
@@ -95,21 +97,23 @@ ScProphetRev2Studio {
 				this.controls["B"], this.specstore["B"], this.key_to_default["B"],
 				this.p, this.bld, this.n, "B")));
 
-		this.gatedsequencer = View().layout_(HLayout(
-			ScProphetRev2GatedSequenceEditor.new(this.parent,
+		this.gseq1 = ScProphetRev2GatedSequenceEditor.new(this.parent,
 				this.d, 16, this.delegation_controls["A"],
 				this.controls["A"], this.specstore["A"], this.key_to_default["A"],
-				this.p, this.bld, this.n, "A"),
-			ScProphetRev2GatedSequenceEditor.new(this.parent,
+				this.p, this.bld, this.n, "A");
+		this.gseq2 = ScProphetRev2GatedSequenceEditor.new(this.parent,
 				this.d, 16, this.delegation_controls["B"],
 				this.controls["B"], this.specstore["B"], this.key_to_default["B"],
-				this.p, this.bld, this.n, "B")));
-
+				this.p, this.bld, this.n, "B");
+		this.gatedsequencer = View().layout_(HLayout(this.gseq1,this.gseq2));
 		this.midilooper = ScProphetRev2MidiLooper.new(this.p, 16);
 		this.midilooperview = View().layout_(HLayout(this.midilooper));
 
 		this.tablayout=StackLayout(this.parameters,
-			View().layout_(HLayout(this.ppane1.automationView, this.ppane2.automationView)),
+			View().layout_(
+				HLayout(
+					VLayout(this.ppane1.automationView, this.gseq1.automationView),
+					VLayout(this.ppane2.automationView, this.gseq2.automationView))),
 			this.envelopeviewers,
 			this.gatedsequencer,
 			this.midilooperview);
