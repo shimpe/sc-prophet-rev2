@@ -34,7 +34,7 @@ ScProphetRev2ParametersPane {
 	}
 
 	automationView {
-		^View().layout_(this.controlbuilder.make_automation_layout(this.make_automation_controls(this.controls, this.controlbuilder)));
+		^View().layout_(this.make_automation_layout(this.make_automation_controls(this.controls, this.controlbuilder, this.layer)));
 	}
 
 	make_parameter_controls {
@@ -444,9 +444,30 @@ ScProphetRev2ParametersPane {
 		);
 	}
 
+	make_automation_layout {
+		|  controls |
+		var groupkeys = ["label_rndgrp_", "control_rndgrp_onoff_", "control_rndgrp_nudgerandomize_",
+			"label_rndgrp_period_", "control_rndgrp_period_"];
+		var hlayoutlist = ["osc", "lpf", "amp", "lfos", "fx", "arp", "aux", "mod"].collect({
+			| detailkey |
+			var group = groupkeys.collect({ |key| controls[(key++detailkey).asSymbol] });
+			group = group.add(nil);
+			HLayout(*group);
+		});
+		hlayoutlist = hlayoutlist.add(nil);
+		^VLayout(*hlayoutlist);
+	}
+
 	make_automation_controls {
-		| controls, bld |
-		bld.make_automation_control(controls, "Oscillators 1&2", "osc", "A");
+		| controls, bld, layer |
+		bld.make_automation_control(controls, "Oscillators 1&2", "osc", layer);
+		bld.make_automation_control(controls, "Low pass filter", "lpf", layer);
+		bld.make_automation_control(controls, "Amplifier", "amp", layer);
+		bld.make_automation_control(controls, "LFOs", "lfos", layer);
+		bld.make_automation_control(controls, "Effects", "fx", layer);
+		bld.make_automation_control(controls, "Clock and arp", "arp", layer);
+		bld.make_automation_control(controls, "Aux Envelope", "aux", layer);
+		bld.make_automation_control(controls, "Mod Matrix", "mod", layer);
 		^controls;
 	}
 }

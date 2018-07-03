@@ -294,7 +294,7 @@ ScProphetRev2LiveControlBuilder {
 			if (cbox.value) {
 				if (Tdef(tkey).isPlaying.not) {
 					("start playing task").postln;
-					Tdef(tkey).play;
+					Tdef(tkey).quant_(0).play;
 				};
 			} {
 				if (Tdef(tkey).isPlaying) {
@@ -321,22 +321,13 @@ ScProphetRev2LiveControlBuilder {
 						} {
 							{controls[randomizebtnkey].valueAction_(0)}.defer;
 						};
-						("waiting for "++period++" seconds").postln;
+						//("waiting for "++period++" seconds").postln;
 						period.wait;
 					}
-				});
+				}).quant_(0);
 			}.defer;
 		});
 		^controls;
-	}
-
-	make_automation_layout {
-		|  controls |
-		var groupkeys = ["label_rndgrp_", "control_rndgrp_onoff_", "control_rndgrp_nudgerandomize_",
-			"label_rndgrp_period_", "control_rndgrp_period_"];
-		var oscgroup = groupkeys.collect({ |key| controls[(key++"osc").asSymbol] });
-		oscgroup = oscgroup.add(nil);
-		^VLayout(HLayout(*oscgroup));
 	}
 
 }

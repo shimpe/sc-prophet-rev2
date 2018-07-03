@@ -108,7 +108,11 @@ ScProphetRev2Studio {
 		this.midilooper = ScProphetRev2MidiLooper.new(this.p, 16);
 		this.midilooperview = View().layout_(HLayout(this.midilooper));
 
-		this.tablayout=StackLayout(this.parameters, this.ppane1.automationView, this.envelopeviewers, this.gatedsequencer, this.midilooperview);
+		this.tablayout=StackLayout(this.parameters,
+			View().layout_(HLayout(this.ppane1.automationView, this.ppane2.automationView)),
+			this.envelopeviewers,
+			this.gatedsequencer,
+			this.midilooperview);
 
 		this.location = TextField().string_(Platform.userHomeDir +/+ "ScRev2Presets");
 		this.savename = TextField().string_("test");
