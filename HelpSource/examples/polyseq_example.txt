@@ -1,0 +1,52 @@
+1 /*File format version*/
+6 /*Bank*/
+1 /*Program*/
+false /*mute 0*/
+0 /*midi channel 0*/
+e5_1 e5_2 f#5_2 e5_1 d#5_2 c#5_2 e5_1 e5_4 f#5_4 d#5_4 c#5_4 d#5_2 c#5_2 e5_2 f#5_2  d#5_2 c#5_2 d#5_1*2 /*panola spec 0*/
+false /*mute 1*/
+0 /*midi channel 1*/
+a4_1 b4_1 d#5_4 c# b4 c#5 g#4_1 a_1 a_4 g# b a g#_1 g#_2 a b a g#_1*2 /*panola spec 1*/
+false /*mute 2*/
+0 /*midi channel 2*/
+e4_1 e_2 d# e d# f# e e_1 e_4 d# f# e f#_2 e e d# f# g# f# e d#_1 /*panola spec 2*/
+false /*mute 3*/
+0 /*midi channel 3*/
+a3_1 g#3_1 a3_1 b3_2 c#4_2 a3_1 f#3_4 g#3 a3 b c#4_2 c# a3 a3 g# f# g#_1*2 /*panola spec 3*/
+false /*mute 4*/
+0 /*midi channel 4*/
+r_1*10 b#4_1 /*panola spec 4*/
+false /*mute 5*/
+0 /*midi channel 5*/
+ /*panola spec 5*/
+false /*mute 6*/
+0 /*midi channel 6*/
+ /*panola spec 6*/
+false /*mute 7*/
+0 /*midi channel 7*/
+ /*panola spec 7*/
+false /*mute 8*/
+0 /*midi channel 8*/
+ /*panola spec 8*/
+false /*mute 9*/
+0 /*midi channel 9*/
+ /*panola spec 9*/
+false /*mute 10*/
+0 /*midi channel 10*/
+ /*panola spec 10*/
+false /*mute 11*/
+0 /*midi channel 11*/
+ /*panola spec 11*/
+false /*mute 12*/
+0 /*midi channel 12*/
+ /*panola spec 12*/
+false /*mute 13*/
+0 /*midi channel 13*/
+ /*panola spec 13*/
+false /*mute 14*/
+0 /*midi channel 14*/
+ /*panola spec 14*/
+false /*mute 15*/
+0 /*midi channel 15*/
+ /*panola spec 15*/
+0 /*transposition*/
