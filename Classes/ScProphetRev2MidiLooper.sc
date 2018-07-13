@@ -13,6 +13,11 @@ ScProphetRev2MidiLooper {
 	var <>ffield;
 	var <>pfield;
 	var <>layout;
+	var <>numtonote;
+	var <>noteontracker;
+	var <>notefield;
+	var <>noterecordtrack;
+	var <>noterecordbutton;
 
 	*new {
 		|prophet, tracks=16|
@@ -28,6 +33,8 @@ ScProphetRev2MidiLooper {
 		this.nrpncache = ();
 		this.transpose = 0;
 		this.last_used_path = Platform.userHomeDir;
+		this.numtonote = ScProphetRev2MidinumberToNote.new();
+		this.noteontracker = ();
 
 		this.mutecheckboxes = gTRACKS.collect({
 			|i|
@@ -241,29 +248,82 @@ ScProphetRev2MidiLooper {
 			VLayout(
 				*this.gTRACKS.collect({
 					|i|
-					HLayout([this.mutecheckboxes[i], stretch:1],
+					HLayout(
+						[StaticText().string_((i+1).asDigits(10,2).join("")), stretch:1],
+						[this.mutecheckboxes[i], stretch:1],
 						[this.midichannelctrls[i], stretch:1],
 						[this.textfields[i], stretch:15],
 						[this.durationtextfields[i], stretch:1])
 				});
 			);
 		];
-
+		this.notefield = TextField().string_("").enabled_(false);
+		this.noterecordtrack = PopUpMenu().items_(this.gTRACKS.collect({|i|i+1;}));
+		this.noterecordbutton = Button().string_("Add to track").action_({
+			| button |
+			var track = this.noterecordtrack.value.asInt;
+			var oldvalue = this.textfields[track].value;
+			{ this.textfields[track].value_(oldvalue+" "+this.notefield.value); }.defer;
+		});
 		this.layout = this.layout.add(
-			HLayout(
-				CheckBox().string_("(Un)Mute all").value_(false).action_({
-					|cbox|
-					this.mutecheckboxes.do({
-						|cb|
-						cb.valueAction_(cbox.value);
+			VLayout(
+				HLayout(
+					CheckBox().string_("(Un)Mute all").value_(false).action_({
+						|cbox|
+						this.mutecheckboxes.do({
+							|cb|
+							cb.valueAction_(cbox.value);
+						});
+					}),
+					StaticText().string_("Transpose"),
+					TextField().string_("0").action_({
+						| tfield |
+						this.transpose = tfield.value.asFloat;
 					});
-				}),
-				StaticText().string_("Transpose"),
-				TextField().string_("0").action_({
-					| tfield |
-					this.transpose = tfield.value.asFloat;
+				),
+				HLayout(
+					StaticText().string_("Last notes played"),
+					this.notefield,
+					this.noterecordbutton,
+					this.noterecordtrack
+				)
+			)
+		);
+
+		//MIDIdef.trace;
+		MIDIdef.noteOn(
+			\scprophetrev2midiloopernoteonresponder, {
+				| vel, noteNum, chan, src |
+				var sortedkeys;
+				var displaystring = "";
+				var numbernotes = 0;
+				if (vel == 0) {
+					this.noteontracker[noteNum] = false;
+				} {
+					this.noteontracker[noteNum] = true;
+				};
+				sortedkeys = this.noteontracker.keys.asList.sort;
+				sortedkeys.do({
+					| key |
+					if (this.noteontracker[key] == true) {
+						if (displaystring.compare("") != 0) {
+							displaystring = displaystring ++ " ";
+						};
+						numbernotes = numbernotes+1;
+						displaystring = displaystring ++ this.numtonote.midinumber_to_notename(key);
+					}
 				});
-			);
+				if (numbernotes > 1) {
+					displaystring = "<" ++ displaystring ++ ">";
+				};
+				{ this.notefield.string_(displaystring); }.defer;
+			}
+		);
+		MIDIdef.noteOff(
+			\scprophetrev2midiloopernoteoffresponder, {
+				| vel, noteNum, chan, src |
+				this.noteontracker[noteNum] = false;
+			}
 		);
 
 		^this;
