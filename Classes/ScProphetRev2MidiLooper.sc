@@ -20,6 +20,8 @@ ScProphetRev2MidiLooper {
 	var <>noterecordrhythm;
 	var <>noterecordmultiplier;
 	var <>noterecordbutton;
+	var <>preferflats;
+	var <>showmidinums;
 
 	*new {
 		|prophet, tracks=16|
@@ -263,6 +265,11 @@ ScProphetRev2MidiLooper {
 		this.noterecordtrack = PopUpMenu().items_(this.gTRACKS.collect({|i|i+1;}));
 		this.noterecordrhythm = PopUpMenu().items_(["1", "1/2", "1/4", "1/8", "1/16" , "1/32", "1/64", "1/128"]);
 		this.noterecordmultiplier = PopUpMenu().items_(["normal", "triola"]);
+		this.preferflats = CheckBox().string_("Use flats").value_(false);
+		this.showmidinums = CheckBox().string_("Show midi numbers").value_(false).action_({
+			| cb |
+			{ this.noterecordbutton.enabled_(cb.value.not); }.defer;
+		});
 		this.noterecordbutton = Button().string_("Add to track").action_({
 			| button |
 			var track = this.noterecordtrack.value.asInt;
@@ -292,7 +299,9 @@ ScProphetRev2MidiLooper {
 					this.noterecordtrack,
 					StaticText().string_("Rhythm"),
 					this.noterecordrhythm,
-					this.noterecordmultiplier
+					this.noterecordmultiplier,
+					this.preferflats,
+					this.showmidinums
 				)
 			)
 		);
@@ -314,6 +323,13 @@ ScProphetRev2MidiLooper {
 					sortedkeys.do({
 						| key |
 						if (this.noteontracker[key] == true) {
+							var flats = this.preferflats.value;
+							var notename;
+							if (this.showmidinums.value) {
+								notename = key.asString;
+							} {
+								notename = this.numtonote.midinumber_to_notename(key, flats);
+							};
 							if (displaystring.compare("") == 0) {
 								// first note
 								var triola = this.noterecordmultiplier.item.compare("triola") == 0;
@@ -324,13 +340,13 @@ ScProphetRev2MidiLooper {
 									selectedItem = this.noterecordrhythm.item.copyRange(2,5);
 								};
 								if (triola) {
-									displaystring = displaystring ++ this.numtonote.midinumber_to_notename(key) ++ "_" ++ selectedItem ++ "*2/3";
+									displaystring = displaystring ++ notename ++ "_" ++ selectedItem ++ "*2/3";
 								} {
-									displaystring = displaystring ++ this.numtonote.midinumber_to_notename(key) ++ "_" ++ selectedItem;
+									displaystring = displaystring ++ notename ++ "_" ++ selectedItem;
 								}
 							} {
 								// if previous notes present already
-								displaystring = displaystring ++ " " ++ this.numtonote.midinumber_to_notename(key);
+								displaystring = displaystring ++ " " ++ notename;
 							};
 							numbernotes = numbernotes+1;
 						}
