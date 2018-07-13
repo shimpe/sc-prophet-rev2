@@ -17,6 +17,8 @@ ScProphetRev2MidiLooper {
 	var <>noteontracker;
 	var <>notefield;
 	var <>noterecordtrack;
+	var <>noterecordrhythm;
+	var <>noterecordmultiplier;
 	var <>noterecordbutton;
 
 	*new {
@@ -44,7 +46,7 @@ ScProphetRev2MidiLooper {
 				if (cbox.value) {
 					if (player.notNil) {
 						if (player.muteCount == 0) {
-							"Mute".postln;
+							//"Mute".postln;
 							player.mute;
 						};
 					} /*{
@@ -56,7 +58,7 @@ ScProphetRev2MidiLooper {
 				} {
 					if (player.notNil) {
 						if (player.muteCount != 0) {
-							"Unmute".postln;
+							//"Unmute".postln;
 							player.unmute;
 						};
 					} /*{
@@ -259,6 +261,8 @@ ScProphetRev2MidiLooper {
 		];
 		this.notefield = TextField().string_("").enabled_(false);
 		this.noterecordtrack = PopUpMenu().items_(this.gTRACKS.collect({|i|i+1;}));
+		this.noterecordrhythm = PopUpMenu().items_(["1", "1/2", "1/4", "1/8", "1/16" , "1/32", "1/64", "1/128"]);
+		this.noterecordmultiplier = PopUpMenu().items_(["normal", "triola"]);
 		this.noterecordbutton = Button().string_("Add to track").action_({
 			| button |
 			var track = this.noterecordtrack.value.asInt;
@@ -285,7 +289,10 @@ ScProphetRev2MidiLooper {
 					StaticText().string_("Last notes played"),
 					this.notefield,
 					this.noterecordbutton,
-					this.noterecordtrack
+					this.noterecordtrack,
+					StaticText().string_("Rhythm"),
+					this.noterecordrhythm,
+					this.noterecordmultiplier
 				)
 			)
 		);
@@ -294,29 +301,45 @@ ScProphetRev2MidiLooper {
 		MIDIdef.noteOn(
 			\scprophetrev2midiloopernoteonresponder, {
 				| vel, noteNum, chan, src |
-				var sortedkeys;
-				var displaystring = "";
-				var numbernotes = 0;
-				if (vel == 0) {
-					this.noteontracker[noteNum] = false;
-				} {
-					this.noteontracker[noteNum] = true;
-				};
-				sortedkeys = this.noteontracker.keys.asList.sort;
-				sortedkeys.do({
-					| key |
-					if (this.noteontracker[key] == true) {
-						if (displaystring.compare("") != 0) {
-							displaystring = displaystring ++ " ";
-						};
-						numbernotes = numbernotes+1;
-						displaystring = displaystring ++ this.numtonote.midinumber_to_notename(key);
-					}
-				});
-				if (numbernotes > 1) {
-					displaystring = "<" ++ displaystring ++ ">";
-				};
-				{ this.notefield.string_(displaystring); }.defer;
+				{
+					var sortedkeys;
+					var displaystring = "";
+					var numbernotes = 0;
+					if (vel == 0) {
+						this.noteontracker[noteNum] = false;
+					} {
+						this.noteontracker[noteNum] = true;
+					};
+					sortedkeys = this.noteontracker.keys.asList.sort;
+					sortedkeys.do({
+						| key |
+						if (this.noteontracker[key] == true) {
+							if (displaystring.compare("") == 0) {
+								// first note
+								var triola = this.noterecordmultiplier.item.compare("triola") == 0;
+								var selectedItem = "";
+								if (this.noterecordrhythm.item.compare("1") == 0) {
+									selectedItem = "1";
+								} {
+									selectedItem = this.noterecordrhythm.item.copyRange(2,5);
+								};
+								if (triola) {
+									displaystring = displaystring ++ this.numtonote.midinumber_to_notename(key) ++ "_" ++ selectedItem ++ "*2/3";
+								} {
+									displaystring = displaystring ++ this.numtonote.midinumber_to_notename(key) ++ "_" ++ selectedItem;
+								}
+							} {
+								// if previous notes present already
+								displaystring = displaystring ++ " " ++ this.numtonote.midinumber_to_notename(key);
+							};
+							numbernotes = numbernotes+1;
+						}
+					});
+					if (numbernotes > 1) {
+						displaystring = "<" ++ displaystring ++ ">";
+					};
+					this.notefield.string_(displaystring);
+				}.defer;
 			}
 		);
 		MIDIdef.noteOff(
