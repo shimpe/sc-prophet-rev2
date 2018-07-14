@@ -24,6 +24,7 @@ ScProphetRev2Studio {
 	var <>ppane2;
 	var <>gseq1;
 	var <>gseq2;
+	var <>tuningpane;
 
 	*new {
 		| parent, prophet |
@@ -108,6 +109,7 @@ ScProphetRev2Studio {
 		this.gatedsequencer = View().layout_(HLayout(this.gseq1,this.gseq2));
 		this.midilooper = ScProphetRev2MidiLooper.new(this.p, 16);
 		this.midilooperview = View().layout_(HLayout(this.midilooper));
+		this.tuningpane = View();
 
 		this.tablayout=StackLayout(this.parameters,
 			View().layout_(
@@ -116,7 +118,9 @@ ScProphetRev2Studio {
 					VLayout(this.ppane2.automationView, this.gseq2.automationView))),
 			this.envelopeviewers,
 			this.gatedsequencer,
-			this.midilooperview);
+			this.midilooperview,
+			this.tuningpane
+		);
 
 		this.location = TextField().string_(Platform.userHomeDir +/+ "ScRev2Presets");
 		this.savename = TextField().string_("test");
@@ -126,7 +130,8 @@ ScProphetRev2Studio {
 				Button().string_("Automation").action_({ this.tablayout.index = 1; }),
 				Button().string_("Envelopes").action_({this.tablayout.index = 2;}),
 				Button().string_("Gated Sequencer").action_({this.tablayout.index = 3;}),
-				Button().string_("Poly Seq On Steroids").action_({this.tablayout.index = 4;})
+				Button().string_("Poly Seq On Steroids").action_({this.tablayout.index = 4;}),
+				Button().string_("Tuning").action_({this.tablayout.index = 5;})
 			),
 			HLayout(
 				StaticText().string_("Location"),
