@@ -4403,8 +4403,8 @@ ScProphetRev2 {
 		if (this.midi_out.notNil) {
 			this.midi_out.sysex(Int8Array.newFrom([cSTART_SYSEX, cNRT_MSG, cREQ_CHANNEL, cREQ_INQUIRY_MSG, cREQ_INQUIRY_REQ, cEOX]));
 		} {
-			"WARNING: cannot send commands to synth because not connected yet.".postln;
-			"WARNING: Call connect first.".postln;
+			"Cannot send commands to synth because not connected yet.".warn;
+			"Call connect first.".warn;
 		};
 	}
 
@@ -4461,8 +4461,8 @@ ScProphetRev2 {
 		if (midi_out.notNil) {
 			midi_out.sysex(Int8Array.newFrom([cSTART_SYSEX, cDSI_ID, cREV2_ID, cREQ_PRG_TRANSMIT, bank, program, cEOX]));
 		} {
-			"WARNING: cannot send commands to synth because not connected yet.".postln;
-			"WARNING: Call connect first.".postln;
+			"Cannot send commands to synth because not connected yet.".warn;
+			"Call connect first.".warn;
 		};
 	}
 
@@ -4516,8 +4516,8 @@ ScProphetRev2 {
 		if (midi_out.notNil) {
 			midi_out.sysex(Int8Array.newFrom([cSTART_SYSEX, cDSI_ID, cREV2_ID, cREQ_STATE_TRANSMIT, cEOX]));
 		} {
-			"WARNING: cannot send commands to synth because not connected yet.".postln;
-			"WARNING: Call connect first.".postln;
+			"Cannot send commands to synth because not connected yet.".warn;
+			"Call connect first.".warn;
 		};
 	}
 
@@ -4570,9 +4570,139 @@ ScProphetRev2 {
 		if (midi_out.notNil) {
 			midi_out.sysex(Int8Array.newFrom([cSTART_SYSEX, cDSI_ID, cREV2_ID, cREQ_GLOBAL_PAR, cEOX]));
 		} {
-			"WARNING: cannot send commands to synth because not connected yet.".postln;
-			"WARNING: Call connect first.".postln;
+			"Cannot send commands to synth because not connected yet.".warn;
+			"Call connect first.".warn;
 		};
 
 	}
+
+/*  // not supported by DSI?!
+	get_tuning_from_synth {
+		| tuning_prg_number = 0, completionHandler = nil |
+		var cSTART_SYSEX = 16rF0;
+		var cSTART_SYSEX_NRT = 16r7E;
+		var cCHANNEL = 16r7F;
+		var cMIDI_TUNING = 16r08;
+		var cBULK_DUMP_REQUEST = 16r00;
+		var cEOX = 16rF7;
+		/*
+		F0 7E : Universal Non-Real Time SysEx header
+		<device ID> : ID of target device
+		08 : sub-ID#1 (MIDI Tuning)
+		00 : sub-ID#2 (bulk dump request)
+		tt : tuning program number (0 – 127)
+		F7 : EOX
+		*/
+		MIDIIn.sysex = {
+			| uid, data |
+			var cSYSEX_HEADER = 1; // length in bytes
+			var cNRT_MSG = 1;
+			var cCHANNEL = 1;
+			var cMIDI_TUNING = 1;
+			var cBULK_DUMP_REQUEST = 1;
+			var cTUNING_NUMBER = 1;
+			var cEOX = 1;
+
+			var sysex_raw_data;
+
+			data.postln;
+
+			sysex_raw_data = data.drop(cSYSEX_HEADER + cNRT_MSG + cCHANNEL + cMIDI_TUNING + cBULK_DUMP_REQUEST + cTUNING_NUMBER).drop(cEOX.neg);
+
+			MIDIIn.sysex = {};
+
+			if (completionHandler.notNil) {
+				completionHandler.(sysex_raw_data);
+			} /* else */ {
+				sysex_raw_data.postln;
+			};
+		};
+
+		if (midi_out.notNil) {
+			midi_out.sysex(Int8Array.newFrom([cSTART_SYSEX, cSTART_SYSEX_NRT, cCHANNEL, cMIDI_TUNING, cBULK_DUMP_REQUEST, tuning_prg_number, cEOX]));
+		} {
+			"Cannot send commands to synth because not connected yet.".warn;
+			"Call connect first.".warn;
+		};
+	}*/
+
+	send_tuning_to_synth {
+		| tuning_index_zerobased = 0, tuning_name="Custom Tuning I", midinumber_to_frequency = nil |
+		if (midinumber_to_frequency.notNil) {
+			var sysexdata = Int8Array.new;
+			var cSYSEX_HEADER = 16rF0;
+			var cNRT_MSG = 16r7E;
+			var cDEVICE_ID = 16r7F;
+			var cMIDI_TUNING = 16r08;
+			var cBULK_DUMP_REPLY = 16r01;
+			var cTUNING_NUMBER = tuning_index_zerobased;
+			var cNAME = tuning_name.copyRange(0,15);
+			var cEOX = 16rF7;
+			var checksum = 0;
+
+			sysexdata = sysexdata.add(cSYSEX_HEADER);
+			sysexdata = sysexdata.add(cNRT_MSG);
+			sysexdata = sysexdata.add(cDEVICE_ID);
+			sysexdata = sysexdata.add(cMIDI_TUNING);
+			sysexdata = sysexdata.add(cBULK_DUMP_REPLY);
+			sysexdata = sysexdata.add(cTUNING_NUMBER);
+			16.do({
+				|i|
+				var chr = cNAME[i];
+				if (chr.notNil) {
+					sysexdata = sysexdata.add(chr.ascii);
+				} {
+					sysexdata = sysexdata.add(($ ).ascii);
+				}
+			});
+
+			128.do({
+				| note |
+				var freq = midinumber_to_frequency[note];
+				if (freq.notNil) {
+					var desiredfreq = freq;
+					var closest_semitone = desiredfreq.cpsmidi.floor;
+					var firstbyte = closest_semitone;
+					var difference = desiredfreq.cpsmidi - closest_semitone;
+					var difference_cents = difference*100;
+					var diff_mts = (difference_cents).linlin(0, 100, 0, 2.pow(14)).round(1).asInt;
+					var secondbyte = (diff_mts >> 7);
+					var thirdbyte = (diff_mts & 127);
+					sysexdata = sysexdata.add(firstbyte);
+					sysexdata = sysexdata.add(secondbyte);
+					sysexdata = sysexdata.add(thirdbyte);
+				} {
+					// insert a "no change"
+					sysexdata = sysexdata.add(16r7F);
+					sysexdata = sysexdata.add(16r7F);
+					sysexdata = sysexdata.add(16r7F);
+				};
+			});
+
+			sysexdata.do({
+				| val, idx |
+				if (idx == 0) {
+					checksum = 0;
+				} {
+					if (idx == 1) {
+						checksum = val;
+					} {
+						checksum = checksum.bitXor(val);
+					};
+				};
+			});
+
+			sysexdata = sysexdata.add(checksum);
+			sysexdata = sysexdata.add(cEOX);
+
+			if (this.midi_out.notNil) {
+				this.midi_out.sysex(Int8Array.newFrom(sysexdata));
+			} {
+				"Cannot send commands to synth because not connected yet.".warn;
+				"Call connect first.".warn;
+			};
+
+		}
+	}
+
 }
