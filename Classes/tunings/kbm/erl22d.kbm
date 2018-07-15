@@ -1,0 +1,36 @@
+! erl22d.kbm
+! Paul Erlich's other 12 out of 22 equal keyboard mapping starting on D.
+! See his posting to the Tuning List on 23-10-2000.
+!
+! Size of map (greater than or equal to the number of notes in the scale
+! to be mapped). The pattern repeats every so many keys:
+12
+! First note to retune:
+0
+! Last note to retune:
+127
+! Middle note where the first entry of the mapping is mapped to:
+62
+! Reference note for which frequency is given:
+62
+! Frequency to tune the above note to (floating point e.g. 440.0):
+261.6256
+! Scale degree to consider as formal octave (determines difference in pitch
+! between adjacent mapping patterns):
+22
+! Mapping.
+! The numbers represent scale degrees mapped to keys. The first entry is for
+! the given middle note, the next for subsequent higher keys.
+! For an unmapped key, put in an "x". At the end, unmapped keys may be left out.
+0
+2
+3
+6
+7
+9
+11
+13
+15
+16
+19
+20

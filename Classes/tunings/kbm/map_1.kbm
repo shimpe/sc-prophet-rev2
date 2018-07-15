@@ -1,0 +1,22 @@
+! map_1.kbm
+! 55-tone multichannel map, octave 1
+! This mapping assumes a 2/1 octave. It can be used for scales with less than 55 tones.
+! See the "One octave per MIDI channel" feature to calculate the reference frequencies
+! for subsequent octaves automatically. Then all reference frequenties except the one in
+! the first file will be ignored.
+!
+! Size of map:
+0
+! First MIDI note number to retune:
+0
+! Last MIDI note number to retune:
+55
+! Middle note where the first entry of the mapping is mapped to:
+0
+! Reference note for which frequency is given:
+0
+! Frequency to tune the above note to (floating point e.g. 440.0):
+65.406
+! Scale degree to consider as formal octave:
+0
+! Mapping.

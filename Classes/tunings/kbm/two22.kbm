@@ -1,0 +1,48 @@
+! two22.kbm
+! Paul Erlich's two octave mapping for a 22-tone scale leaving the E's unused
+! C = 261
+!
+! Size of map (greater than or equal to the number of notes in the scale
+! to be mapped). The pattern repeats every so many keys:
+24
+! First note to retune:
+0
+! Last note to retune:
+127
+! Middle note where the first entry of the mapping is mapped to:
+60
+! Reference note for which frequency is given:
+60
+! Frequency to tune the above note to (floating point e.g. 440.0):
+261.6256
+! Scale degree to consider as formal octave (determines difference in pitch
+! between adjacent mapping patterns):
+22
+! Mapping.
+! The numbers represent scale degrees mapped to keys. The first entry is for
+! the given middle note, the next for subsequent higher keys.
+! For an unmapped key, put in an "x". At the end, unmapped keys may be left out.
+0
+1
+2
+3
+x
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+x
+15
+16
+17
+18
+19
+20
+21

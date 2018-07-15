@@ -1,0 +1,49 @@
+! two20.kbm
+! Mapping on two octaves for a 20-tone scale starting on C
+! C = 261
+!
+! Size of map (greater than or equal to the number of notes in the scale
+! to be mapped). The pattern repeats every so many keys:
+24
+! First note to retune:
+0
+! Last note to retune:
+127
+! Middle note where the first entry of the mapping is mapped to:
+60
+! Reference note for which frequency is given:
+60
+! Frequency to tune the above note to (floating point e.g. 440.0):
+261.6256
+! Scale degree to consider as formal octave (determines difference in pitch
+! between adjacent mapping patterns):
+20
+! Mapping.
+! The numbers represent scale degrees mapped to keys. The first entry is for
+! the given middle note, the next for subsequent higher keys.
+! For an unmapped key, put in an "x". At the end, unmapped keys may be left out.
+0
+1
+3
+4
+6
+7
+9
+11
+13
+14
+16
+17
+0
+2
+3
+5
+7
+8
+10
+12
+13
+15
+17
+18
+19

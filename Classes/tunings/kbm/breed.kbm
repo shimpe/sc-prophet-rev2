@@ -1,0 +1,21 @@
+! breed.kbm
+! Graham Breed's fourth based keyboard mapping
+! Use with breed.scl
+! See http://www.compulink.co.uk/~gbreed/schv12.htm
+!
+! Size of map (greater than or equal to the number of notes in the scale 
+! to be mapped). Zero means linear mapping.
+0
+! First MIDI note number to retune:
+0
+! Last MIDI note number to retune:
+127
+! Middle note where the first entry of the mapping is mapped to:
+48
+! Reference note for which frequency is given:
+70
+! Frequency to tune the above note to (floating point e.g. 440.0):
+440.0
+! Scale degree to consider as formal octave (determines difference in pitch 
+! between adjacent mapping patterns):
+0

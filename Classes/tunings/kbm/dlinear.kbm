@@ -1,0 +1,17 @@
+! dlinear.kbm
+! Linear mapping with D4 on standard D4 frequency.
+! Useful for the Miracle Blackjack scale
+! Size:
+0
+! First MIDI note number to retune:
+0
+! Last MIDI note number to retune:
+127
+! Middle note where the first entry of the mapping is mapped to:
+62
+! Reference note for which frequency is given:
+62
+! Frequency to tune the above note to (floating point e.g. 440.0):
+293.664768
+! Scale degree to consider as formal octave (0 means last scale degree):
+0

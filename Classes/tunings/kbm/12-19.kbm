@@ -1,0 +1,35 @@
+! 12-19.kbm
+! Twelve out of 19-tone keyboard mapping
+!
+! Size of map (greater than or equal to the number of notes in the scale 
+! to be mapped). The pattern repeats every so many keys:
+12
+! First MIDI note number to retune:
+0
+! Last MIDI note number to retune:
+127
+! Middle note where the first entry of the mapping is mapped to:
+60
+! Reference note for which frequency is given:
+69
+! Frequency to tune the above note to (floating point e.g. 440.0):
+440.0
+! Scale degree to consider as formal octave (determines difference in pitch 
+! between adjacent mapping patterns):
+19
+! Mapping.
+! The numbers represent scale degrees mapped to keys. The first entry is for
+! the given middle note, the next for subsequent higher keys.
+! For an unmapped key, put in an "x". At the end, unmapped keys may be left out.
+0
+1
+3
+5
+6
+8
+9
+11
+12
+14
+16
+17

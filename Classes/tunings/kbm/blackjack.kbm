@@ -1,0 +1,23 @@
+! blackjack.kbm
+! Linear mapping for blackjack.scl
+!    having the maximum number of naturals on white keys.
+! 1/1 = G is mapped to the G above middle-C key.
+! A point of symmetry of the scale B[ aligns with a point of symmetry of
+!   the keyboard at the Ab/G# below middle-C key.
+! The middle-C pitch is on the B below middle-C key.
+! The D above middle-C key has its standard pitch.
+! The A440 pitch is on the D above C above middle-C key.
+! Size:
+0
+! First MIDI note number to retune:
+0
+! Last MIDI note number to retune:
+127
+! Middle note where the first entry of the mapping is mapped to:
+71
+! Reference note for which frequency is given:
+71
+! Frequency to tune the above note to (floating point e.g. 440.0):
+391.9954
+! Scale degree to consider as formal octave (0 means last scale degree):
+0

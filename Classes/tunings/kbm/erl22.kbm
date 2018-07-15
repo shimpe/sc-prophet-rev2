@@ -1,0 +1,35 @@
+! erl22.kbm
+! Paul Erlich's 12 out of 22 equal keyboard mapping starting on C#
+!
+! Size of map (greater than or equal to the number of notes in the scale
+! to be mapped). The pattern repeats every so many keys:
+12
+! First note to retune:
+0
+! Last note to retune:
+127
+! Middle note where the first entry of the mapping is mapped to:
+61
+! Reference note for which frequency is given:
+61
+! Frequency to tune the above note to (floating point e.g. 440.0):
+261.6256
+! Scale degree to consider as formal octave (determines difference in pitch
+! between adjacent mapping patterns):
+22
+! Mapping.
+! The numbers represent scale degrees mapped to keys. The first entry is for
+! the given middle note, the next for subsequent higher keys.
+! For an unmapped key, put in an "x". At the end, unmapped keys may be left out.
+0
+2
+4
+6
+7
+9
+11
+13
+15
+17
+19
+20
