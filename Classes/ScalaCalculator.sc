@@ -80,21 +80,21 @@ ScalaCalculator {
 
 	load {
 		| sclPathStr, kbmPathStr=nil |
-		this.sclPathStr = sclPathStr.standardizePath;
-		this.kbmPathStr = kbmPathStr.standardizePath;
+		this.sclPath = sclPathStr.standardizePath;
+		this.kbmPath = kbmPathStr.standardizePath;
 
-		if (sclPath.notNil) {
-			File.use(this.sclPathStr, "r", { | f | this.sclContents = f.readAllString.split($\n) });
+		if (this.sclPath.notNil) {
+			File.use(this.sclPath, "r", { | f | this.sclContents = f.readAllString.split($\n) });
 		} {
-			this.pr_setDefaultScl;
-			"Valid scl file must be specified. Using default settings.".warning;
+			"Valid scl file must be specified. Using default settings.".warn;
+			this.sclContents_(nil);
 		};
 
 		if (this.kbmPath.notNil) {
-			File.use(this.kbmPathStr, "r", { | f | this.kbmContents = f.readAllString.split($\n) });
+			File.use(this.kbmPath, "r", { | f | this.kbmContents = f.readAllString.split($\n) });
 		} {
 			"Using default keyboard mapping.".warn;
-			this.pr_setDefaultKbm;
+			this.kbmContents_(nil);
 		};
 
 		this.pr_parseScl;
@@ -104,101 +104,98 @@ ScalaCalculator {
 	pr_parseScl {
 		var nonCommentLines = 0;
 		var lastentry = nil;
-		this.sclInfo = (
-			\description: "",
-			\notes: 0,
-			\octavefactor: (\value:2, \value2:1, \type: \ratio),
-			\tuning : (
-				\0 : (\value : 1, \value2: 1, \type: \ratio)
-			)
-		);
-		this.sclContents.do({
-			| ln, filelineindex |
-			var line = ln.stripWhiteSpace;
-			if (line[0] == $!) {
-				// comment line - ignore
-			} {
-				nonCommentLines = nonCommentLines + 1;
-				if (nonCommentLines == 1) {
-					this.sclInfo[\description] = ln;
-				};
-				if (nonCommentLines == 2) {
-					this.sclInfo[\notes] = ln.asInteger;
-				};
-				if (nonCommentLines > 2) {
-					var cline = this.pr_cleanupLine(line);
-					var splitline = cline.split($ );
-					var firstentry = splitline[0];
-					var type = \cents;
-					var value = 0;
-					var value2 = nil;
-					var found = false;
-					if (found.not && firstentry.find("|").notNil && firstentry.find(">").notNil) {
-						var primefactors = firstentry.copyRange(firstentry.find("|")+1, firstentry.find(">")-1).split($@);
-						found = true;
-						type = \ratio;
-						value = 1;
-						value2 = 1;
-						primefactors.do({
-							| factor, idx |
-							if (factor.find("/").notNil) {
-								var splitfactor = factor.split($/);
-								var num = splitfactor[0].asInteger;
-								var den = splitfactor[1].asInteger;
-								if (den != 0) {
-									if ((num*den) <= 0) {
-										value2 = value2 * primeFactors[idx].pow(num.abs / den.abs);
+		this.sclInfo = ();
+		if (this.sclContents.isNil) {
+			this.pr_setDefaultScl;
+		} {
+			this.sclContents.do({
+				| ln, filelineindex |
+				var line = ln.stripWhiteSpace;
+				if ((line.stripWhiteSpace.compare("") == 0) || (line[0] == $!)) {
+					// comment line - ignore
+				} {
+					nonCommentLines = nonCommentLines + 1;
+					if (nonCommentLines == 1) {
+						this.sclInfo[\description] = ln;
+					};
+					if (nonCommentLines == 2) {
+						this.sclInfo[\notes] = ln.asInteger;
+					};
+					if (nonCommentLines > 2) {
+						var cline = this.pr_cleanupLine(line);
+						var splitline = cline.split($ );
+						var firstentry = splitline[0];
+						var type = \cents;
+						var value = 0;
+						var value2 = nil;
+						var found = false;
+						if (found.not && firstentry.find("|").notNil && firstentry.find(">").notNil) {
+							var primefactors = firstentry.copyRange(firstentry.find("|")+1, firstentry.find(">")-1).split($@);
+							found = true;
+							type = \ratio;
+							value = 1;
+							value2 = 1;
+							primefactors.do({
+								| factor, idx |
+								if (factor.find("/").notNil) {
+									var splitfactor = factor.split($/);
+									var num = splitfactor[0].asInteger;
+									var den = splitfactor[1].asInteger;
+									if (den != 0) {
+										if ((num*den) <= 0) {
+											value2 = value2 * primeFactors[idx].pow(num.abs / den.abs);
+										} {
+											value = value * primeFactors[idx].pow(num / den);
+										};
 									} {
-										value = value * primeFactors[idx].pow(num / den);
+										value = 0;
+										value2 = 1;
+										("Division by zero in scala file " ++ this.sclPath ++ " on line "++(filelineindex+1)).error;
+										ln.error;
 									};
 								} {
-									value = 0;
-									value2 = 1;
-									("Division by zero in scala file " ++ this.sclPath ++ " on line "++(filelineindex+1)).error;
-									ln.error;
+									if (factor.asInteger < 0) {
+										value2 = value2 * primeFactors[idx].pow(factor.asInteger.neg);
+									} {
+										value = value * primeFactors[idx].pow(factor.asInteger);
+									};
 								};
-							} {
-								if (factor.asInteger < 0) {
-									value2 = value2 * primeFactors[idx].pow(factor.asInteger.neg);
-								} {
-									value = value * primeFactors[idx].pow(factor.asInteger);
-								};
-							};
-						});
-					};
-					if (firstentry.find(".").notNil) {
-						type = \cents;
-						value = firstentry.asFloat;
-						value2 = nil;
-						found = true;
-					};
-					if (found.not && firstentry.find("/").notNil) {
-						var splitentry = firstentry.split($/);
-						type = \ratio;
-						value = splitentry[0].asInteger;
-						value2 = splitentry[1].asInteger;
-						if (value*value2 < 0) {
-							("Negative ratios not allowed in scala file " ++ this.sclPath ++ " on line "++(filelineindex+1)).error;
+							});
 						};
-						found = true;
+						if (firstentry.find(".").notNil) {
+							type = \cents;
+							value = firstentry.asFloat;
+							value2 = nil;
+							found = true;
+						};
+						if (found.not && firstentry.find("/").notNil) {
+							var splitentry = firstentry.split($/);
+							type = \ratio;
+							value = splitentry[0].asInteger;
+							value2 = splitentry[1].asInteger;
+							if (value*value2 < 0) {
+								("Negative ratios not allowed in scala file " ++ this.sclPath ++ " on line "++(filelineindex+1)).error;
+							};
+							found = true;
+						};
+						if (found.not) {
+							type = \ratio;
+							value = firstentry.asInteger;
+							value2 = 1;
+							found = true;
+						};
+						lastentry = (nonCommentLines-2).asSymbol;
+						this.sclInfo[\tuning][lastentry] = (\value:value, \value2:value2, \type: type);
 					};
-					if (found.not) {
-						type = \ratio;
-						value = firstentry.asInteger;
-						value2 = 1;
-						found = true;
-					};
-					lastentry = (nonCommentLines-2).asSymbol;
-					this.sclInfo[\tuning][lastentry] = (\value:value, \value2:value2, \type: type);
-
 				};
-			};
-		});
-		this.sclInfo[\octavefactor] = this.sclInfo[\tuning][lastentry];
-		this.sclInfo[\tuning][lastentry] = nil;
+			});
+			this.sclInfo[\octavefactor] = this.sclInfo[\tuning][lastentry];
+			this.sclInfo[\tuning][lastentry] = nil;
+		};
 	}
 
 	pr_setDefaultScl {
+		this.sclInfo = ();
 		this.sclInfo[\description] = "12 tone Equal Temperament";
 		this.sclInfo[\notes] =  12;
 		this.sclInfo[\octavefactor] = (\value:1200, \type: \cents);
@@ -221,7 +218,6 @@ ScalaCalculator {
 		this.kbmInfo = ();
 		if (this.kbmContents.isNil) {
 			this.pr_setDefaultKbm();
-			"No keyboard mapping loaded. Using default keyboard mapping.".warn;
 		} {
 			var nonCommentLines = 0;
 			this.kbmContents.do({
@@ -290,6 +286,7 @@ ScalaCalculator {
 	}
 
 	pr_setDefaultKbm {
+		this.kbmInfo = ();
 		this.kbmInfo[\mapsize] = 12;
 		this.kbmInfo[\minnote] = 0;
 		this.kbmInfo[\maxnote] = 127;
@@ -352,7 +349,7 @@ ScalaCalculator {
 			};
 
 			virtualreffreq = this.kbmInfo[\reffreq]/ratio; // undo the transformation associated to current physical degree because
-			                                               // after mapping degrees, ref note is not guaranteed to get phys degree 0
+			// after mapping degrees, ref note is not guaranteed to get phys degree 0
 
 			// for each key, get physical degree, use it to look up ratio, apply it to the virtualreffreq, and compensate for octave
 			128.do({
@@ -372,7 +369,7 @@ ScalaCalculator {
 						tuning = this.sclInfo[\tuning][physdeg];
 						if (tuning.notNil) {
 							if (tuning[\type] == \cents) {
-							ratio = 2.pow(tuning[\value]/1200);
+								ratio = 2.pow(tuning[\value]/1200);
 							} {
 								ratio = tuning[\value] / tuning[\value2];
 							};

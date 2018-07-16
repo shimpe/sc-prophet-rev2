@@ -292,3 +292,27 @@ d = c.calculateKeyToFreq;
 	d[val.asSymbol].debug(val);
 });
 )
+
+
+(
+c = ScalaCalculator();
+c.sclContents_([
+	"! 11-limit-only.scl",
+	"!",
+	"11-limit-only",
+	" 11",
+	"!",
+	" 12/11",
+	" 11/10",
+	" 11/9",
+	" 14/11",
+	" 11/8",
+	" 16/11",
+	" 11/7",
+	" 18/11",
+	" 20/11",
+	" 11/6",
+	" 2/1"]);
+c.pr_parseScl;
+c.sclInfo.debug("sclInfo");
+)
