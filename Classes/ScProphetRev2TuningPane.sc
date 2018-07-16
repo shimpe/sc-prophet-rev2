@@ -105,7 +105,6 @@ ScProphetRev2TuningPane {
 				var tuneindex = this.controls[\control_tuning].value;
 				var tunename = this.tunename.value;
 				var keytofreq;
-				var freqtable = ();
 				if (sclpath.isNil || (sclpath.compare("") == 0) || File.exists(sclpath).not) {
 					"No valid scl file specified. Fallback to default.".warn;
 					sclpath = nil;
@@ -117,13 +116,22 @@ ScProphetRev2TuningPane {
 				calc.load(sclpath, kbmpath);
 				keytofreq = calc.calculateKeyToFreq;
 				if (keytofreq.notNil) {
+					var freqtable = [];
 					128.do({
 						|i|
-						if (keytofreq[i.asSymbol].notNil && keytofreq[i.asSymbol][\freq].notNil) {
-							freqtable[i] = keytofreq[i.asSymbol][\freq];
+						if (keytofreq[i.asSymbol].notNil) {
+							if (keytofreq[i.asSymbol][\freq].notNil) {
+								freqtable = freqtable.add(keytofreq[i.asSymbol][\freq]);
+							} {
+								freqtable = freqtable.add(nil);
+							};
+						} {
+							freqtable = freqtable.add(nil);
 						};
 					});
+					"Sending now!".warn;
 					this.prophet.send_tuning_to_synth(tuneindex, tunename, freqtable);
+					"Done sending!".warn;
 				} {
 					"Meh. Couldn't calculate the midi key to frequency table. Bailing out.".error;
 				};
@@ -152,9 +160,13 @@ ScProphetRev2TuningPane {
 					var displaytext = "";
 					128.do({
 						|i|
-						if (keytofreq[i.asSymbol].notNil && keytofreq[i.asSymbol][\freq].notNil) {
-							displaytext = displaytext ++ i ++ " : " ++ keytofreq[i.asSymbol][\freq] ++ "\n";
-						} {
+						if (keytofreq[i.asSymbol].notNil) {
+							if (keytofreq[i.asSymbol][\freq].notNil) {
+								displaytext = displaytext ++ i ++ " : " ++ keytofreq[i.asSymbol][\freq] ++ "\n";
+							} {
+								displaytext = displaytext ++ i ++ " : ------\n";
+							};
+						}{
 							displaytext = displaytext ++ i ++ " : ------\n";
 						};
 					});
