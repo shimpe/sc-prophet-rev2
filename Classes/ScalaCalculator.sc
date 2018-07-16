@@ -345,7 +345,7 @@ ScalaCalculator {
 		reftuning = this.sclInfo[\tuning][refdegree];
 		if (reftuning.notNil) {
 			var ratio;
-			if (reftuning[\type] == \cents) {
+			if (reftuning[\type].debug(refnote.asString++" reftuning \\type") == \cents) {
 				ratio = 2.pow(reftuning[\value]/1200);
 			} {
 				ratio = reftuning[\value]/reftuning[\value2];
@@ -364,40 +364,44 @@ ScalaCalculator {
 						var ratio;
 						var freq;
 						var octavediff;
-						if (tuning[\type] == \cents) {
+						if (tuning.notNil) {
+							if (tuning[\type].debug(key.asString++" tuning \\type") == \cents) {
 							ratio = 2.pow(tuning[\value]/1200);
-						} {
-							ratio = tuning[\value] / tuning[\value2];
-						};
-						freq = virtualreffreq * ratio;
+							} {
+								ratio = tuning[\value] / tuning[\value2];
+							};
+							freq = virtualreffreq * ratio;
 
-						octavediff = keytofreq[refnote.asSymbol][\octave] - keytofreq[key.asSymbol][\octave];
-						if (octavediff > 0) {
-							var loops = octavediff.abs;
-							var ratio;
-							var octavefactor = this.sclInfo[\octavefactor];
-							if (octavefactor[\type] == \cents) {
-								ratio = 2.pow(octavefactor[\value]/1200);
+							octavediff = keytofreq[refnote.asSymbol][\octave] - keytofreq[key.asSymbol][\octave];
+							if (octavediff > 0) {
+								var loops = octavediff.abs;
+								var ratio;
+								var octavefactor = this.sclInfo[\octavefactor];
+								if (octavefactor[\type].debug(" octavefactor \\type") == \cents) {
+									ratio = 2.pow(octavefactor[\value]/1200);
+								} {
+									ratio = octavefactor[\value]/octavefactor[\value2];
+								};
+								loops.do({
+									freq = freq / ratio;
+								});
+								keytofreq[key.asSymbol][\freq] = freq;
 							} {
-								ratio = octavefactor[\value]/octavefactor[\value2];
+								var loops = octavediff.abs;
+								var ratio;
+								var octavefactor = this.sclInfo[\octavefactor];
+								if (octavefactor[\type].debug(" octavefactor \\type") == \cents) {
+									ratio = 2.pow(octavefactor[\value]/1200);
+								} {
+									ratio = octavefactor[\value] / octavefactor[\value2];
+								};
+								loops.do({
+									freq = freq * ratio;
+								});
+								keytofreq[key.asSymbol][\freq] = freq;
 							};
-							loops.do({
-								freq = freq / ratio;
-							});
-							keytofreq[key.asSymbol][\freq] = freq;
 						} {
-							var loops = octavediff.abs;
-							var ratio;
-							var octavefactor = this.sclInfo[\octavefactor];
-							if (octavefactor[\type] == \cents) {
-								ratio = 2.pow(octavefactor[\value]/1200);
-							} {
-								ratio = octavefactor[\value] / octavefactor[\value2];
-							};
-							loops.do({
-								freq = freq * ratio;
-							});
-							keytofreq[key.asSymbol][\freq] = freq;
+							("Keyboard map mentions degree "++physdeg++" which doesn't exist in tuning information. Ignoring.").error;
 						};
 					};
 				};
