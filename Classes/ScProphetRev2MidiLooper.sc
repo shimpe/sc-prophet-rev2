@@ -37,7 +37,7 @@ ScProphetRev2MidiLooper {
 		this.nrpncache = ();
 		this.transpose = 0;
 		this.last_used_path = Platform.userHomeDir;
-		this.numtonote = ScProphetRev2MidinumberToNote.new();
+		this.numtonote = MidinumberToNote.new();
 		this.noteontracker = ();
 
 		this.mutecheckboxes = gTRACKS.collect({

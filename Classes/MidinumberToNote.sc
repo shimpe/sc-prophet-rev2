@@ -1,4 +1,4 @@
-ScProphetRev2MidinumberToNote {
+MidinumberToNote {
 	classvar chromatic_scale;
 	classvar flat_chromatic_scale;
 	classvar midi_to_note;
