@@ -287,7 +287,7 @@ c.sclInfo.debug("sclInfo");
 c.pr_parseKbm;
 c.kbmInfo.debug("kbmInfo");
 d = c.calculateKeyToFreq;
-[0, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 127, 128].do({
+[0, 36, 37, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 127, 128].do({
 	|val|
 	d[val.asSymbol].debug(val);
 });
