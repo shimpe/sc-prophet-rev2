@@ -105,6 +105,7 @@ ScalaCalculator {
 		var nonCommentLines = 0;
 		var lastentry = nil;
 		this.sclInfo = ();
+		this.sclInfo[\tuning] = (\0 : (\value : 0, \type: \cents)); // degree 0 is implied (not present in .scl file)
 		if (this.sclContents.isNil) {
 			this.pr_setDefaultScl;
 		} {
@@ -216,6 +217,7 @@ ScalaCalculator {
 
 	pr_parseKbm {
 		this.kbmInfo = ();
+		this.kbmInfo[\mapping] = ();
 		if (this.kbmContents.isNil) {
 			this.pr_setDefaultKbm();
 		} {
