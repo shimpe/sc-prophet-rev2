@@ -4636,7 +4636,7 @@ ScProphetRev2 {
 			var cMIDI_TUNING = 16r08;
 			var cBULK_DUMP_REPLY = 16r01;
 			var cTUNING_NUMBER = tuning_index_zerobased;
-			var cNAME = tuning_name.copyRange(0,15).debug("name");
+			var cNAME = tuning_name.copyRange(0,15);
 			var cEOX = 16rF7;
 			var checksum = 0;
 
@@ -4662,12 +4662,28 @@ ScProphetRev2 {
 				if (freq.notNil) {
 					var desiredfreq = freq;
 					var closest_semitone = desiredfreq.cpsmidi.floor;
-					var firstbyte = closest_semitone;
-					var difference = desiredfreq.cpsmidi - closest_semitone;
-					var difference_cents = difference*100;
-					var diff_mts = (difference_cents).linlin(0, 100, 0, 2.pow(14)).round(1).asInt;
-					var secondbyte = (diff_mts >> 7);
-					var thirdbyte = (diff_mts & 127);
+					var firstbyte;
+					var difference;
+					var difference_cents;
+					var diff_mts;
+					var secondbyte;
+					var thirdbyte;
+
+					firstbyte = closest_semitone;
+					difference = desiredfreq.cpsmidi - closest_semitone;
+
+					// rejoice for obscure floating point limited precision bugs taking forever to debug
+					if ((closest_semitone - desiredfreq.cpsmidi) < 1e-5) {
+						closest_semitone = closest_semitone + 1;
+						difference = 0;
+					};
+					// amen
+
+					difference_cents = difference*100;
+					diff_mts = (difference_cents).linlin(0, 100, 0, 2.pow(14)).round(1).asInt;
+					secondbyte = (diff_mts >> 7);
+					thirdbyte = (diff_mts & 127);
+
 					sysexdata = sysexdata.add(firstbyte);
 					sysexdata = sysexdata.add(secondbyte);
 					sysexdata = sysexdata.add(thirdbyte);
@@ -4692,11 +4708,11 @@ ScProphetRev2 {
 				};
 			});
 
-			sysexdata = sysexdata.add(checksum);
+			sysexdata = sysexdata.add(checksum.bitAnd(16r7F));
 			sysexdata = sysexdata.add(cEOX);
 
 			if (this.midi_out.notNil) {
-				this.midi_out.sysex(Int8Array.newFrom(sysexdata));
+				this.midi_out.sysex(sysexdata);
 			} {
 				"Cannot send commands to synth because not connected yet.".warn;
 				"Call connect first.".warn;
