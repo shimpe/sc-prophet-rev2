@@ -4636,7 +4636,7 @@ ScProphetRev2 {
 			var cMIDI_TUNING = 16r08;
 			var cBULK_DUMP_REPLY = 16r01;
 			var cTUNING_NUMBER = tuning_index_zerobased;
-			var cNAME = tuning_name.copyRange(0,15);
+			var cNAME = tuning_name.copyRange(0,15).debug("name");
 			var cEOX = 16rF7;
 			var checksum = 0;
 
@@ -4652,7 +4652,7 @@ ScProphetRev2 {
 				if (chr.notNil) {
 					sysexdata = sysexdata.add(chr.ascii);
 				} {
-					sysexdata = sysexdata.add(($ ).ascii);
+					sysexdata = sysexdata.add($ .ascii);
 				}
 			});
 
@@ -4702,7 +4702,9 @@ ScProphetRev2 {
 				"Call connect first.".warn;
 			};
 
-		}
+		} {
+			"No frequency table specified. Nothing to send.".warn;
+		};
 	}
 
 }

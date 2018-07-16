@@ -60,19 +60,21 @@ ScProphetRev2Studio {
 		this.delegation_controls["B"] = IdentityDictionary.new;
 
 		this.p.makeNRPNResponder(this.n.str2num('LAYER A/B SWITCH', "A") /* sent when changing program */, { | value, parnum |
-			this.p.get_current_patch_state(completionHandler:{
-				// loop over all controls and set all values; also refresh the plotviews
-				["A", "B"].do({
-					|layer|
-					this.key_to_default[layer].keysValuesDo({
-						| key, value, i |
-						{
-							this.controls[layer][key].value_(this.key_to_default[layer][key].());
-							if (key.asString.find("plotter").notNil) {
-								this.controls[layer][key].specs_(this.specstore[layer][key][\specs]).domainSpecs_(this.specstore[layer][key][\domainspecs]);
-								this.controls[layer][key].interactionView.refresh;
-							}
-						}.defer;
+			this.p.get_global_parameters_from_synth(completionHandler: {
+				this.p.get_current_patch_state(completionHandler:{
+					// loop over all controls and set all values; also refresh the plotviews
+					["A", "B"].do({
+						|layer|
+						this.key_to_default[layer].keysValuesDo({
+							| key, value, i |
+							{
+								this.controls[layer][key].value_(this.key_to_default[layer][key].());
+								if (key.asString.find("plotter").notNil) {
+									this.controls[layer][key].specs_(this.specstore[layer][key][\specs]).domainSpecs_(this.specstore[layer][key][\domainspecs]);
+									this.controls[layer][key].interactionView.refresh;
+								}
+							}.defer;
+						});
 					});
 				});
 			});
@@ -109,7 +111,9 @@ ScProphetRev2Studio {
 		this.gatedsequencer = View().layout_(HLayout(this.gseq1,this.gseq2));
 		this.midilooper = ScProphetRev2MidiLooper.new(this.p, 16);
 		this.midilooperview = View().layout_(HLayout(this.midilooper));
-		this.tuningpane = View();
+		this.tuningpane = ScProphetRev2TuningPane.new(this.parent, this.d, this.delegation_controls["A"],
+				this.controls["A"], this.specstore["A"], this.key_to_default["A"],
+				this.p, this.bld, this.n);
 
 		this.tablayout=StackLayout(this.parameters,
 			View().layout_(
