@@ -4673,7 +4673,7 @@ ScProphetRev2 {
 					difference = desiredfreq.cpsmidi - closest_semitone;
 
 					// rejoice for obscure floating point limited precision bugs taking forever to debug
-					if ((closest_semitone - desiredfreq.cpsmidi) < (1/pow(2,14))) {
+					if ((closest_semitone - desiredfreq.cpsmidi) < 1e-5) {
 						closest_semitone = closest_semitone + 1;
 						difference = 0;
 					};
