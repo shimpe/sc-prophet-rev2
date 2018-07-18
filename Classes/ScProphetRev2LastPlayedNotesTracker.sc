@@ -120,8 +120,36 @@ ScProphetRev2LastPlayedNotesTracker {
 			| key |
 			if (this.lastplayednotes[key] == true) {
 				^this.numtonote.midinumber_to_notename(key, flats);
-			}
+			};
 		});
 		^this.numtonote.midinumber_to_notename(69, flats);
+	}
+
+	getLowestLastPlayedNoteInRange {
+		| minnote, maxnote |
+		var flats = this.preferflats.value;
+		this.noteontracker.keys.asList.sort.do({
+			| key |
+			if ((key >= minnote) && (key <= maxnote)) {
+				if (this.lastplayednotes[key] == true) {
+					^this.numtonote.midinumber_to_notename(key, flats);
+				};
+			};
+		});
+		^this.numtonote.midinumber_to_notename(69, flats);
+	}
+
+	getNumberOfLastPlayedNotesInRange {
+		| minnote, maxnote |
+		var notes = 0;
+		this.noteontracker.keys.asList.sort.do({
+			| key |
+			if ((key >= minnote)  && (key <= maxnote)) {
+				if (this.lastplayednotes[key] == true) {
+					notes = notes + 1;
+				}
+			};
+		});
+		^notes;
 	}
 }

@@ -14,11 +14,13 @@ s.waitForBoot({
 	OSCdef.freeAll;
 	CCResponder.removeAll;
 	MIDIdef.freeAll;
+	Tdef.removeAll;
 
 	studio = ScProphetRev2Studio.new(w, p);
 	w.layout_(VLayout(studio));
 	w.front;
 	w.onClose_(studio.cleanUpFunc.value)
 });
+
 )
 

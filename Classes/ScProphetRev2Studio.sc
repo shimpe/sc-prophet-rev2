@@ -112,7 +112,7 @@ ScProphetRev2Studio {
 		this.gatedsequencer = View().layout_(HLayout(this.gseq1,this.gseq2));
 		this.midilooper = ScProphetRev2MidiLooper.new(this.p, 16);
 		this.midilooperview = View().layout_(HLayout(this.midilooper));
-		this.arpeggiatorview = ScProphetRev2Arpeggiator.new(this.p);
+		this.arpeggiatorview = ScProphetRev2Arpeggiator.new(this.p, this.n);
 		this.tuningpane = ScProphetRev2TuningPane.new(this.parent, this.d, this.delegation_controls["A"],
 				this.controls["A"], this.specstore["A"], this.key_to_default["A"],
 				this.p, this.bld, this.n);
