@@ -327,6 +327,17 @@ ScalaCalculator {
 		^result;
 	}
 
+	pr_toRatio {
+		| spec |
+		var ratio;
+		if (spec[\type] == \cents) {
+			ratio = (2.pow(spec[\value]/1200));
+		} {
+			ratio = (spec[\value])/spec[\value2];
+		};
+		^ratio;
+	}
+
 	calculateKeyToFreq {
 		var keytofreq = ();
 		var deg0note = this.kbmInfo[\degree0note];
@@ -345,12 +356,18 @@ ScalaCalculator {
 			var key = deg0 - this.kbmInfo[\mapsize] + degree;
 			if (key < 0) { key = key + this.kbmInfo[\mapsize]; };
 			while ({key < 128}, {
-				if ((key <= this.kbmInfo[\maxnote]) && (key >= this.kbmInfo[\minnote])) {
-					if (keytofreq[key.asSymbol].isNil) { keytofreq[key.asSymbol] = (); };
-					keytofreq[key.asSymbol][\logicaldegree] = degree;
-					keytofreq[key.asSymbol][\physicaldegree] = this.kbmInfo[\mapping][degree.asSymbol];
-					keytofreq[key.asSymbol][\octave] = octave;
+				var extraoctave = 0;
+				var octaveratio = this.pr_toRatio(this.sclInfo[\octavefactor]);
+				//if ((key <= this.kbmInfo[\maxnote]) && (key >= this.kbmInfo[\minnote])) {
+				if (keytofreq[key.asSymbol].isNil) { keytofreq[key.asSymbol] = (); };
+				keytofreq[key.asSymbol][\logicaldegree] = degree;
+				keytofreq[key.asSymbol][\physicaldegree] = this.kbmInfo[\mapping][degree.asSymbol];
+				if (keytofreq[key.asSymbol][\physicaldegree] >= this.sclInfo[\notes]) {
+					keytofreq[key.asSymbol][\physicaldegree] = keytofreq[key.asSymbol][\physicaldegree].mod(this.sclInfo[\notes]);
+					extraoctave = keytofreq[key.asSymbol][\physicaldegree].div(this.sclInfo[\notes]);
 				};
+				keytofreq[key.asSymbol][\octave] = (octave+extraoctave);
+				//};
 				key = key + this.kbmInfo[\mapsize];
 				octave = octave + 1;
 			});
@@ -358,25 +375,9 @@ ScalaCalculator {
 
 		// look up tuning for (mapped) fixed frequency degree
 		refdegree = keytofreq[refnote.asSymbol][\physicaldegree];
-		while ({this.sclInfo[\tuning][refdegree].isNil}, {
-			refdegree = (refdegree.asInteger - this.sclInfo[\notes]).asSymbol;
-			extrarefoctave = extrarefoctave + 1;
-		});
 		reftuning = this.sclInfo[\tuning][refdegree];
-		if (this.sclInfo[\octavefactor][\type] == \cents) {
-			extraoctaveratio = 2.pow(this.sclInfo[\octavefactor][\value]/1200);
-		} {
-			extraoctaveratio = this.sclInfo[\octavefactor][\value]/this.sclInfo[\octavefactor][\value2];
-		};
-		extraoctaveratio = extrarefoctave*extraoctaveratio;
 		if (reftuning.notNil) {
-			var ratio;
-			if (reftuning[\type] == \cents) {
-				ratio = (2.pow(reftuning[\value]/1200))*extraoctaveratio;
-			} {
-				ratio = (reftuning[\value]*extraoctaveratio)/reftuning[\value2];
-			};
-
+			var ratio = this.pr_toRatio(reftuning);
 			virtualreffreq = this.kbmInfo[\reffreq]/ratio; // undo the transformation associated to current physical degree because
 			// after mapping degrees, ref note is not guaranteed to get phys degree 0
 
@@ -387,46 +388,23 @@ ScalaCalculator {
 					var physdeg = keytofreq[key.asSymbol][\physicaldegree];
 					if (physdeg.notNil) {
 						var tuning;
-						var ratio;
-						var freq;
-						var octavediff;
-						var extraoctave = 0;
-						while ({this.sclInfo[\tuning][physdeg].isNil}, {
-							physdeg = (physdeg.asInteger - this.sclInfo[\notes]).asSymbol;
-							extraoctave = extraoctave + 1;
-						});
 						tuning = this.sclInfo[\tuning][physdeg];
 						if (tuning.notNil) {
-							if (tuning[\type] == \cents) {
-								ratio = 2.pow(tuning[\value]/1200);
-							} {
-								ratio = tuning[\value] / tuning[\value2];
-							};
-							freq = virtualreffreq * ratio;
-
-							octavediff = keytofreq[refnote.asSymbol][\octave] - (keytofreq[key.asSymbol][\octave] + extraoctave);
+							var ratio = this.pr_toRatio(tuning);
+							var freq = virtualreffreq * ratio;
+							var octavediff = keytofreq[refnote.asSymbol][\octave] - keytofreq[key.asSymbol][\octave];
 							if (octavediff > 0) {
 								var loops = octavediff.abs;
-								var ratio;
 								var octavefactor = this.sclInfo[\octavefactor];
-								if (octavefactor[\type] == \cents) {
-									ratio = 2.pow(octavefactor[\value]/1200);
-								} {
-									ratio = octavefactor[\value]/octavefactor[\value2];
-								};
+								var ratio = this.pr_toRatio(octavefactor);
 								loops.do({
 									freq = freq / ratio;
 								});
 								keytofreq[key.asSymbol][\freq] = freq;
 							} {
 								var loops = octavediff.abs;
-								var ratio;
 								var octavefactor = this.sclInfo[\octavefactor];
-								if (octavefactor[\type] == \cents) {
-									ratio = 2.pow(octavefactor[\value]/1200);
-								} {
-									ratio = octavefactor[\value] / octavefactor[\value2];
-								};
+								var ratio = this.pr_toRatio(octavefactor);
 								loops.do({
 									freq = freq * ratio;
 								});
