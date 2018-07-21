@@ -312,6 +312,21 @@ ScalaCalculator {
 		);
 	}
 
+	keyToFreq {
+		var intermediate = this.calculateKeyToFreq;
+		var keys = intermediate.keys.asList.sort;
+		var result = ();
+		128.do({
+			| key |
+			if (intermediate[key.asSymbol].notNil) {
+				result[key] = intermediate[key.asSymbol][\freq];
+			} {
+				result[key] = nil;
+			};
+		});
+		^result;
+	}
+
 	calculateKeyToFreq {
 		var keytofreq = ();
 		var deg0note = this.kbmInfo[\degree0note];
@@ -320,6 +335,8 @@ ScalaCalculator {
 		var reftuning;
 		var virtualreffreq;
 		var deg0 = deg0note % this.kbmInfo[\mapsize];
+		var extrarefoctave = 0;
+		var extraoctaveratio = 0;
 
 		// first assign logical (consecutive) and physical (remapped) degrees to each note
 		this.kbmInfo[\mapsize].do({
@@ -341,13 +358,23 @@ ScalaCalculator {
 
 		// look up tuning for (mapped) fixed frequency degree
 		refdegree = keytofreq[refnote.asSymbol][\physicaldegree];
+		while ({this.sclInfo[\tuning][refdegree].isNil}, {
+			refdegree = (refdegree.asInteger - this.sclInfo[\notes]).asSymbol;
+			extrarefoctave = extrarefoctave + 1;
+		});
 		reftuning = this.sclInfo[\tuning][refdegree];
+		if (this.sclInfo[\octavefactor][\type] == \cents) {
+			extraoctaveratio = 2.pow(this.sclInfo[\octavefactor][\value]/1200);
+		} {
+			extraoctaveratio = this.sclInfo[\octavefactor][\value]/this.sclInfo[\octavefactor][\value2];
+		};
+		extraoctaveratio = extrarefoctave*extraoctaveratio;
 		if (reftuning.notNil) {
 			var ratio;
 			if (reftuning[\type] == \cents) {
-				ratio = 2.pow(reftuning[\value]/1200);
+				ratio = (2.pow(reftuning[\value]/1200))*extraoctaveratio;
 			} {
-				ratio = reftuning[\value]/reftuning[\value2];
+				ratio = (reftuning[\value]*extraoctaveratio)/reftuning[\value2];
 			};
 
 			virtualreffreq = this.kbmInfo[\reffreq]/ratio; // undo the transformation associated to current physical degree because
