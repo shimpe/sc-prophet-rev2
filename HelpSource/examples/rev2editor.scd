@@ -19,7 +19,8 @@ s.waitForBoot({
 	studio = ScProphetRev2Studio.new(w, p);
 	w.layout_(VLayout(studio));
 	w.front;
-	w.onClose_(studio.cleanUpFunc.value)
+	w.addToOnClose({{studio.cleanUpFunc}.defer});
+	w.addToOnClose({{p.all_notes_off}.defer});
 });
 
 )
