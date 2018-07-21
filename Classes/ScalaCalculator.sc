@@ -318,8 +318,8 @@ ScalaCalculator {
 		var result = ();
 		128.do({
 			| key |
-			if (intermediate[key.asSymbol].notNil) {
-				result[key] = intermediate[key.asSymbol][\freq];
+			if (intermediate[key].notNil) {
+				result[key] = intermediate[key][\freq];
 			} {
 				result[key] = nil;
 			};
@@ -355,91 +355,64 @@ ScalaCalculator {
 	}
 
 	calculateKeyToFreq {
+		var keytofreq;
 		var firstdegreenote = this.kbmInfo[\degree0note];
 		var mappingkeys = this.kbmInfo[\mapping].keys.asList.collect({|el|el.asInteger}).sort;
 		var mappeddegrees = mappingkeys.collect({
 			| key |
-			this.kbmInfo[\mapping][key.asSymbol];
+			this.kbmInfo[\mapping][key.asSymbol].asInteger;
 		});
 		var repeatevery = this.kbmInfo[\mapsize];
-		var octave = 0;
-		var previousextraoctaves = 0;
-		var pulses = 0;
-		var keytofreq = ();
-		var reffreqnote;
-		var reffreqcents;
-		var reffreq;
-
-		firstdegreenote = (firstdegreenote.mod(repeatevery))-repeatevery;
-		// first assign mapped degree to all note numbers
-		(128+12).do({
-			| key, idx |
-			var degreenote = firstdegreenote + key;
-			var degree = degreenote.mod(repeatevery);
-			var mappeddegree = mappeddegrees[degree].asInteger;
-			if ((degreenote>=0) && (degreenote<128)){
-				keytofreq[degreenote] = ();
-				if ((mappeddegree == 0) && (degreenote != this.kbmInfo[\degree0note])) {
-					keytofreq[degreenote][\mappeddegree] = this.kbmInfo[\octavedegree].asInteger;
-					keytofreq[degreenote][\octave] = idx.div(repeatevery)-1;
-				} {
-					keytofreq[degreenote][\mappeddegree] = mappeddegree;
-					keytofreq[degreenote][\octave] = idx.div(repeatevery);
-				};
-			}
-		});
-
-		keytofreq[73].debug("73");
-
-		// then convert kbm degree to tuning info degree
-		128.do({
-			|key|
-			var mappeddegree = keytofreq[key][\mappeddegree].asInteger;
+		var mappedcents;
+		var degree0 = this.kbmInfo[\degree0note].asInteger;
+		var firstdegree0 = degree0.mod(this.kbmInfo[\mapsize]) - this.kbmInfo[\mapsize];
+		var reffreq = this.kbmInfo[\reffreq];
+		mappeddegrees = mappeddegrees.add(this.kbmInfo[\octavedegree].asInteger);
+		mappedcents = mappeddegrees.collect({
+			| mappeddegree |
 			var wrappeddegree = mappeddegree.mod(this.sclInfo[\notes]);
 			var extraoctave = mappeddegree.div(this.sclInfo[\notes]);
-			keytofreq[key][\tuningdegree] = wrappeddegree;
-			keytofreq[key][\extraoctave] = extraoctave;
+			var tunecents = this.pr_toCents(this.sclInfo[\tuning][wrappeddegree.asSymbol]);
+			var extraoctavecents = extraoctave*this.pr_toCents(this.sclInfo[\octavefactor]);
+			tunecents+extraoctavecents;
 		});
-
-		// cumulative octave correction [0,0,0, 1,1,1, 0,0,0, 1,1,1] => [0,0,0, 1,1,1, 1,1,1, 2,2,2]
-		previousextraoctaves = 0;
-		128.do({
-			|key|
-			var currentextraoctaves = keytofreq[key][\extraoctave];
-			if (currentextraoctaves > previousextraoctaves) {
-				// pulse
-				previousextraoctaves = currentextraoctaves;
-				pulses = pulses+1;
-			}{
-				if (currentextraoctaves < previousextraoctaves) {
-					previousextraoctaves = 0;
-				};
+		keytofreq = ();
+		(firstdegree0..127).do({
+			|value,idx|
+			if (value>=0) {
+				var octave;
+				keytofreq[value] = ();
+				octave = (value-degree0).div(this.kbmInfo[\mapsize]);
+				keytofreq[value][\octave] = octave;
 			};
-			keytofreq[key][\xtraoctcorr] = pulses;
-			keytofreq[key][\tuningoctave] = (keytofreq[key][\octave] + pulses);
 		});
 
-		// calculate cents difference with degree 0 number
-		128.do({
-			|key|
-			var octavediff = keytofreq[key][\tuningoctave] - keytofreq[this.kbmInfo[\degree0note]][\tuningoctave];
-			var tuning = this.pr_toCents(this.sclInfo[\tuning][keytofreq[key][\tuningdegree].asSymbol]);
-			var extracents = octavediff*this.pr_toCents(this.sclInfo[\octavefactor]);
-			keytofreq[key][\cents] = (tuning+extracents);
+		(firstdegree0..127).do({
+			|value,idx|
+			if (value >= 0) {
+				var mappeddegree;
+				var octavediff;
+				var octavecompensation = 0;
+				mappeddegree = (value-firstdegree0).mod(this.kbmInfo[\mapsize]);
+				if (mappeddegree == 0) { mappeddegree = this.kbmInfo[\mapsize]; octavecompensation = 1.neg; };
+				keytofreq[value][\cents] = mappedcents[mappeddegree];
+				octavediff = keytofreq[value][\octave] - keytofreq[this.kbmInfo[\degree0note]][\octave] + octavecompensation;
+				keytofreq[value][\reloctave] = (octavediff+1);
+			};
 		});
 
-		// calculate cents difference wrt reference frequency note
-		reffreqnote = this.kbmInfo[\reffreqnote];
-		reffreqcents = keytofreq[reffreqnote][\cents];
-		reffreq = this.kbmInfo[\reffreq];
-		128.do({
-			|key|
-			keytofreq[key][\refcents] = keytofreq[key][\cents] - reffreqcents;
-			keytofreq[key][\freq] = this.pr_centToRatio(keytofreq[key][\refcents])*reffreq;
-
-			keytofreq[key][\freq].debug(""++key);
+		(firstdegree0..127).do({
+			|value,idx|
+			if (value>=0) {
+				var reloctavecompensation = (keytofreq[this.kbmInfo[\degree0note]][\reloctave] - keytofreq[this.kbmInfo[\reffreqnote]][\reloctave]);
+				var octavefactor = this.pr_toCents(this.sclInfo[\octavefactor]);
+				// rebase cents onto reference frequency note
+				var relcents = keytofreq[value][\cents] - keytofreq[this.kbmInfo[\reffreqnote].asInteger][\cents] + ((keytofreq[value][\reloctave] + reloctavecompensation)*mappedcents[this.kbmInfo[\mapsize]]);
+				keytofreq[value][\freq] = reffreq*this.pr_centToRatio(relcents);
+			};
 		});
 
+		^keytofreq;
 	}
 
 	pr_cleanupLine {
