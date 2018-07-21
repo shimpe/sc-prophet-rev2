@@ -33,7 +33,8 @@ ScProphetRev2Studio {
 	}
 
 	cleanUpFunc {
-		^this.midilooper.cleanUpFunc();
+		this.midilooper.cleanUpFunc();
+		this.arpeggiatorview.cleanUpFunc();
 	}
 
 	init {
@@ -118,12 +119,12 @@ ScProphetRev2Studio {
 				this.p, this.bld, this.n);
 
 		this.tablayout=StackLayout(this.parameters,
+			this.envelopeviewers,
+			this.gatedsequencer,
 			View().layout_(
 				HLayout(
 					VLayout(this.ppane1.automationView, this.gseq1.automationView),
 					VLayout(this.ppane2.automationView, this.gseq2.automationView))),
-			this.envelopeviewers,
-			this.gatedsequencer,
 			this.midilooperview,
 			this.arpeggiatorview,
 			this.tuningpane
@@ -134,9 +135,9 @@ ScProphetRev2Studio {
 		this.tabrow = VLayout(
 			HLayout(
 				Button().string_("Parameters").action_({ this.tablayout.index = 0; }),
-				Button().string_("Automation").action_({ this.tablayout.index = 1; }),
-				Button().string_("Envelopes").action_({this.tablayout.index = 2;}),
-				Button().string_("Gated Sequencer").action_({this.tablayout.index = 3;}),
+				Button().string_("Envelopes").action_({this.tablayout.index = 1;}),
+				Button().string_("Gated Sequencer").action_({this.tablayout.index = 2;}),
+				Button().string_("Automation").action_({ this.tablayout.index = 3; }),
 				Button().string_("Poly Seq On Steroids").action_({this.tablayout.index = 4;}),
 				Button().string_("Arpeggiator On Steroids").action_({this.tablayout.index = 5;}),
 				Button().string_("Tuning").action_({this.tablayout.index = 6;})
