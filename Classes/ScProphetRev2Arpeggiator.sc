@@ -47,6 +47,11 @@ ScProphetRev2Arpeggiator {
 		^("arp74327ee8b2e9993eaedc8e15939a1e2b1bd63e8a"++i).asSymbol;
 	}
 
+	cleanUpFunc {
+		Tdef(\checknotes).stop;
+		Pdef(\overallarpeggiopattern).stop;
+	}
+
 	init {
 		| prophet, nrpntable |
 		this.prophet = prophet;
@@ -57,7 +62,7 @@ ScProphetRev2Arpeggiator {
 		this.nrpncache = ();
 		Tdef(\checknotes, {
 			loop {
-					{
+				{
 					if (this.globalenable.value) {
 						var minnote = this.panola.noteToMidi(this.lowtrigtfield.value);
 						var maxnote = this.panola.noteToMidi(this.hightrigtfield.value);
@@ -213,7 +218,7 @@ ScProphetRev2Arpeggiator {
 							};
 						};
 						newValue = currValue ++ this.tracker.getLastPlayedNotes;
-						this.notecontrols[key][trackkey][\score].string_(newValue);
+						this.notecontrols[key][trackkey][\score].valueAction_(newValue);
 					}.defer;
 				});
 				this.notecontrols[key][trackkey][\midichannel] = TextField().string_("0");
