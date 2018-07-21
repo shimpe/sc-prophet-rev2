@@ -1,4 +1,5 @@
 Test11_19 : UnitTest {
+	/*
 	test_scl_11_19_gould_kbm_11 {
 		var c = ScalaCalculator();
 		var keytofreq;
@@ -233,6 +234,7 @@ Test11_19 : UnitTest {
 			this.assertFloatEquals(keytofreq[key], expected[key]);
 		})
 	}
+	*/
 
 	test_scl_11_19_gould_kbm_19 {
 		var c = ScalaCalculator();
@@ -432,8 +434,10 @@ Test11_19 : UnitTest {
 
 		128.do({
 			| key |
-			this.assertFloatEquals(keytofreq[key], expected[key], onFailure:key.debug("key"));
+			key.debug("check key");
+			this.assertFloatEquals(keytofreq[key], expected[key]);
 		})
+
 	}
 }
 

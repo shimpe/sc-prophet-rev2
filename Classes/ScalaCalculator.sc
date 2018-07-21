@@ -338,89 +338,108 @@ ScalaCalculator {
 		^ratio;
 	}
 
-	calculateKeyToFreq {
-		var keytofreq = ();
-		var deg0note = this.kbmInfo[\degree0note];
-		var refnote = this.kbmInfo[\reffreqnote];
-		var refdegree;
-		var reftuning;
-		var virtualreffreq;
-		var deg0 = deg0note % this.kbmInfo[\mapsize];
-		var extrarefoctave = 0;
-		var extraoctaveratio = 0;
+	pr_toCents {
+		| spec |
+		var cents;
+		if (spec[\type] == \cents) {
+			cents = spec[\value];
+		} {
+			cents = 1200*(spec[\value]/spec[\value2]).log2;
+		};
+		^cents;
+	}
 
-		// first assign logical (consecutive) and physical (remapped) degrees to each note
-		this.kbmInfo[\mapsize].do({
-			| degree |
-			var octave = 0;
-			var key = deg0 - this.kbmInfo[\mapsize] + degree;
-			if (key < 0) { key = key + this.kbmInfo[\mapsize]; };
-			while ({key < 128}, {
-				var extraoctave = 0;
-				var octaveratio = this.pr_toRatio(this.sclInfo[\octavefactor]);
-				//if ((key <= this.kbmInfo[\maxnote]) && (key >= this.kbmInfo[\minnote])) {
-				if (keytofreq[key.asSymbol].isNil) { keytofreq[key.asSymbol] = (); };
-				keytofreq[key.asSymbol][\logicaldegree] = degree;
-				keytofreq[key.asSymbol][\physicaldegree] = this.kbmInfo[\mapping][degree.asSymbol];
-				if (keytofreq[key.asSymbol][\physicaldegree] >= this.sclInfo[\notes]) {
-					keytofreq[key.asSymbol][\physicaldegree] = keytofreq[key.asSymbol][\physicaldegree].mod(this.sclInfo[\notes]);
-					extraoctave = keytofreq[key.asSymbol][\physicaldegree].div(this.sclInfo[\notes]);
+	pr_centToRatio {
+		| cents |
+		^2.pow(cents/1200);
+	}
+
+	calculateKeyToFreq {
+		var firstdegreenote = this.kbmInfo[\degree0note];
+		var mappingkeys = this.kbmInfo[\mapping].keys.asList.collect({|el|el.asInteger}).sort;
+		var mappeddegrees = mappingkeys.collect({
+			| key |
+			this.kbmInfo[\mapping][key.asSymbol];
+		});
+		var repeatevery = this.kbmInfo[\mapsize];
+		var octave = 0;
+		var previousextraoctaves = 0;
+		var pulses = 0;
+		var keytofreq = ();
+		var reffreqnote;
+		var reffreqcents;
+		var reffreq;
+
+		firstdegreenote = (firstdegreenote.mod(repeatevery))-repeatevery;
+		// first assign mapped degree to all note numbers
+		(128+12).do({
+			| key, idx |
+			var degreenote = firstdegreenote + key;
+			var degree = degreenote.mod(repeatevery);
+			var mappeddegree = mappeddegrees[degree].asInteger;
+			if ((degreenote>=0) && (degreenote<128)){
+				keytofreq[degreenote] = ();
+				if ((mappeddegree == 0) && (degreenote != this.kbmInfo[\degree0note])) {
+					keytofreq[degreenote][\mappeddegree] = this.kbmInfo[\octavedegree].asInteger;
+					keytofreq[degreenote][\octave] = idx.div(repeatevery)-1;
+				} {
+					keytofreq[degreenote][\mappeddegree] = mappeddegree;
+					keytofreq[degreenote][\octave] = idx.div(repeatevery);
 				};
-				keytofreq[key.asSymbol][\octave] = (octave+extraoctave);
-				//};
-				key = key + this.kbmInfo[\mapsize];
-				octave = octave + 1;
-			});
+			}
 		});
 
-		// look up tuning for (mapped) fixed frequency degree
-		refdegree = keytofreq[refnote.asSymbol][\physicaldegree];
-		reftuning = this.sclInfo[\tuning][refdegree];
-		if (reftuning.notNil) {
-			var ratio = this.pr_toRatio(reftuning);
-			virtualreffreq = this.kbmInfo[\reffreq]/ratio; // undo the transformation associated to current physical degree because
-			// after mapping degrees, ref note is not guaranteed to get phys degree 0
+		keytofreq[73].debug("73");
 
-			// for each key, get physical degree, use it to look up ratio, apply it to the virtualreffreq, and compensate for octave
-			128.do({
-				| key |
-				if ((key <= this.kbmInfo[\maxnote]) && (key >= this.kbmInfo[\minnote])) {
-					var physdeg = keytofreq[key.asSymbol][\physicaldegree];
-					if (physdeg.notNil) {
-						var tuning;
-						tuning = this.sclInfo[\tuning][physdeg];
-						if (tuning.notNil) {
-							var ratio = this.pr_toRatio(tuning);
-							var freq = virtualreffreq * ratio;
-							var octavediff = keytofreq[refnote.asSymbol][\octave] - keytofreq[key.asSymbol][\octave];
-							if (octavediff > 0) {
-								var loops = octavediff.abs;
-								var octavefactor = this.sclInfo[\octavefactor];
-								var ratio = this.pr_toRatio(octavefactor);
-								loops.do({
-									freq = freq / ratio;
-								});
-								keytofreq[key.asSymbol][\freq] = freq;
-							} {
-								var loops = octavediff.abs;
-								var octavefactor = this.sclInfo[\octavefactor];
-								var ratio = this.pr_toRatio(octavefactor);
-								loops.do({
-									freq = freq * ratio;
-								});
-								keytofreq[key.asSymbol][\freq] = freq;
-							};
-						};
-					};
+		// then convert kbm degree to tuning info degree
+		128.do({
+			|key|
+			var mappeddegree = keytofreq[key][\mappeddegree].asInteger;
+			var wrappeddegree = mappeddegree.mod(this.sclInfo[\notes]);
+			var extraoctave = mappeddegree.div(this.sclInfo[\notes]);
+			keytofreq[key][\tuningdegree] = wrappeddegree;
+			keytofreq[key][\extraoctave] = extraoctave;
+		});
+
+		// cumulative octave correction [0,0,0, 1,1,1, 0,0,0, 1,1,1] => [0,0,0, 1,1,1, 1,1,1, 2,2,2]
+		previousextraoctaves = 0;
+		128.do({
+			|key|
+			var currentextraoctaves = keytofreq[key][\extraoctave];
+			if (currentextraoctaves > previousextraoctaves) {
+				// pulse
+				previousextraoctaves = currentextraoctaves;
+				pulses = pulses+1;
+			}{
+				if (currentextraoctaves < previousextraoctaves) {
+					previousextraoctaves = 0;
 				};
-			});
+			};
+			keytofreq[key][\xtraoctcorr] = pulses;
+			keytofreq[key][\tuningoctave] = (keytofreq[key][\octave] + pulses);
+		});
 
-			^keytofreq;
+		// calculate cents difference with degree 0 number
+		128.do({
+			|key|
+			var octavediff = keytofreq[key][\tuningoctave] - keytofreq[this.kbmInfo[\degree0note]][\tuningoctave];
+			var tuning = this.pr_toCents(this.sclInfo[\tuning][keytofreq[key][\tuningdegree].asSymbol]);
+			var extracents = octavediff*this.pr_toCents(this.sclInfo[\octavefactor]);
+			keytofreq[key][\cents] = (tuning+extracents);
+		});
 
-		} {
-			"Reference note tuning could not be looked up. Are .scl and .kbm files ok?".error;
-			^nil;
-		};
+		// calculate cents difference wrt reference frequency note
+		reffreqnote = this.kbmInfo[\reffreqnote];
+		reffreqcents = keytofreq[reffreqnote][\cents];
+		reffreq = this.kbmInfo[\reffreq];
+		128.do({
+			|key|
+			keytofreq[key][\refcents] = keytofreq[key][\cents] - reffreqcents;
+			keytofreq[key][\freq] = this.pr_centToRatio(keytofreq[key][\refcents])*reffreq;
+
+			keytofreq[key][\freq].debug(""++key);
+		});
+
 	}
 
 	pr_cleanupLine {
