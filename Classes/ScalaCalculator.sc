@@ -225,7 +225,7 @@ ScalaCalculator {
 			this.kbmContents.do({
 				| ln, filelineindex |
 				var line = ln.stripWhiteSpace;
-				if (line[0] == $!) {
+				if ((line[0] == $!) || (line.compare("") == 0)){
 					// comment line - ignore
 				} {
 					nonCommentLines = nonCommentLines + 1;
@@ -268,7 +268,6 @@ ScalaCalculator {
 					|num|
 					var key = num.asSymbol;
 					// not sure if the next block is correct...
-					this.kbmInfo[\mapsize] = this.kbmInfo[\octavedegree]; //??
 					if (this.kbmInfo[\octavedegree] == 0) {
 						this.pr_setDefaultKbm;
 					};
