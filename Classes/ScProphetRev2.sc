@@ -4666,17 +4666,25 @@ ScProphetRev2 {
 					var diff_mts;
 					var secondbyte;
 					var thirdbyte;
-					firstbyte = closest_semitone;
 					difference = desiredfreq.cpsmidi - closest_semitone;
-					// rejoice for obscure floating point limited precision bugs taking forever to debug
-					if ((closest_semitone - desiredfreq.cpsmidi) < 1e-5) {
-						closest_semitone = closest_semitone + 1;
+					// rejoice for obscure bugs taking forever to debug
+					if ((desiredfreq.cpsmidi - closest_semitone) < 1e-5) {
 						difference = 0;
+					} {
+						if (((closest_semitone+1) - desiredfreq.cpsmidi) < 1e-5) {
+							closest_semitone = closest_semitone + 1;
+							difference = 0;
+						};
+					};
+					if (desiredfreq.cpsmidi > 127) {
+						closest_semitone = 127;
+						difference = 99;
 					};
 					// amen
+					firstbyte = closest_semitone.asInteger;
 					difference_cents = difference*100;
 					diff_mts = (difference_cents).linlin(0, 100, 0, 2.pow(14)-1).round(1).asInt;
-					secondbyte = (diff_mts >> 7);
+					secondbyte = ((diff_mts >> 7) & 127); // & 127 should be superfluous
 					thirdbyte = (diff_mts & 127);
 					sysexdata = sysexdata.add(firstbyte);
 					sysexdata = sysexdata.add(secondbyte);
