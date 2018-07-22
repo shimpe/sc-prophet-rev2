@@ -114,14 +114,14 @@ ScProphetRev2TuningPane {
 					kbmpath = nil;
 				};
 				calc.load(sclpath, kbmpath);
-				keytofreq = calc.calculateKeyToFreq;
+				keytofreq = calc.keyToFreq;
 				if (keytofreq.notNil) {
 					var freqtable = [];
 					128.do({
 						|i|
-						if (keytofreq[i.asSymbol].notNil) {
-							if (keytofreq[i.asSymbol][\freq].notNil) {
-								freqtable = freqtable.add(keytofreq[i.asSymbol][\freq]);
+						if (keytofreq[i].notNil) {
+							if (keytofreq[i].notNil) {
+								freqtable = freqtable.add(keytofreq[i]);
 							} {
 								freqtable = freqtable.add(nil);
 							};
@@ -155,14 +155,14 @@ ScProphetRev2TuningPane {
 					kbmpath = nil;
 				};
 				calc.load(sclpath, kbmpath);
-				keytofreq = calc.calculateKeyToFreq;
+				keytofreq = calc.keyToFreq;
 				if (keytofreq.notNil) {
 					var displaytext = "";
 					128.do({
 						|i|
-						if (keytofreq[i.asSymbol].notNil) {
-							if (keytofreq[i.asSymbol][\freq].notNil) {
-								displaytext = displaytext ++ i ++ " : " ++ keytofreq[i.asSymbol][\freq] ++ "\n";
+						if (keytofreq[i].notNil) {
+							if (keytofreq[i].notNil) {
+								displaytext = displaytext ++ i ++ " : " ++ keytofreq[i] ++ "\n";
 							} {
 								displaytext = displaytext ++ i ++ " : ------\n";
 							};
