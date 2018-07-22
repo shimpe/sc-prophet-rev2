@@ -4639,7 +4639,6 @@ ScProphetRev2 {
 			var cNAME = tuning_name.copyRange(0,15);
 			var cEOX = 16rF7;
 			var checksum = 0;
-
 			sysexdata = sysexdata.add(cSYSEX_HEADER);
 			sysexdata = sysexdata.add(cNRT_MSG);
 			sysexdata = sysexdata.add(cDEVICE_ID);
@@ -4655,7 +4654,6 @@ ScProphetRev2 {
 					sysexdata = sysexdata.add($ .ascii);
 				}
 			});
-
 			128.do({
 				| note |
 				var freq = midinumber_to_frequency[note];
@@ -4668,22 +4666,18 @@ ScProphetRev2 {
 					var diff_mts;
 					var secondbyte;
 					var thirdbyte;
-
 					firstbyte = closest_semitone;
 					difference = desiredfreq.cpsmidi - closest_semitone;
-
 					// rejoice for obscure floating point limited precision bugs taking forever to debug
 					if ((closest_semitone - desiredfreq.cpsmidi) < 1e-5) {
 						closest_semitone = closest_semitone + 1;
 						difference = 0;
 					};
 					// amen
-
 					difference_cents = difference*100;
-					diff_mts = (difference_cents).linlin(0, 100, 0, 2.pow(14)).round(1).asInt;
+					diff_mts = (difference_cents).linlin(0, 100, 0, 2.pow(14)-1).round(1).asInt;
 					secondbyte = (diff_mts >> 7);
 					thirdbyte = (diff_mts & 127);
-
 					sysexdata = sysexdata.add(firstbyte);
 					sysexdata = sysexdata.add(secondbyte);
 					sysexdata = sysexdata.add(thirdbyte);
@@ -4694,7 +4688,6 @@ ScProphetRev2 {
 					sysexdata = sysexdata.add(16r7F);
 				};
 			});
-
 			sysexdata.do({
 				| val, idx |
 				if (idx == 0) {
@@ -4707,20 +4700,16 @@ ScProphetRev2 {
 					};
 				};
 			});
-
 			sysexdata = sysexdata.add(checksum.bitAnd(16r7F));
 			sysexdata = sysexdata.add(cEOX);
-
 			if (this.midi_out.notNil) {
 				this.midi_out.sysex(sysexdata);
 			} {
 				"Cannot send commands to synth because not connected yet.".warn;
 				"Call connect first.".warn;
 			};
-
 		} {
 			"No frequency table specified. Nothing to send.".warn;
 		};
 	}
-
 }
