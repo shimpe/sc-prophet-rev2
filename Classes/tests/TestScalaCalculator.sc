@@ -1,5 +1,5 @@
 Test11_19 : UnitTest {
-	test_scl_11_19_gould_kbm_11 {
+	test_scl_std {
 		var c = ScalaCalculator();
 		var keytofreq;
 		var expected;
@@ -230,15 +230,15 @@ Test11_19 : UnitTest {
 
 		128.do({
 			| key |
-			//key.debug("key");
-			//if ((key > 50) && (key<80)) {
-			this.assertFloatEquals(keytofreq[key], expected[key]);
-			//}
+			if (expected[key].notNil) {
+				key.debug("key");
+				this.assertFloatEquals(keytofreq[key], expected[key]);
+			};
 		})
 	}
 
 
-	test_scl_11_19_gould_kbm_19 {
+	test_scl_bigmap {
 		var c = ScalaCalculator();
 		var keytofreq;
 		var expected;
@@ -436,10 +436,10 @@ Test11_19 : UnitTest {
 
 		128.do({
 			| key |
-			//key.debug("check key");
-			//if ((key>50) && (key<80)) {
-			this.assertFloatEquals(keytofreq[key], expected[key]);
-			//};
+			if (expected[key].notNil) {
+				key.debug("key");
+				this.assertFloatEquals(keytofreq[key], expected[key]);
+			};
 		})
 
 	}
@@ -641,7 +641,80 @@ Test11_19 : UnitTest {
 		keytofreq = c.keyToFreq();
 		128.do({
 			| key |
-			this.assertFloatEquals(keytofreq[key], expected[key]);
+			if (expected[key].notNil) {
+				key.debug("key");
+				this.assertFloatEquals(keytofreq[key], expected[key]);
+			};
+		});
+	}
+
+	test_cornercase_singledegree {
+		var c = ScalaCalculator();
+		var keytofreq;
+		var expected;
+		c.sclContents_([
+			"! quasi_9.scl",
+			"!",
+			"Quasi-Equal Enneatonic, Each \"tetrachord\" has 125 + 125 + 125 + 125 cents",
+			" 9",
+			"!",
+			" 125.00000",
+			" 250.00000",
+			" 375.00000",
+			" 500.00000",
+			" 700.00000",
+			" 825.00000",
+			" 950.00000",
+			" 1075.00000",
+			" 2/1",
+		]);
+		c.pr_parseScl;
+		c.kbmContents_([
+			"! 9.kbm",
+			"! Example keyboard mapping for a 9-tone scale",
+			"! Two tones are duplicated. Other ones may be more convenient.",
+			"!",
+			"! Size of map. The pattern repeats every so many keys:",
+			"12",
+			"! First MIDI note number to retune:",
+			"0",
+			"! Last MIDI note number to retune:",
+			"127",
+			"! Middle note where the first entry of the mapping is mapped to:",
+			"60",
+			"! Reference note for which frequency is given:",
+			"60",
+			"! Frequency to tune the above note to (floating point e.g. 440.0):",
+			"261.6256",
+			"! Scale degree to consider as formal octave (determines difference in pitch ",
+			"! between adjacent mapping patterns):",
+			"9",
+			"! Mapping.",
+			"! The numbers represent scale degrees mapped to keys. The first entry is for",
+			"! the given middle note, the next for subsequent higher keys.",
+			"0"
+		]);
+		c.pr_parseKbm;
+		expected = (
+			0 : 261.6256,
+			12: 261.6256,
+			24: 261.6256,
+			36: 261.6256,
+			48: 261.6256,
+			60: 261.6256,
+			72: 261.6256,
+			84: 261.6256,
+			96: 261.6256,
+			108: 261.6256,
+			120: 261.6256
+		);
+		keytofreq = c.keyToFreq();
+		128.do({
+			| key |
+			if (expected[key].notNil) {
+				key.debug("key");
+				this.assertFloatEquals(keytofreq[key], expected[key]);
+			};
 		});
 	}
 
@@ -658,6 +731,13 @@ TestScalaCalculator {
 	}
 
 	init {
-		Test11_19.run;
+		// run all tests
+		//Test11_19.run;
+
+		// run single tests
+		Test11_19.runTest("Test11_19:test_scl_std");
+		//Test11_19.runTest("Test11_19:test_scl_bigmap");
+		//Test11_19.runTest("Test11_19:test_emptyline");
+		//Test11_19.runTest("Test11_19:test_cornercase_singledegree");
 	}
 }
