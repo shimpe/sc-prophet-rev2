@@ -4668,28 +4668,41 @@ ScProphetRev2 {
 					var thirdbyte;
 					difference = desiredfreq.cpsmidi - closest_semitone;
 					// rejoice for obscure bugs taking forever to debug
+					if (desiredfreq.cpsmidi < 0) {
+						closest_semitone = 0;
+						desiredfreq = closest_semitone.midicps;
+						difference = 0;
+					};
+					if (desiredfreq.cpsmidi >= 127) {
+						closest_semitone = 127;
+						desiredfreq = closest_semitone.midicps;
+						difference = 0;
+					};
 					if ((desiredfreq.cpsmidi - closest_semitone) < 1e-5) {
+						if (closest_semitone < 0) {
+							closest_semitone = 0;
+						};
 						difference = 0;
 					} {
 						if (((closest_semitone+1) - desiredfreq.cpsmidi) < 1e-5) {
 							closest_semitone = closest_semitone + 1;
+							if (closest_semitone > 127) {
+								closest_semitone = 127;
+							};
 							difference = 0;
 						};
-					};
-					if (desiredfreq.cpsmidi > 127) {
-						closest_semitone = 127;
-						difference = 99;
 					};
 					// amen
 					firstbyte = closest_semitone.asInteger;
 					difference_cents = difference*100;
-					diff_mts = (difference_cents).linlin(0, 100, 0, 2.pow(14)-1).round(1).asInt;
-					secondbyte = ((diff_mts >> 7) & 127); // & 127 should be superfluous
+					diff_mts = difference_cents.linlin(0, 100, 0, 2.pow(14)-1).floor.asInt;
+					secondbyte = (diff_mts >> 7);
 					thirdbyte = (diff_mts & 127);
 					sysexdata = sysexdata.add(firstbyte);
 					sysexdata = sysexdata.add(secondbyte);
 					sysexdata = sysexdata.add(thirdbyte);
 				} {
+					// ("Frequency for note "++note++" is nil.").warn;
 					// insert a "no change"
 					sysexdata = sysexdata.add(16r7F);
 					sysexdata = sysexdata.add(16r7F);
