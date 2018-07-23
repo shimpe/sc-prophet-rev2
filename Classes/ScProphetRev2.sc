@@ -4703,10 +4703,12 @@ ScProphetRev2 {
 					sysexdata = sysexdata.add(thirdbyte);
 				} {
 					// ("Frequency for note "++note++" is nil.").warn;
-					// insert a "no change"
-					sysexdata = sysexdata.add(16r7F);
-					sysexdata = sysexdata.add(16r7F);
-					sysexdata = sysexdata.add(16r7F);
+					// i wanted to insert a "no change" 0x7F 0x7F 0x7F
+					// but it doesn't work as standardized on rev2
+					// so insert the normal note instead (0,0,0 just sounds weird).
+					sysexdata = sysexdata.add(note);
+					sysexdata = sysexdata.add(0);
+					sysexdata = sysexdata.add(0);
 				};
 			});
 			sysexdata.do({

@@ -15,6 +15,8 @@ ScProphetRev2TuningPane {
 	var <>sysexsendbutton;
 	var <>scalafiletfield;
 	var <>scalafilebutton;
+	var <>scalanumstepslabel;
+	var <>scaladescription;
 	var <>kbmfiletfield;
 	var <>kbmfilebutton;
 	var <>scalasendbutton;
@@ -67,12 +69,22 @@ ScProphetRev2TuningPane {
 			}.defer;
 		});
 		this.scalafiletfield = TextField();
+		this.scalanumstepslabel = StaticText();
+		this.scaladescription = StaticText();
 		this.scalafilebutton = Button().string_("Select .scl file").action_({
 			| button |
 			FileDialog.new(
 				okFunc:{
 					| path |
-					{ this.scalafiletfield.string_(path[0]); }.defer;
+					{
+						var calc = ScalaCalculator();
+						this.scalafiletfield.string_(path[0]);
+						calc.load(path[0], nil);
+						if (calc.getNoOfScaleSteps.notNil) {
+							this.scalanumstepslabel.string_("No of scale steps: "++calc.getNoOfScaleSteps.asString);
+							this.scaladescription.string_(calc.getDescription);
+						};
+					}.defer;
 				},
 				cancelFunc:{
 				},
@@ -162,12 +174,17 @@ ScProphetRev2TuningPane {
 						|i|
 						if (keytofreq[i].notNil) {
 							if (keytofreq[i].notNil) {
-								displaytext = displaytext ++ i ++ " : " ++ keytofreq[i] ++ "\n";
+								var midinum = keytofreq[i].cpsmidi;
+								displaytext = displaytext ++ i ++ ":\t " ++ keytofreq[i].asStringPrec(4) ++ "\t midi number: " ++ "\t " ++
+								midinum.asStringPrec(4) ++ "\n";
+								if ((midinum < 0) || (midinum > 127)) {
+									displaytext = "(" ++ displaytext ++ ")"
+								};
 							} {
-								displaytext = displaytext ++ i ++ " : ------\n";
+								displaytext = displaytext ++ i ++ ":\t ------\n";
 							};
 						}{
-							displaytext = displaytext ++ i ++ " : ------\n";
+							displaytext = displaytext ++ i ++ ":\t ------\n";
 						};
 					});
 					this.textview.string_(displaytext);
@@ -223,7 +240,11 @@ ScProphetRev2TuningPane {
 				HLayout(
 					this.scalafiletfield,
 					this.scalafilebutton,
+					this.scalanumstepslabel,
 					nil
+				),
+				HLayout(
+					this.scaladescription
 				),
 				HLayout(
 					this.kbmfiletfield,

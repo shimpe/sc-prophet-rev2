@@ -353,6 +353,14 @@ ScalaCalculator {
 		^2.pow(cents/1200);
 	}
 
+	getNoOfScaleSteps {
+		^this.sclInfo[\notes];
+	}
+
+	getDescription {
+		^this.sclInfo[\description];
+	}
+
 	calculateKeyToFreq {
 		var keytofreq;
 		var firstdegreenote = this.kbmInfo[\degree0note];
