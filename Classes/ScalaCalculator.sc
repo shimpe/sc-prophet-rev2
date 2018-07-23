@@ -370,6 +370,7 @@ ScalaCalculator {
 		var firstdegree0 = degree0.mod(this.kbmInfo[\mapsize]) - this.kbmInfo[\mapsize];
 		var reffreq = this.kbmInfo[\reffreq];
 		mappeddegrees = mappeddegrees.add(this.kbmInfo[\octavedegree].asInteger);
+		// mappeddegrees can contain duplicate numbers and nils, do don't try to make mappedcents a dictionary
 		mappedcents = mappeddegrees.collect({
 			| mappeddegree |
 			if (mappeddegree.notNil) {
@@ -382,6 +383,7 @@ ScalaCalculator {
 				nil;
 			};
 		});
+
 		keytofreq = ();
 		(firstdegree0..127).do({
 			|value,idx|
@@ -401,7 +403,7 @@ ScalaCalculator {
 				var octavecompensation = 0;
 				degree = (value-firstdegree0).mod(this.kbmInfo[\mapsize]);
 				if (degree == 0) { degree = this.kbmInfo[\mapsize]; octavecompensation = 1.neg; };
-				keytofreq[value][\cents] = mappedcents[degree];
+				keytofreq[value][\cents] = mappedcents[degree]; // mapped cents is already mapped, so do not use a mapped degree to index
 				octavediff = keytofreq[value][\octave] - keytofreq[this.kbmInfo[\degree0note]][\octave] + octavecompensation;
 				keytofreq[value][\reloctave] = (octavediff+1);
 			};
