@@ -736,8 +736,8 @@ TestScalaCalculator {
 
 		// run single tests
 		Test11_19.runTest("Test11_19:test_scl_std");
-		//Test11_19.runTest("Test11_19:test_scl_bigmap");
-		//Test11_19.runTest("Test11_19:test_emptyline");
-		//Test11_19.runTest("Test11_19:test_cornercase_singledegree");
+		//Test11_19.runTest("Test11_19:test_scl_bigmap"); // why scala has some different replies?
+		Test11_19.runTest("Test11_19:test_emptyline");
+		//Test11_19.runTest("Test11_19:test_cornercase_singledegree"); // why scala uses no octave equivalence?
 	}
 }

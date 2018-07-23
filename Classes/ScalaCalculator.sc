@@ -356,12 +356,15 @@ ScalaCalculator {
 	calculateKeyToFreq {
 		var keytofreq;
 		var firstdegreenote = this.kbmInfo[\degree0note];
-		var mappingkeys = this.kbmInfo[\mapping].keys.asList.collect({|el|el.asInteger}).sort;
+		var mappingkeys = (this.kbmInfo[\mapsize]).collect({|el| el; });
 		var mappeddegrees = mappingkeys.collect({
 			| key |
-			this.kbmInfo[\mapping][key.asSymbol].asInteger;
+			if (this.kbmInfo[\mapping][key.asSymbol].notNil) {
+				this.kbmInfo[\mapping][key.asSymbol].asInteger;
+			} {
+				nil;
+			};
 		});
-		var repeatevery = this.kbmInfo[\mapsize];
 		var mappedcents;
 		var degree0 = this.kbmInfo[\degree0note].asInteger;
 		var firstdegree0 = degree0.mod(this.kbmInfo[\mapsize]) - this.kbmInfo[\mapsize];
@@ -369,11 +372,15 @@ ScalaCalculator {
 		mappeddegrees = mappeddegrees.add(this.kbmInfo[\octavedegree].asInteger);
 		mappedcents = mappeddegrees.collect({
 			| mappeddegree |
-			var wrappeddegree = mappeddegree.mod(this.sclInfo[\notes]);
-			var extraoctave = mappeddegree.div(this.sclInfo[\notes]);
-			var tunecents = this.pr_toCents(this.sclInfo[\tuning][wrappeddegree.asSymbol]);
-			var extraoctavecents = extraoctave*this.pr_toCents(this.sclInfo[\octavefactor]);
-			tunecents+extraoctavecents;
+			if (mappeddegree.notNil) {
+				var wrappeddegree = mappeddegree.mod(this.sclInfo[\notes]);
+				var extraoctave = mappeddegree.div(this.sclInfo[\notes]);
+				var tunecents = this.pr_toCents(this.sclInfo[\tuning][wrappeddegree.asSymbol]);
+				var extraoctavecents = extraoctave*this.pr_toCents(this.sclInfo[\octavefactor]);
+				tunecents+extraoctavecents;
+			} {
+				nil;
+			};
 		});
 		keytofreq = ();
 		(firstdegree0..127).do({
@@ -389,12 +396,12 @@ ScalaCalculator {
 		(firstdegree0..127).do({
 			|value,idx|
 			if (value >= 0) {
-				var mappeddegree;
+				var degree;
 				var octavediff;
 				var octavecompensation = 0;
-				mappeddegree = (value-firstdegree0).mod(this.kbmInfo[\mapsize]);
-				if (mappeddegree == 0) { mappeddegree = this.kbmInfo[\mapsize]; octavecompensation = 1.neg; };
-				keytofreq[value][\cents] = mappedcents[mappeddegree];
+				degree = (value-firstdegree0).mod(this.kbmInfo[\mapsize]);
+				if (degree == 0) { degree = this.kbmInfo[\mapsize]; octavecompensation = 1.neg; };
+				keytofreq[value][\cents] = mappedcents[degree];
 				octavediff = keytofreq[value][\octave] - keytofreq[this.kbmInfo[\degree0note]][\octave] + octavecompensation;
 				keytofreq[value][\reloctave] = (octavediff+1);
 			};
@@ -403,11 +410,21 @@ ScalaCalculator {
 		(firstdegree0..127).do({
 			|value,idx|
 			if (value>=0) {
+
 				var reloctavecompensation = (keytofreq[this.kbmInfo[\degree0note]][\reloctave] - keytofreq[this.kbmInfo[\reffreqnote]][\reloctave]);
 				var octavefactor = this.pr_toCents(this.sclInfo[\octavefactor]);
 				// rebase cents onto reference frequency note
-				var relcents = keytofreq[value][\cents] - keytofreq[this.kbmInfo[\reffreqnote].asInteger][\cents] + ((keytofreq[value][\reloctave] + reloctavecompensation)*mappedcents[this.kbmInfo[\mapsize]]);
-				keytofreq[value][\freq] = reffreq*this.pr_centToRatio(relcents);
+				var val_cents = keytofreq[value][\cents];
+				var ref_cents = keytofreq[this.kbmInfo[\reffreqnote].asInteger][\cents];
+				var val_oct = keytofreq[value][\reloctave];
+				var oct_cents = mappedcents[this.kbmInfo[\mapsize]];
+
+				if (val_cents.notNil) {
+					var relcents = val_cents - ref_cents + ((val_oct + reloctavecompensation)*oct_cents);
+					keytofreq[value][\freq] = reffreq*this.pr_centToRatio(relcents);
+				} {
+					keytofreq[value][\freq] = nil;
+				};
 			};
 		});
 
