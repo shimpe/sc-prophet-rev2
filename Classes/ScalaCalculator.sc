@@ -264,14 +264,12 @@ ScalaCalculator {
 			});
 			if (this.kbmInfo[\mapsize] == 0) {
 				// map size = 0: generate linear mapping
-				128.do({
+				this.sclInfo[\notes].do({
 					|num|
 					var key = num.asSymbol;
-					// not sure if the next block is correct...
-					if (this.kbmInfo[\octavedegree] == 0) {
-						this.pr_setDefaultKbm;
-					};
 					this.kbmInfo[\mapping][key] = key;
+					this.kbmInfo[\mapsize] = this.sclInfo[\notes];
+					this.kbmInfo[\octavedegree] = this.sclInfo[\notes];
 				});
 			} {
 				// map size != 0: skip all not used degrees
@@ -359,6 +357,14 @@ ScalaCalculator {
 
 	getDescription {
 		^this.sclInfo[\description];
+	}
+
+	getReferenceNote {
+		^this.kbmInfo[\reffreqnote];
+	}
+
+	getReferenceFrequency {
+		^this.kbmInfo[\reffreq];
 	}
 
 	calculateKeyToFreq {

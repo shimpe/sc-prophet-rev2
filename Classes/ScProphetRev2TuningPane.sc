@@ -19,6 +19,7 @@ ScProphetRev2TuningPane {
 	var <>scaladescription;
 	var <>kbmfiletfield;
 	var <>kbmfilebutton;
+	var <>mappingreference;
 	var <>scalasendbutton;
 	var <>scalalistbutton;
 	var <>tunename;
@@ -94,12 +95,23 @@ ScProphetRev2TuningPane {
 			);
 		});
 		this.kbmfiletfield = TextField();
+		this.mappingreference = StaticText();
 		this.kbmfilebutton = Button().string_("Select .kbm file").action_({
 			| button |
 			FileDialog.new(
 				okFunc:{
 					| path |
-					{ this.kbmfiletfield.string_(path[0]); }.defer;
+					{
+						var calc = ScalaCalculator();
+						var note = MidinumberToNote();
+						var displaystring = "";
+						this.kbmfiletfield.string_(path[0]);
+						calc.load(nil, path[0]);
+						displaystring = note.midinumber_to_notename(calc.getReferenceNote, false);
+						displaystring = displaystring + calc.getReferenceFrequency.asStringPrec(10);
+						displaystring = displaystring + "Hz";
+						this.mappingreference.string_(displaystring);
+					}.defer;
 				},
 				cancelFunc:{
 				},
@@ -170,15 +182,19 @@ ScProphetRev2TuningPane {
 				keytofreq = calc.keyToFreq;
 				if (keytofreq.notNil) {
 					var displaytext = "";
+					var colorregions = [];
 					128.do({
 						|i|
 						if (keytofreq[i].notNil) {
 							if (keytofreq[i].notNil) {
 								var midinum = keytofreq[i].cpsmidi;
-								displaytext = displaytext ++ i ++ ":\t " ++ keytofreq[i].asStringPrec(4) ++ "\t midi number: " ++ "\t " ++
-								midinum.asStringPrec(4) ++ "\n";
-								if ((midinum < 0) || (midinum > 127)) {
-									displaytext = "(" ++ displaytext ++ ")"
+								var colorneeded = ((midinum < 0) || (midinum > 127));
+								if  (colorneeded) {
+									colorregions = colorregions.add([displaytext.size]);
+								};
+								displaytext = displaytext ++ i ++ ":\t " ++ keytofreq[i].asStringPrec(10) ++ "\t midi number: " ++ "\t " ++ midinum.asStringPrec(10) ++ "\n";
+								if (colorneeded) {
+									colorregions[colorregions.size-1] = colorregions[colorregions.size-1].add(displaytext.size);
 								};
 							} {
 								displaytext = displaytext ++ i ++ ":\t ------\n";
@@ -188,6 +204,10 @@ ScProphetRev2TuningPane {
 						};
 					});
 					this.textview.string_(displaytext);
+					colorregions.do({
+						|reg|
+						this.textview.setStringColor(Color.blue, reg[0], reg[1]-reg[0]);
+					});
 				} {
 					"Meh. Couldn't calculate the midi key to frequency table. Bailing out.".error;
 				};
@@ -249,6 +269,7 @@ ScProphetRev2TuningPane {
 				HLayout(
 					this.kbmfiletfield,
 					this.kbmfilebutton,
+					this.mappingreference,
 					nil
 				),
 				HLayout(
