@@ -24,6 +24,13 @@ ScProphetRev2TuningPane {
 	var <>scalalistbutton;
 	var <>tunename;
 
+	var <>selfoctavetfield;
+	var <>selfpartstfield;
+	var <>selfrefnote;
+	var <>selfreffreq;
+	var <>selflistbutton;
+	var <>selfsendbutton;
+
 	var <>textview;
 
 	*new {
@@ -217,6 +224,74 @@ ScProphetRev2TuningPane {
 		this.tunename = TextField().string_("Custom Tuning I");
 		this.textview = TextView();
 
+		this.selfoctavetfield = TextField().string_("1");
+		this.selfpartstfield = TextField().string_("12");
+		this.selfrefnote = TextField().string_("a4");
+		this.selfreffreq = TextField().string_("440");
+		this.selflistbutton = Button().string_("List calculated frequencies").action_({
+			| lbutton |
+			var ec = EdoCalculator(this.selfoctavetfield.value.asFloat,
+				this.selfpartstfield.value.asFloat,
+				this.selfrefnote.value.asString,
+				this.selfreffreq.value.asFloat);
+			var keytofreq = ec.keyToFreq;
+			var displaytext = "";
+			var colorregions = [];
+			128.do({
+				|i|
+				if (keytofreq[i].notNil) {
+					if (keytofreq[i].notNil) {
+						var midinum = keytofreq[i].cpsmidi;
+						var colorneeded = ((midinum < 0) || (midinum > 127));
+						if  (colorneeded) {
+							colorregions = colorregions.add([displaytext.size]);
+						};
+						displaytext = displaytext ++ i ++ ":\t " ++ keytofreq[i].asStringPrec(10) ++ "\t midi number: " ++ "\t " ++ midinum.asStringPrec(10) ++ "\n";
+						if (colorneeded) {
+							colorregions[colorregions.size-1] = colorregions[colorregions.size-1].add(displaytext.size);
+						};
+					} {
+						displaytext = displaytext ++ i ++ ":\t ------\n";
+					};
+				}{
+					displaytext = displaytext ++ i ++ ":\t ------\n";
+				};
+			});
+			this.textview.string_(displaytext);
+			colorregions.do({
+				|reg|
+				this.textview.setStringColor(Color.blue, reg[0], reg[1]-reg[0]);
+			});
+		});
+		this.selfsendbutton = Button().string_("Send to active tuning bank").action_({
+			| sbutton |
+			var ec = EdoCalculator(this.selfoctavetfield.value.asFloat,
+				this.selfpartstfield.value.asFloat,
+				this.selfrefnote.value.asString,
+				this.selfreffreq.value.asFloat);
+			var keytofreq = ec.keyToFreq;
+			var tuneindex = this.controls[\control_tuning].value;
+			var freqtable = [];
+			if (keytofreq.notNil) {
+				128.do({
+					|i|
+					if (keytofreq[i].notNil) {
+						if (keytofreq[i].notNil) {
+							freqtable = freqtable.add(keytofreq[i]);
+						} {
+							freqtable = freqtable.add(nil);
+						};
+					} {
+						freqtable = freqtable.add(nil);
+					};
+				});
+				"Sending now!".warn;
+				this.prophet.send_tuning_to_synth(tuneindex, ""++this.selfpartstfield.value++"steps/"++ this.selfoctavetfield.value ++ "oct EDO", freqtable);
+				"Done sending!".warn;
+			};
+		});
+
+
 		this.builder.make_labeled_combobox(
 			this.parent,
 			this.patchdumper,
@@ -281,6 +356,27 @@ ScProphetRev2TuningPane {
 					this.scalalistbutton,
 					this.scalasendbutton,
 					nil
+				),
+				HLayout(
+					StaticText().string_("Or generate an EDO tuning on the fly").font_(Font("Monaco", 16)).background_(Color.yellow),
+					nil
+				),
+				HLayout(
+					StaticText().string_("Divide"),
+					this.selfoctavetfield,
+					StaticText().string_("octaves into"),
+					this.selfpartstfield,
+					StaticText().string_("equal parts, and tune note"),
+					this.selfrefnote,
+					StaticText().string_("to"),
+					this.selfreffreq,
+					StaticText().string_("Hz"),
+					nil
+				),
+				HLayout(
+					this.selflistbutton,
+					this.selfsendbutton,
+					nil,
 				),
 				HLayout(
 					this.textview;
