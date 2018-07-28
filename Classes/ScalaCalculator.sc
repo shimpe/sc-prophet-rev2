@@ -371,6 +371,7 @@ ScalaCalculator {
 		var keytofreq;
 		var firstdegreenote = this.kbmInfo[\degree0note];
 		var mappingkeys = (this.kbmInfo[\mapsize]).collect({|el| el; });
+		// mappeddegrees can contain duplicate numbers and nils, do don't try to make mappedcents a dictionary
 		var mappeddegrees = mappingkeys.collect({
 			| key |
 			if (this.kbmInfo[\mapping][key.asSymbol].notNil) {
@@ -381,10 +382,13 @@ ScalaCalculator {
 		});
 		var mappedcents;
 		var degree0 = this.kbmInfo[\degree0note].asInteger;
-		var firstdegree0 = degree0.mod(this.kbmInfo[\mapsize]) - this.kbmInfo[\mapsize];
+		var firstdegree0 = degree0.mod(this.kbmInfo[\mapsize]) - this.kbmInfo[\mapsize]; // lowest midi note that corresponds to degree 0, should be <= 0
 		var reffreq = this.kbmInfo[\reffreq];
-		mappeddegrees = mappeddegrees.add(this.kbmInfo[\octavedegree].asInteger);
-		// mappeddegrees can contain duplicate numbers and nils, do don't try to make mappedcents a dictionary
+		mappeddegrees = mappeddegrees.add(this.kbmInfo[\octavedegree].asInteger); // add octave degree explicitly as it's needed to calculate octave equivalence
+
+		// first assign to all degrees from the keyboard mapping a number of cents from the scl file
+		// extra degrees in the mapping that do not occur in the .scl file are treated with octave equivalence,
+		// with the octave factor taken from the last entry in the scl file
 		mappedcents = mappeddegrees.collect({
 			| mappeddegree |
 			if (mappeddegree.notNil) {
@@ -397,7 +401,12 @@ ScalaCalculator {
 				nil;
 			};
 		});
+		// note: mappedcents takes a "normal" (not: "mapped") degree as index and returns
+		// cents for the mapped degree (i.e. it implicitly maps the degree according to the kbm)
 
+		// next, assign an octave to each note
+		// in the end only difference of a note to the octave of the reference note will be important
+		// so don't freak out over the absolute value
 		keytofreq = ();
 		(firstdegree0..127).do({
 			|value,idx|
@@ -409,6 +418,10 @@ ScalaCalculator {
 			};
 		});
 
+		// next, determine a scale degree for each note
+		// assign the corresponding number of cents and relative octave
+		// complication: for a degree 0 note, one should apply the cents for degree "mapsize" instead
+		// (and compensate for the extra octave caused by doing so)
 		(firstdegree0..127).do({
 			|value,idx|
 			if (value >= 0) {
@@ -423,6 +436,9 @@ ScalaCalculator {
 			};
 		});
 
+		// finally, convert all the cents values to frequencies,
+		// taking into account the octavefactor from the scl file to
+		// calculate octave equivalence
 		(firstdegree0..127).do({
 			|value,idx|
 			if (value>=0) {
