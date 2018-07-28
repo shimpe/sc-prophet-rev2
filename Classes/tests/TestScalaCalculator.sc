@@ -1,3 +1,22 @@
+Test_Calc : UnitTest {
+	test_toCents {
+		var c = ScalaCalculator();
+		this.assertEquals(c.pr_toCents((\type:\cents, \value:123)), 123);
+		this.assertEquals(c.pr_toCents((\type:\ratio, \value:1, \value2:2)), 1200.neg);
+	}
+	test_toRatio {
+		var c = ScalaCalculator();
+		this.assertEquals(c.pr_toRatio((\type:\cents, \value:600)), 2.sqrt);
+		this.assertEquals(c.pr_toRatio((\type:\ratio, \value:1, \value2:2)), 0.5);
+	}
+	test_centToRatio {
+		var c = ScalaCalculator();
+		this.assertEquals(c.pr_centToRatio(1200), 2);
+		this.assertEquals(c.pr_centToRatio(0), 1);
+		this.assertEquals(c.pr_centToRatio(1200.neg), 0.5);
+	}
+}
+
 Test11_19 : UnitTest {
 	test_scl_std {
 		var c = ScalaCalculator();
@@ -1005,15 +1024,15 @@ Test11_19 : UnitTest {
 			95 : 3992.592593,
 			96 : 4401.005944,
 			97 : 4753.08642,
-			98 : 239.292791,
+			98 : 5239.292791,
 			99 : 5658.436214,
-			100	: 6161.408322,
-			101	: 6736.233588,
-			102	: 7335.009907,
-			103	: 7921.8107,
-			104	: 8625.971651,
-			105	: 9430.727023,
-			106	: 10269.01387,
+			100 : 6161.408322,
+			101 : 6736.233588,
+			102 : 7335.009907,
+			103 : 7921.8107,
+			104 : 8625.971651,
+			105 : 9430.727023,
+			106 : 10269.01387,
 			107 : 11090.53498,
 			108 : 12225.01651
 		);
@@ -1041,6 +1060,7 @@ TestScalaCalculator {
 
 	init {
 		// run all tests
+		Test_Calc.run;
 		//Test11_19.run;
 
 		// run single tests
