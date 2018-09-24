@@ -4,5 +4,6 @@
   version: "0.0.1",
   schelp: "ScProphetRev2.schelp",
   license: "GPL",
+  dependencies: ["Panola", "TemporalDict"],
   copyright: "Stefaan Himpe, march 2018"
 )
