@@ -10,6 +10,7 @@ ScProphetRev2LastPlayedNotesTracker {
 	var <>preferflats;
 	var <>showmidinums;
 	var <>numtonote;
+	var <>showrhythm;
 
 	*new {
 		|prophet, name|
@@ -22,7 +23,18 @@ ScProphetRev2LastPlayedNotesTracker {
 		this.name = name;
 		this.noteontracker = ();
 		this.lastplayednotes = ();
+		this.showrhythm = true;
 		this.numtonote = MidinumberToNote();
+		this.notefield = TextField().string_("").enabled_(false);
+		this.noterecordrhythm = PopUpMenu().items_(["1", "1/2", "1/4", "1/8", "1/16" , "1/32", "1/64", "1/128"]);
+		this.noterecordmultiplier = PopUpMenu().items_(["normal", "triola"]);
+		this.preferflats = CheckBox().string_("Use flats").value_(false);
+		this.showmidinums = CheckBox().string_("Show midi numbers").value_(false);
+		this.updateMidiHandlers;
+	}
+
+	updateMidiHandlers {
+		MIDIdef((this.name++"noteontracker").asSymbol).free;
 		MIDIdef.noteOn(
 			(this.name++"noteontracker").asSymbol, {
 				| vel, noteNum, chan, src |
@@ -52,15 +64,19 @@ ScProphetRev2LastPlayedNotesTracker {
 								// first note
 								var triola = this.noterecordmultiplier.item.compare("triola") == 0;
 								var selectedItem = "";
+								var rhythm = "";
 								if (this.noterecordrhythm.item.compare("1") == 0) {
 									selectedItem = "1";
 								} {
 									selectedItem = this.noterecordrhythm.item.copyRange(2,5);
 								};
+								if (this.showrhythm) {
+									rhythm = "_" ++ selectedItem;
+								};
 								if (triola) {
-									displaystring = displaystring ++ notename ++ "_" ++ selectedItem ++ "*2/3";
+									displaystring = displaystring ++ notename ++ rhythm ++ "*2/3";
 								} {
-									displaystring = displaystring ++ notename ++ "_" ++ selectedItem;
+									displaystring = displaystring ++ notename ++ rhythm;
 								}
 							} {
 								// if previous notes present already
@@ -77,6 +93,7 @@ ScProphetRev2LastPlayedNotesTracker {
 			}
 		);
 
+		MIDIdef((this.name++"noteofftracker").asSymbol).free;
 		MIDIdef.noteOff(
 			(this.name++"noteofftracker").asSymbol, {
 				| vel, noteNum, chan, src |
@@ -85,16 +102,16 @@ ScProphetRev2LastPlayedNotesTracker {
 		);
 	}
 
+	setShowMidiNums {
+		| val |
+		this.showmidinums.value_(val);
+	}
+
 	asView {
 		^View().layout_(this.asLayout);
 	}
 
 	asLayout {
-		this.notefield = TextField().string_("").enabled_(false);
-		this.noterecordrhythm = PopUpMenu().items_(["1", "1/2", "1/4", "1/8", "1/16" , "1/32", "1/64", "1/128"]);
-		this.noterecordmultiplier = PopUpMenu().items_(["normal", "triola"]);
-		this.preferflats = CheckBox().string_("Use flats").value_(false);
-		this.showmidinums = CheckBox().string_("Show midi numbers").value_(false);
 		^HLayout(
 			StaticText().string_("Last notes played"),
 			this.notefield,

@@ -31,6 +31,8 @@ ScProphetRev2TuningPane {
 	var <>selflistbutton;
 	var <>selfsendbutton;
 
+	var <>tracker;
+
 	var <>textview;
 
 	*new {
@@ -49,7 +51,41 @@ ScProphetRev2TuningPane {
 		this.prophet = prophet;
 		this.builder = builder;
 		this.nrpntable = nrpntable;
+		this.tracker = ScProphetRev2LastPlayedNotesTracker.new(this.prophet, "Tune");
+		this.tracker.setShowMidiNums(true);
+		this.tracker.showrhythm_(false);
+		this.tracker.updateMidiHandlers; // need to refresh the midi handlers as they are different if showrhythm is false
 		^this
+	}
+
+	pr_getDisplayText {
+		| keytofreq, keytodeg, keytocents, colorregions |
+		var displaytext = "";
+		128.do({
+			|i|
+			if (keytofreq[i].notNil) {
+				if (keytofreq[i].notNil) {
+					var midinum = keytofreq[i].cpsmidi;
+					var colorneeded = ((midinum < 0) || (midinum > 127));
+					if  (colorneeded) {
+						colorregions = colorregions.add([displaytext.size]);
+					};
+					if (keytodeg.notNil && keytocents.notNil) {
+						displaytext = displaytext ++ i ++ ":\t " ++ keytofreq[i].asStringPrec(8) ++ "\t\t midi number: " ++ "\t " ++ midinum.asStringPrec(8) ++ "\t\t mapped degree: " ++ keytodeg[i] ++ "\t cents for degree: " ++ keytocents[i] ++ "\n";
+					} {
+						displaytext = displaytext ++ i ++ ":\t " ++ keytofreq[i].asStringPrec(8) ++ "\t\t midi number: " ++ "\t " ++ midinum.asStringPrec(8) ++ "\n"
+					};
+					if (colorneeded) {
+						colorregions[colorregions.size-1] = colorregions[colorregions.size-1].add(displaytext.size);
+					};
+				} {
+					displaytext = displaytext ++ i ++ ":\t ------\n";
+				};
+			}{
+				displaytext = displaytext ++ i ++ ":\t ------\n";
+			};
+		});
+		^(\txt:displaytext, \regions:colorregions);
 	}
 
 	asView {
@@ -177,6 +213,8 @@ ScProphetRev2TuningPane {
 				var tuneindex = this.controls[\control_tuning].value;
 				var tunename = this.tunename.value;
 				var keytofreq;
+				var keytodeg;
+				var keytocents;
 				if (sclpath.isNil || (sclpath.compare("") == 0) || File.exists(sclpath).not) {
 					"No valid scl file specified. Fallback to default.".warn;
 					sclpath = nil;
@@ -187,31 +225,12 @@ ScProphetRev2TuningPane {
 				};
 				calc.load(sclpath, kbmpath);
 				keytofreq = calc.keyToFreq;
+				keytodeg = calc.keyToDeg;
+				keytocents = calc.keyToCents;
 				if (keytofreq.notNil) {
-					var displaytext = "";
-					var colorregions = [];
-					128.do({
-						|i|
-						if (keytofreq[i].notNil) {
-							if (keytofreq[i].notNil) {
-								var midinum = keytofreq[i].cpsmidi;
-								var colorneeded = ((midinum < 0) || (midinum > 127));
-								if  (colorneeded) {
-									colorregions = colorregions.add([displaytext.size]);
-								};
-								displaytext = displaytext ++ i ++ ":\t " ++ keytofreq[i].asStringPrec(10) ++ "\t midi number: " ++ "\t " ++ midinum.asStringPrec(10) ++ "\n";
-								if (colorneeded) {
-									colorregions[colorregions.size-1] = colorregions[colorregions.size-1].add(displaytext.size);
-								};
-							} {
-								displaytext = displaytext ++ i ++ ":\t ------\n";
-							};
-						}{
-							displaytext = displaytext ++ i ++ ":\t ------\n";
-						};
-					});
-					this.textview.string_(displaytext);
-					colorregions.do({
+					var result = this.pr_getDisplayText(keytofreq, keytodeg, keytocents);
+					this.textview.string_(result[\txt]);
+					result[\regions].do({
 						|reg|
 						this.textview.setStringColor(Color.blue, reg[0], reg[1]-reg[0]);
 					});
@@ -235,30 +254,9 @@ ScProphetRev2TuningPane {
 				this.selfrefnote.value.asString,
 				this.selfreffreq.value.asFloat);
 			var keytofreq = ec.keyToFreq;
-			var displaytext = "";
-			var colorregions = [];
-			128.do({
-				|i|
-				if (keytofreq[i].notNil) {
-					if (keytofreq[i].notNil) {
-						var midinum = keytofreq[i].cpsmidi;
-						var colorneeded = ((midinum < 0) || (midinum > 127));
-						if  (colorneeded) {
-							colorregions = colorregions.add([displaytext.size]);
-						};
-						displaytext = displaytext ++ i ++ ":\t " ++ keytofreq[i].asStringPrec(10) ++ "\t midi number: " ++ "\t " ++ midinum.asStringPrec(10) ++ "\n";
-						if (colorneeded) {
-							colorregions[colorregions.size-1] = colorregions[colorregions.size-1].add(displaytext.size);
-						};
-					} {
-						displaytext = displaytext ++ i ++ ":\t ------\n";
-					};
-				}{
-					displaytext = displaytext ++ i ++ ":\t ------\n";
-				};
-			});
-			this.textview.string_(displaytext);
-			colorregions.do({
+			var result = this.pr_getDisplayText(keytofreq, nil, nil);
+			this.textview.string_(result[\txt]);
+			result[\regions].do({
 				|reg|
 				this.textview.setStringColor(Color.blue, reg[0], reg[1]-reg[0]);
 			});
@@ -380,6 +378,9 @@ ScProphetRev2TuningPane {
 				),
 				HLayout(
 					this.textview;
+				),
+				HLayout(
+					this.tracker
 				)
 			)
 		);

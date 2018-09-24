@@ -324,6 +324,36 @@ ScalaCalculator {
 		^result;
 	}
 
+	keyToDeg {
+		var intermediate = this.calculateKeyToFreq;
+		var keys = intermediate.keys.asList.sort;
+		var result = ();
+		128.do({
+			| key |
+			if (intermediate[key].notNil) {
+				result[key] = intermediate[key][\mappeddegree];
+			} {
+				result[key] = nil;
+			};
+		});
+		^result;
+	}
+
+	keyToCents {
+		var intermediate = this.calculateKeyToFreq;
+		var keys = intermediate.keys.asList.sort;
+		var result = ();
+		128.do({
+			| key |
+			if (intermediate[key].notNil) {
+				result[key] = intermediate[key][\cents];
+			} {
+				result[key] = nil;
+			};
+		});
+		^result;
+	}
+
 	pr_toRatio {
 		| spec |
 		var ratio;
@@ -454,8 +484,10 @@ ScalaCalculator {
 				if (val_cents.notNil) {
 					var relcents = val_cents - ref_cents + ((val_oct + reloctavecompensation)*oct_cents);
 					keytofreq[value][\freq] = reffreq*this.pr_centToRatio(relcents);
+					keytofreq[value][\mappeddegree] = mappeddegrees[(value-firstdegree0).mod(this.kbmInfo[\mapsize])];
 				} {
 					keytofreq[value][\freq] = nil;
+					keytofreq[value][\mappeddegree] = mappeddegrees[(value-firstdegree0).mod(this.kbmInfo[\mapsize])];
 				};
 			};
 		});
