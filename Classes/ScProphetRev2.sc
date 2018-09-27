@@ -34,6 +34,7 @@ ScProphetRev2 {
     var <>pan_mode;
     var <>foot_assign;
     var <>layer_mode;
+    var <>fx_sync_rate;
     var <>tunings;
     var <>pressure_curve;
     var <>velocity_curve;
@@ -131,6 +132,7 @@ ScProphetRev2 {
         this.pressure_curve = ["Pressure Curve 1", "Pressure Curve 2", "Pressure Curve 3", "Pressure Curve 4"];
         this.velocity_curve = ["Velocity Curve 1", "Velocity Curve 2", "Velocity Curve 3", "Velocity Curve 4",
             "Velocity Curve 5", "Velocity Curve 6", "Velocity Curve 7", "Velocity Curve 8"];
+        this.fx_sync_rate = ["16th", "16th dot", "8th triplet", "8th", "8th dot", "quarter triplet", "quarter", "quarter dot", "half", "half dot", "whole"];
         this.rev2_nrpn = Dictionary.newFrom([
             0 : (\layer:"A", \min:0, \max:120, \name:"Osc 1 Freq", \hint:this.note_name, \sysexpos:0),
             2048 : (\layer:"B", \min:0, \max:120, \name:"Osc 1 Freq", \hint:this.note_name, \sysexpos:1024),
@@ -368,6 +370,8 @@ ScProphetRev2 {
             2205 : (\layer:"B", \min:0, \max:127, \name:"FX param 2", \sysexpos:1143),
             158 : (\layer:"A", \min:0, \max:1, \name:"FX clock sync", \hint:this.off_on, \sysexpos:120),
             2206 : (\layer:"B", \min:0, \max:1, \name:"FX clock sync", \hint:this.off_on, \sysexpos:1144),
+            159 : (\layer:"A", \min:0, \max:1, \name:"FX sync rate", \hint:this.fx_sync_rate, \sysexpos:121),
+            2207 : (\layer:"B", \min:0, \max:1, \name:"FX sync rate", \hint:this.fx_sync_rate, \sysexpos:1145),
             163 : (\layer:"A", \min:0, \max:2, \name:"A/B Mode", \hint:this.ab_mode, \sysexpos:231),
             164 : (\layer:"A", \min:0, \max:1, \name:"Seq Start/Stop"),
             2212 : (\layer:"B", \min:0, \max:1, \name:"Seq Start/Stop"),
@@ -2071,8 +2075,9 @@ ScProphetRev2 {
             1043 : (\layer:"A", \min:128, \max:255, \name:"Seq Step 1-64 Velocity 6 (step 64)", \sysexpos:1023),
             3091 : (\layer:"B", \min:128, \max:255, \name:"Seq Step 1-64 Velocity 6 (step 64)", \sysexpos:2047),
 
-            1088 : (\layer:"A", \min:0, \max:1, \name:"Seq Play/Stop"),
-            //3136 : (\layer:"B", \min:0, \max:1, \name:"Seq Play/Stop"), //???
+            4188 : (\layer: "GLOBAL", \min:0, \max:1, \name:"SEQ On/Off", \hint:this.off_on, \sysexpos:nil), // only nrpn, no sysex?
+            4192 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Record mode", \hint:this.off_on, \sysexpos:nil), // only nrpn, no sysex?
+
             16383: (\layer:"A", \min:0, \max:1, \name:"Seq Rec On/Off"),
 
             // the following NRPNs are fake, just to give the characters a place to live in the data structure
@@ -2147,7 +2152,6 @@ ScProphetRev2 {
             4125 : (\layer: "GLOBAL", \min:0, \max:1, \name:"MIDI Prog Send", \hint:this.off_on, \sysexpos:26),
             4126 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Save Edit B", \hint:this.off_on, \sysexpos:27),
             4190 : (\layer: "GLOBAL", \min:0, \max:1, \name:"Layer A/B Switch", \hint:this.layer_mode),
-
         ]);
         this.sysex_bytepos = Dictionary.newFrom([
             0 : (\name:"Osc 1 Freq", \nrpn:0),
@@ -2392,8 +2396,8 @@ ScProphetRev2 {
             1143 : (\name:"FX param 2", \nrpn:2205),
             120 : (\name:"FX clock sync", \nrpn:158),
             1144 : (\name:"FX clock sync", \nrpn:2206),
-            121 : (\name:"FX sync rate", \key:1.neg),
-            1145 : (\name:"FX sync rate", \key:1.neg),
+            121 : (\name:"FX sync rate", \nrpn:159),
+            1145 : (\name:"FX sync rate", \nrpn:2207),
             122 : (\name:"Keyboard Mode", \nrpn:170),
             1146 : (\name:"Keyboard Mode", \nrpn:2218),
             123 : (\name:"Unison on/off", \nrpn:168),
@@ -2402,14 +2406,14 @@ ScProphetRev2 {
             1148 : (\name:"Unison Mode", \nrpn:2217),
             125 : (\key:1.neg, \name:"UNISON Unused"),
             1149 : (\key:1.neg, \name:"UNISON Unused"),
-            126 : (\key:1.neg, \name:"UNISON note 1"),
-            1150 : (\key:1.neg, \name:"UNISON note 1"),
-            127 : (\key:1.neg, \name:"UNISON note 2"),
-            1151 : (\key:1.neg, \name:"UNISON note 2"),
-            128 : (\key:1.neg, \name:"UNISON note 3"),
-            1152 : (\key:1.neg, \name:"UNISON note 3"),
-            129 : (\key:1.neg, \name:"UNISON note 4"),
-            1153 : (\key:1.neg, \name:"UNISON note 4"),
+            126 : (\key:1.neg, \name:"UNISON chord note 1"),
+            1150 : (\key:1.neg, \name:"UNISON chord note 1"),
+            127 : (\key:1.neg, \name:"UNISON chord note 2"),
+            1151 : (\key:1.neg, \name:"UNISON chord note 2"),
+            128 : (\key:1.neg, \name:"UNISON chord note 3"),
+            1152 : (\key:1.neg, \name:"UNISON chord note 3"),
+            129 : (\key:1.neg, \name:"UNISON chord note 4"),
+            1153 : (\key:1.neg, \name:"UNISON chord note 4"),
             130 : (\name:"BPM Tempo", \nrpn:179),
             1154 : (\name:"BPM Tempo", \nrpn:2227),
             131 : (\name:"Clock Divide", \nrpn:175),
@@ -2424,12 +2428,12 @@ ScProphetRev2 {
             1159 : (\name:"Arp. Relatch", \nrpn:2226),
             136 : (\name:"Arp. on/off", \nrpn:172),
             1160 : (\name:"Arp. on/off", \nrpn:2220),
-            137 : (\key:1.neg, \name:"SEQ On/Off"),
+            137 : ( \key:1.neg, \name:"SEQ On/Off"),
             1161 : (\key:1.neg, \name:"SEQ On/Off"),
             138 : (\name:"Gated Seq. Mode", \nrpn:182),
             1162 : (\name:"Gated Seq. Mode", \nrpn:2230),
-            139 : (\name:"Gated Seq. type", \nrpn:183),
-            1163 : (\name:"Gated Seq. type", \nrpn:2231),
+            139 : (\name:"Gated Seq. on/off", \nrpn:183),
+            1163 : (\name:"Gated Seq. on/off", \nrpn:2231),
             140 : (\name:"Gated Seq Track 1 Step 1-16 (step 1)", \nrpn:192),
             1164 : (\name:"Gated Seq Track 1 Step 1-16 (step 1)", \nrpn:2240),
             141 : (\name:"Gated Seq Track 1 Step 1-16 (step 2)", \nrpn:193),
