@@ -4252,7 +4252,7 @@ ScProphetRev2 {
         };
         MIDIClient.destinations.do({
             |el, idx|
-            if ((el.name == "Rev2 MIDI 1"), {
+            if ((el.name == name), {
                 ("connecting to midi endpoint "++el.name).postln;
                 found = true;
                 midi_out = MIDIOut.newByName("Rev2", el.name).latency_(Server.default.latency);
