@@ -4245,17 +4245,17 @@ ScProphetRev2 {
     }
 
     connect {
-        | name = "Rev2 MIDI 1"|
+        | device="Rev2", name = "Rev2 MIDI 1"|
         var found = false;
         if (MIDIClient.initialized.not) {
             MIDIClient.init;
         };
         MIDIClient.destinations.do({
             |el, idx|
-            if ((el.name == name), {
+            if ((el.name.debug("check midi endpoint looking for %".format(name)) == name), {
                 ("connecting to midi endpoint "++el.name).postln;
                 found = true;
-                midi_out = MIDIOut.newByName("Rev2", el.name).latency_(Server.default.latency);
+                midi_out = MIDIOut.newByName(device, el.name).latency_(Server.default.latency);
             });
         });
         if (found.not) {
