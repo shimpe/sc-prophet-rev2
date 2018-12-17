@@ -29,7 +29,13 @@ METHOD:: connect
 Before we can talk to the HW synth, first contact needs to be established.
 Connect will do that.
 
+ARGUMENT:: device
+
+device corresponds to the first part of a MIDIClient.destinations element
+
 ARGUMENT:: name
+
+name corresponds to the second part of a MIDIClient.destinations element
 
 returns:: a connected ScProphetRev2
 
