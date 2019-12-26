@@ -4714,7 +4714,7 @@ ScProphetRev2 {
                     // amen
                     firstbyte = closest_semitone.asInteger;
                     difference_cents = difference*100;
-                    diff_mts = difference_cents.linlin(0, 100, 0, 2.pow(14)-1).round(1).asInt;
+                    diff_mts = difference_cents.linlin(0, 100, 0, 2.pow(14)-1).round(1).asInteger;
                     secondbyte = (diff_mts >> 7);
                     thirdbyte = (diff_mts & 127);
                     sysexdata = sysexdata.add(firstbyte);

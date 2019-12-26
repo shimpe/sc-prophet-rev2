@@ -1,7 +1,7 @@
 (
   name: "ScProphetRev2",
   summary: "Quark to talk to prophet rev2 hardware synthesizer",
-  version: "0.0.1",
+  version: "0.0.2",
   schelp: "ScProphetRev2.schelp",
   license: "GPL",
   dependencies: ["Panola", "TemporalDict", "wslib"],

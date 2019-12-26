@@ -198,7 +198,7 @@ ScProphetRev2Studio {
                                     var layer = lay_control_value[0].stripWhiteSpace;
                                     var key = lay_control_value[1].stripWhiteSpace.postln;
                                     var value = lay_control_value[2].stripWhiteSpace;
-                                    var val = value.asInt;
+                                    var val = value.asInteger;
                                     var symbolkey = key.asSymbol;
                                     if (key.find("plotter").isNil) {
                                         if (value.compare("false") == 0) {
@@ -211,7 +211,7 @@ ScProphetRev2Studio {
                                             this.controls[layer][symbolkey].valueAction_(val);
                                         }.defer;
                                     } {
-                                        var values = value.copyRange(1, value.size-2).split($,).collect({ |el| el.asInt;});
+                                        var values = value.copyRange(1, value.size-2).split($,).collect({ |el| el.asInteger;});
                                         {
                                             this.controls[layer][symbolkey]
                                             .value_(values)

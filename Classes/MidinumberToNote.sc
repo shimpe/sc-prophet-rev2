@@ -40,9 +40,9 @@ MidinumberToNote {
 	midinumber_to_notename {
 		| midinumber, prefer_flats=false |
 		if (prefer_flats.not) {
-			^midi_to_note[midinumber.asInt];
+			^midi_to_note[midinumber.asInteger];
 		} {
-			^midi_to_flat_note[midinumber.asInt];
+			^midi_to_flat_note[midinumber.asInteger];
 		};
 	}
 }

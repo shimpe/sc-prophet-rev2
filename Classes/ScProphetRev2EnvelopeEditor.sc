@@ -37,24 +37,24 @@ ScProphetRev2EnvelopeEditor {
 		this.envview.drawFunc_({
 			| uview |
 			this.draw_envelopes(uview, minx:0, maxx:uview.bounds.width, miny:0, maxy:uview.bounds.height, margin:10,
-				amp_dly:this.controls[\control_ampdelay].value.asInt,
-				amp_a:this.controls[\control_ampattack].value.asInt,
-				amp_d:this.controls[\control_ampdecay].value.asInt,
-				amp_s:this.controls[\control_ampsustain].value.asInt,
-				amp_r:this.controls[\control_amprelease].value.asInt,
-				amp_amt:this.controls[\control_ampenvamt].value.asInt,
-				lpf_dly:this.controls[\control_lpfdelay].value.asInt,
-				lpf_a:this.controls[\control_lpfattack].value.asInt,
-				lpf_d:this.controls[\control_lpfdecay].value.asInt,
-				lpf_s:this.controls[\control_lpfsustain].value.asInt,
-				lpf_r:this.controls[\control_lpfrelease].value.asInt,
-				lpf_amt:this.controls[\control_lpfenvamt].value.asInt,
-				aux_dly:this.controls[\control_auxdel].value.asInt,
-				aux_a:this.controls[\control_auxattack].value.asInt,
-				aux_d:this.controls[\control_auxdecay].value.asInt,
-				aux_s:this.controls[\control_auxsustain].value.asInt,
-				aux_r:this.controls[\control_auxrelease].value.asInt,
-				aux_amt:this.controls[\control_auxenvamt].value.asInt
+				amp_dly:this.controls[\control_ampdelay].value.asInteger,
+				amp_a:this.controls[\control_ampattack].value.asInteger,
+				amp_d:this.controls[\control_ampdecay].value.asInteger,
+				amp_s:this.controls[\control_ampsustain].value.asInteger,
+				amp_r:this.controls[\control_amprelease].value.asInteger,
+				amp_amt:this.controls[\control_ampenvamt].value.asInteger,
+				lpf_dly:this.controls[\control_lpfdelay].value.asInteger,
+				lpf_a:this.controls[\control_lpfattack].value.asInteger,
+				lpf_d:this.controls[\control_lpfdecay].value.asInteger,
+				lpf_s:this.controls[\control_lpfsustain].value.asInteger,
+				lpf_r:this.controls[\control_lpfrelease].value.asInteger,
+				lpf_amt:this.controls[\control_lpfenvamt].value.asInteger,
+				aux_dly:this.controls[\control_auxdel].value.asInteger,
+				aux_a:this.controls[\control_auxattack].value.asInteger,
+				aux_d:this.controls[\control_auxdecay].value.asInteger,
+				aux_s:this.controls[\control_auxsustain].value.asInteger,
+				aux_r:this.controls[\control_auxrelease].value.asInteger,
+				aux_amt:this.controls[\control_auxenvamt].value.asInteger
 			);
 		});
 

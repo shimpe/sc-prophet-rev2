@@ -80,7 +80,7 @@ ScProphetRev2GatedSequenceEditor {
 		keystore[plotkey] = {gSEQSTEPS.collect({
 			|step|
 			this.patchdumper.init(prophet.rev2, prophet.last_sysex_stream);
-			this.patchdumper.lut(nrpn+step, 0, 127, norange:true, midivalue:true, includeunit:false).asInt;
+			this.patchdumper.lut(nrpn+step, 0, 127, norange:true, midivalue:true, includeunit:false).asInteger;
 		})};
 
 		specstore[plotkey] = (\type:\plot, \nrpn:nrpn, \steps:gSEQSTEPS, \specs:ControlSpec(0, 127, \lin, 1, 0, "steps"), \domainspecs:ControlSpec(0, 15, \lin, 1, 0, "steps"), \prophet:prophet);
@@ -97,7 +97,7 @@ ScProphetRev2GatedSequenceEditor {
 			|plotter, plotIndex, i, value |
 			{
 				var finalnrpn = nrpn + i;
-				prophet.sendNRPN(finalnrpn, value.round(1).asInt);
+				prophet.sendNRPN(finalnrpn, value.round(1).asInteger);
 				controls[plotkey].interactionView.refresh;
 			}.defer;
 		}).setProperties(\plotColor, Color.blue);

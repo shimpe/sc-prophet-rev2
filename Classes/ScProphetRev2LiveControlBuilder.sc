@@ -13,7 +13,7 @@ ScProphetRev2LiveControlBuilder {
 		//("make checkbox: "++label).postln;
 		keystore[finalkey] = {
 			patchdumper.init(prophet.rev2, prophet.last_sysex_stream);
-			patchdumper.lut(nrpn, 0, 1, norange:true, midivalue:true, includeunit:false).asInt;
+			patchdumper.lut(nrpn, 0, 1, norange:true, midivalue:true, includeunit:false).asInteger;
 		};
 		//("looked up initial value").postln;
 		controlspecstore[finalkey] = (\type:\checkbox, \nrpn:nrpn);
@@ -41,7 +41,7 @@ ScProphetRev2LiveControlBuilder {
 		//("set up keys").postln;
 		keystore[combokey] = {
 			patchdumper.init(prophet.rev2, prophet.last_sysex_stream);
-			patchdumper.lut(nrpn, 0, 127, norange:true, midivalue:true, includeunit:false).asInt;
+			patchdumper.lut(nrpn, 0, 127, norange:true, midivalue:true, includeunit:false).asInteger;
 		};
 		//("looked up initial value").postln;
 		controlspecstore[combokey] = (\type:\combo, \items:items, \nrpn:nrpn);
@@ -94,27 +94,27 @@ ScProphetRev2LiveControlBuilder {
 		var default;
 		keystore[textfieldkey] = {
 			patchdumper.init(prophet.rev2, prophet.last_sysex_stream);
-			patchdumper.lut(nrpn, 0, -1, norange:true, midivalue:false, includeunit:false).asInt;
+			patchdumper.lut(nrpn, 0, -1, norange:true, midivalue:false, includeunit:false).asInteger;
 		};
 		controlspecstore[textfieldkey] = (\type:\textfield, \min:min, \max:max, \nrpn:nrpn, \nrpnoffset:nrpnoffset);
 		default = keystore[textfieldkey].();
 		controls[labelkey] = StaticText.new(parent, Rect()).string_(label);
 		controls[textfieldkey] = TextField.new(parent, Rect()).action_({
 			| combo |
-			if ((combo.value.asInt) < (min.asInt)) {
-				combo.value_(min.asInt);
+			if ((combo.value.asInteger) < (min.asInteger)) {
+				combo.value_(min.asInteger);
 			};
-			if ((combo.value.asInt) > (max.asInt)) {
-				combo.value_(max.asInt);
+			if ((combo.value.asInteger) > (max.asInteger)) {
+				combo.value_(max.asInteger);
 			};
 			{
-				prophet.sendNRPN(nrpn, combo.value.asInt+nrpnoffset);
-				if (delegationcontrols[textfieldkey].notNil) { controls[delegationcontrols[textfieldkey]].value_(combo.value.asInt); parent.refresh;};
+				prophet.sendNRPN(nrpn, combo.value.asInteger+nrpnoffset);
+				if (delegationcontrols[textfieldkey].notNil) { controls[delegationcontrols[textfieldkey]].value_(combo.value.asInteger); parent.refresh;};
 			}.defer;
 		}).value_(default);
 		prophet.makeNRPNResponder(nrpn, {
 			| value, nrpn |
-			{ controls[textfieldkey].value_(value.asInt-nrpnoffset); }.defer;
+			{ controls[textfieldkey].value_(value.asInteger-nrpnoffset); }.defer;
 		});
 		^controls[textfieldkey];
 	}
@@ -133,11 +133,11 @@ ScProphetRev2LiveControlBuilder {
 		};
 		controls[ownkey] = TextField.new(parent, Rect()).action_({
 			| tfield |
-			if ((tfield.value.asInt) < (min.asInt)) {
-				tfield.value_(min.asInt);
+			if ((tfield.value.asInteger) < (min.asInteger)) {
+				tfield.value_(min.asInteger);
 			};
-			if ((tfield.value.asInt) > (max.asInt)) {
-				tfield.value_(max.asInt);
+			if ((tfield.value.asInteger) > (max.asInteger)) {
+				tfield.value_(max.asInteger);
 			};
 			{
 				controls[textfieldkey].valueAction_(tfield.value);
@@ -147,7 +147,7 @@ ScProphetRev2LiveControlBuilder {
 		prophet.makeNRPNResponder(nrpn, {
 			| value, nrpn |
 			{
-				controls[ownkey].value_(value.asInt-nrpnoffset);
+				controls[ownkey].value_(value.asInteger-nrpnoffset);
 				parent.refresh;
 			}.defer;
 		});
@@ -179,7 +179,7 @@ ScProphetRev2LiveControlBuilder {
 				};
 				if (spec[\type] == \combo) {
 					if (0.3.coin) {
-						var oldvalue = controls[controlkey].value.asInt;
+						var oldvalue = controls[controlkey].value.asInteger;
 						var perturbation = (-3).rrand(3);
 						var finalvalue = oldvalue + perturbation;
 						if (finalvalue < 0) {
@@ -193,7 +193,7 @@ ScProphetRev2LiveControlBuilder {
 				};
 				if (spec[\type] == \textfield) {
 					if (0.3.coin) {
-						var oldvalue = controls[controlkey].value.asInt;
+						var oldvalue = controls[controlkey].value.asInteger;
 						var perturbation = (3.neg).rrand(3);
 						var finalvalue = oldvalue + perturbation;
 						if (finalvalue < spec[\min]) {
@@ -206,7 +206,7 @@ ScProphetRev2LiveControlBuilder {
 					};
 				};
 				if (spec[\type] == \plot) {
-					var oldvalue = controls[controlkey].value.collect({ |el| el.asInt; });
+					var oldvalue = controls[controlkey].value.collect({ |el| el.asInteger; });
 					var newvalue = oldvalue.collect({
 						|old|
 						var proposed =  old;
@@ -220,7 +220,7 @@ ScProphetRev2LiveControlBuilder {
 						newvalue.do({
 							| value, i |
 							var finalnrpn = spec[\nrpn] + i;
-							spec[\prophet].sendNRPN(finalnrpn, value.round(1).asInt);
+							spec[\prophet].sendNRPN(finalnrpn, value.round(1).asInteger);
 						});
 						controls[controlkey].value_(newvalue);
 						controls[controlkey].interactionView.refresh;
@@ -257,7 +257,7 @@ ScProphetRev2LiveControlBuilder {
 						newvalue.do({
 							| value, i |
 							var finalnrpn = spec[\nrpn] + i;
-							spec[\prophet].sendNRPN(finalnrpn, value.round(1).asInt);
+							spec[\prophet].sendNRPN(finalnrpn, value.round(1).asInteger);
 						});
 						controls[controlkey].value_(newvalue);
 						controls[controlkey].interactionView.refresh;
@@ -308,7 +308,7 @@ ScProphetRev2LiveControlBuilder {
 			| menu |
 			{
 				var period = controls[groupperiodtfieldkey].value.asFloat;
-				var actiontype = menu.value.asInt;
+				var actiontype = menu.value.asInteger;
 				Tdef(tkey, {
 					loop {
 						if (period <= 0) {
@@ -330,7 +330,7 @@ ScProphetRev2LiveControlBuilder {
 			| textfield |
 			{
 				var period = textfield.value.asFloat;
-				var actiontype = controls[groupoptionskey].value.asInt;
+				var actiontype = controls[groupoptionskey].value.asInteger;
 				Tdef(tkey, {
 					loop {
 						if (period <= 0) {

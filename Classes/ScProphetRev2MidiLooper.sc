@@ -107,7 +107,7 @@ ScProphetRev2MidiLooper {
 						var dur = pan.totalDuration;
 						var midipattern, withnrpnpattern;
 						this.durationtextfields[i].value_(dur.round(1e-4));
-						midipattern = pan.asMidiPbind(this.prophet.midi_out, this.midichannelctrls[i].value.asInt);
+						midipattern = pan.asMidiPbind(this.prophet.midi_out, this.midichannelctrls[i].value.asInteger);
 						withnrpnpattern = Pbindf(midipattern,
 							\nrpntype, pan.customPropertyPatternArgs("nrpn"),
 							\sendnrpn, Pfunc({
@@ -118,8 +118,8 @@ ScProphetRev2MidiLooper {
 											this.nrpncache[event[\nrpntype]] = event[\nrpn];
 											this.prophet.sendNRPN(this.nrpntable.str2num(event[\nrpntype][0].asSymbol,
 												event[\nrpntype][1]),
-											event[\nrpn].asInt,
-											this.midichannelctrls[i].value.asInt);
+											event[\nrpn].asInteger,
+											this.midichannelctrls[i].value.asInteger);
 
 										};
 								}}.defer;
@@ -139,26 +139,26 @@ ScProphetRev2MidiLooper {
 		this.ffield = TextField().string_("5").action_({
 			| tfield |
 			if (tfield.value > 4) {
-				this.prophet.select_patch_by_id(bank:"F"++(tfield.value.asInt-4).asString,
+				this.prophet.select_patch_by_id(bank:"F"++(tfield.value.asInteger-4).asString,
 					name:"P"++this.pfield.value,
-					channel:this.midichannelctrls[0].value.asInt);
+					channel:this.midichannelctrls[0].value.asInteger);
 			} {
 				this.prophet.select_patch_by_id(bank:"U"++tfield.value,
 					name:"P"++this.pfield.value,
-					channel:this.midichannelctrls[0].value.asInt);
+					channel:this.midichannelctrls[0].value.asInteger);
 			};
 		});
 
 		this.pfield = TextField().string_("27").action_({
 			| tfield |
 			if (ffield.value > 4) {
-				this.prophet.select_patch_by_id(bank:"F"++(this.ffield.value.asInt-4).asString,
+				this.prophet.select_patch_by_id(bank:"F"++(this.ffield.value.asInteger-4).asString,
 					name:"P"++tfield.value,
-					channel:this.midichannelctrls[0].value.asInt);
+					channel:this.midichannelctrls[0].value.asInteger);
 			} {
 				this.prophet.select_patch_by_id(bank:"U"++this.ffield.value,
 					name:"P"++tfield.value,
-					channel:this.midichannelctrls[0].value.asInt);
+					channel:this.midichannelctrls[0].value.asInteger);
 		};	});
 
 		this.layout = [
@@ -219,7 +219,7 @@ ScProphetRev2MidiLooper {
 								if (c.find("mute").notNil) {
 									var idxoffsetstart = offset + ("/*mute ".size);
 									var idxoffsetstop = (c.size - c.find("*/"));
-									var idx = c.drop(idxoffsetstart).drop(idxoffsetstop.neg).asInt;
+									var idx = c.drop(idxoffsetstart).drop(idxoffsetstop.neg).asInteger;
 									var value = c.keep(offset);
 									{this.mutecheckboxes[idx].valueAction_(false);}.defer;
 									if (value.find("true").notNil) {
@@ -231,14 +231,14 @@ ScProphetRev2MidiLooper {
 								if (c.find("midi channel ").notNil) {
 									var idxoffsetstart = offset + ("/*midi channel ".size);
 									var idxoffsetstop = (c.size - c.find("*/"));
-									var idx = c.drop(idxoffsetstart).drop(idxoffsetstop.neg).asInt;
+									var idx = c.drop(idxoffsetstart).drop(idxoffsetstop.neg).asInteger;
 									var value = c.keep(offset);
 									{ this.midichannelctrls[idx].valueAction_(value); }.defer;
 								};
 								if (c.find("panola spec ").notNil) {
 									var idxoffsetstart = offset + ("/*panola spec ".size);
 									var idxoffsetstop = (c.size - c.find("*/"));
-									var idx = c.drop(idxoffsetstart).drop(idxoffsetstop.neg).asInt;
+									var idx = c.drop(idxoffsetstart).drop(idxoffsetstop.neg).asInteger;
 									var value = c.keep(offset);
 									{ this.textfields[idx].valueAction_(value); }.defer;
 								};

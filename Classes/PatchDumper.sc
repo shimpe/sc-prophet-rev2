@@ -39,10 +39,10 @@ PatchDumper {
 				if (this.rev2[constant+offset][\hint].notNil) {
 					var value = this.rev2[constant+offset][\curval] & mask;
 					if (value > this.rev2[constant+offset][\max]) {
-						var closestpoweroftwo = this.rev2[constant+offset][\curval].asInt.log2.floor;
+						var closestpoweroftwo = this.rev2[constant+offset][\curval].asInteger.log2.floor;
 						var mask = 2.pow(closestpoweroftwo)-1;
 						if (mask > 0) {
-							value = (this.rev2[constant+offset][\curval].asInt) & mask.asInt;
+							value = (this.rev2[constant+offset][\curval].asInteger) & mask.asInteger;
 						};
 					};
 					if (this.rev2[constant+offset][\hint][value].isNil) {
@@ -57,15 +57,15 @@ PatchDumper {
 					}
 				} {
 					var unit = "";
-					var value = this.rev2[constant+offset][\curval].asInt;
+					var value = this.rev2[constant+offset][\curval].asInteger;
 					if (this.rev2[constant+offset][\unit].notNil) {
 						unit = this.rev2[constant+offset][\unit];
 					};
 					if (value > this.rev2[constant+offset][\max]) {
-						var closestpoweroftwo = this.rev2[constant+offset][\curval].asInt.log2.floor;
+						var closestpoweroftwo = this.rev2[constant+offset][\curval].asInteger.log2.floor;
 						var mask = 2.pow(closestpoweroftwo)-1;
 						if (mask > 0) {
-							value = (this.rev2[constant+offset][\curval].asInt) & mask.asInt;
+							value = (this.rev2[constant+offset][\curval].asInteger) & mask.asInteger;
 						};
 					};
 					if (midivalue.not) {
@@ -87,7 +87,7 @@ PatchDumper {
 									}
 								} {
 									//("BEFORE SIGN: "++value).postln;
-									value = value - (this.rev2[constant+offset][\max]/2).ceil.asInt;
+									value = value - (this.rev2[constant+offset][\max]/2).ceil.asInteger;
 									//("AFTER SIGN: "++value++" (max is "++ this.rev2[constant+offset][\max] ++")").postln;
 								}
 							};
@@ -509,17 +509,17 @@ PatchDumper {
 				notes = 64.collect({
 					| j |
 					var nrpn = (cSEQ1_POLY_NOTE1_STEP1 + (i*(64+64)) + j);
-					if ((this.lut(nrpn, offset, norange:true).asInt & 128) != 0) {
-						notenames[(this.lut(nrpn, offset, norange:true).asInt & 127).asInt]++"_";
+					if ((this.lut(nrpn, offset, norange:true).asInteger & 128) != 0) {
+						notenames[(this.lut(nrpn, offset, norange:true).asInteger & 127).asInteger]++"_";
 					} {
-						notenames[(this.lut(nrpn, offset, norange:true).asInt)]++" ";
+						notenames[(this.lut(nrpn, offset, norange:true).asInteger)]++" ";
 					};
 				});
 				velocities = 64.collect({
 					| j |
 					var nrpn = (cSEQ1_POLY_NOTE1_VEL1 + (i*(64+64)) + j);
-					if ((this.lut(nrpn, offset, norange:true).asInt & 128) != 0) {
-						(this.lut(nrpn, offset, norange:true).asInt & 127);
+					if ((this.lut(nrpn, offset, norange:true).asInteger & 128) != 0) {
+						(this.lut(nrpn, offset, norange:true).asInteger & 127);
 					} {
 						"--";
 					};

@@ -112,7 +112,7 @@ ScProphetRev2Arpeggiator {
 												var pan = Panola.new(score);
 												var dur = pan.totalDuration;
 												var pat;
-												var midichannel = this.notecontrols[patternkey][trackkey][\midichannel].value.asInt;
+												var midichannel = this.notecontrols[patternkey][trackkey][\midichannel].value.asInteger;
 												var midipattern = pan.asMidiPbind(midiout, midichannel);
 												var transppat;
 												var withnrpnpattern = Pbindf(midipattern,
@@ -126,7 +126,7 @@ ScProphetRev2Arpeggiator {
 																	this.prophet.sendNRPN(this.nrpntable.str2num(
 																		event[\nrpntype][0].asSymbol,
 																		event[\nrpntype][1]),
-																	event[\nrpn].asInt,
+																	event[\nrpn].asInteger,
 																	midichannel);
 
 																};
