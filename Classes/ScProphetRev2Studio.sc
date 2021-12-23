@@ -233,7 +233,7 @@ ScProphetRev2Studio {
                 nil,
         ));
 
-        ^View().layout_(VLayout(this.tabrow, this.tablayout));
+        ^ScrollView().layout_(VLayout(this.tabrow, this.tablayout));
     }
 
 }
