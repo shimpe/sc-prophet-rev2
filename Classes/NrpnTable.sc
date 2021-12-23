@@ -130,6 +130,7 @@ NrpnTable {
 			'FX_PARAM1' : 156,
 			'FX_PARAM2' : 157,
 			'FX_CLKSYNC' : 158,
+			'FX_SYNCRATE' : 159,
 
 			'ABMODE' : 163,
 
